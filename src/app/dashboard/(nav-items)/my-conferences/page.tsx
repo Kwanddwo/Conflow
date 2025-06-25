@@ -22,7 +22,7 @@ export default function MyConferences() {
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            All Conferences
+            Your Conferences
           </h1>
         </div>
         <Card className="border-0 shadow-2xl bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
