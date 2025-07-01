@@ -1,13 +1,17 @@
+"use client";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+
 
 export default function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
-}) {
+  }) {
+  const { data: session, status } = useSession();
   return (
     <>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
@@ -20,9 +24,15 @@ export default function MarketingLayout({
               Sign Up
             </Button>
           </Link>
-          <Link href="/sign-in">
-            <Button className="cursor-pointer">Sign In</Button>
-          </Link>
+          {status === "authenticated" ? (
+            <Link href="/dashboard">
+              <Button className="cursor-pointer">Sign In</Button>
+            </Link>
+          ) : (
+            <Link href="/sign-in">
+              <Button className="cursor-pointer">Sign In</Button>
+            </Link>
+          )}
           <ModeToggle />
         </div>
       </header>

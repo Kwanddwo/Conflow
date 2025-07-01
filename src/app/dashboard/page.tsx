@@ -10,8 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Dasboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/sign-in");
+    }
+  }, [status, router]);
   const roles = [
     { conference: "CONF2024", role: "Chair", variant: "default" as const },
     { conference: "CONF2023", role: "Reviewer", variant: "secondary" as const },
