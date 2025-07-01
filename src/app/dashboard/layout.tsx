@@ -1,9 +1,10 @@
+"use client";
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/ui/modeToggle';
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react'
-
 function DashboardLayout({children}: {children: React.ReactNode}) {
   return (
     <>
@@ -44,13 +45,16 @@ function DashboardLayout({children}: {children: React.ReactNode}) {
           </Link>
         </nav>
         <div className="flex gap-4">
-          <Link href="/sign-out">
-            <Button className="cursor-pointer">Sign Out</Button>
-          </Link>
+          <Button
+            className="cursor-pointer"
+            onClick={() => signOut({ callbackUrl: "/sign-in" })}
+          >
+            Sign Out
+          </Button>
           <ModeToggle />
         </div>
-        </header>
-          { children }
+      </header>
+      {children}
     </>
   );
 }
