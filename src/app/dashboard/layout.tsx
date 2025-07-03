@@ -1,5 +1,6 @@
 "use client";
 import Logo from '@/components/Logo';
+import ProtectedPage from '@/components/ProtectedPage';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/ui/modeToggle';
 import { signOut } from 'next-auth/react';
@@ -7,7 +8,7 @@ import Link from 'next/link';
 import React from 'react'
 function DashboardLayout({children}: {children: React.ReactNode}) {
   return (
-    <>
+    <ProtectedPage>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
         <Link href="/dashboard">
           <Logo height={120} width={110} />
@@ -55,7 +56,7 @@ function DashboardLayout({children}: {children: React.ReactNode}) {
         </div>
       </header>
       {children}
-    </>
+    </ProtectedPage>
   );
 }
 
