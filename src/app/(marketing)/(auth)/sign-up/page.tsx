@@ -13,9 +13,11 @@ import { trpc } from "@/server/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TRPCClientError } from "@trpc/client";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import EmailVerificationTrigger from "../EmailVerificationTrigger";
 const registerSchema = z
   .object({
     firstName: z.string().min(1, "First name is required"),
@@ -30,6 +32,8 @@ const registerSchema = z
   })
 type RegisterFormData = z.infer<typeof registerSchema>;
 export default function SignUpForm() {
+  const [step, setStep] = useState<"register" | "verify">("register");
+  const [email, setEmail] = useState<string>("");
   const {
     register,
     handleSubmit,
@@ -52,6 +56,8 @@ export default function SignUpForm() {
       const result = await mutateAsync(data)
       console.log('Registered:', result.user)
       toast.success("Registered successfully");
+      setEmail(data.email);
+      setStep("verify");
     } catch (err) {
       const errorMessage =
         err instanceof TRPCClientError
@@ -62,7 +68,7 @@ export default function SignUpForm() {
       console.error("Registration failed:", err);
     }
   };
-  return (
+  const RegisterComponent = () => (
     <div className="min-h-[65vh] bg-[#f8fafc] flex items-center justify-center p-4">
       <div className="w-full max-w-xl bg-white p-8 rounded-lg shadow">
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -221,5 +227,11 @@ export default function SignUpForm() {
         </form>
       </div>
     </div>
+  )
+  return (
+    <>
+      {step === "register" && <RegisterComponent />}
+      {step === "verify" && <EmailVerificationTrigger email={email} from="sign-up"/>}
+    </>
   );
 }
