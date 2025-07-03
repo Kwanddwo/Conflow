@@ -8,8 +8,8 @@ const transporter = nodemailer.createTransport({
     pass: "zABVHXqOgMCLYJ7N",
   },
 });
-export async function sendMail(dest: string, token: string) {
-  const verificationURL = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email/${token}`;
+export async function sendMail(dest: string, token: string,from: string) {
+  const verificationURL = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email/${token}?from=${from}`;
   try {
     await transporter.sendMail({
       from: '"conflow" <aymanderrouich3@gmail.com',
