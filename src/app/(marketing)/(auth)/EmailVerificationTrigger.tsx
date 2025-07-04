@@ -12,7 +12,13 @@ import { trpc } from "@/server/client";
 import { Mail } from "lucide-react";
 import { useState } from "react";
 
-export default function EmailVerificationTrigger({ email,from }: { email: string,from : string }) {
+export default function EmailVerificationTrigger({
+  email,
+  from,
+}: {
+  email: string;
+  from: string;
+}) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const { mutate: sendVerificationEmail, isPending } =
@@ -33,7 +39,7 @@ export default function EmailVerificationTrigger({ email,from }: { email: string
       return;
     }
 
-    sendVerificationEmail({ email , from: from });
+    sendVerificationEmail({ email, from: from });
   }
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
@@ -64,7 +70,7 @@ export default function EmailVerificationTrigger({ email,from }: { email: string
               className="w-full cursor-pointer"
               disabled={isPending || sent}
             >
-              {isPending ? "Sending..." : "Verify your email"}
+              {isPending ? "Sending..." : "Send Verification Email"}
             </Button>
           </form>
         </CardContent>
