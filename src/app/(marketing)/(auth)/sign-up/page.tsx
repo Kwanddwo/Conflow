@@ -18,19 +18,21 @@ import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import EmailVerificationTrigger from "../EmailVerificationTrigger";
-const registerSchema = z
-  .object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    email: z
-      .string()
-      .min(1, "Email is Required")
-      .email("Please enter a valid email adress"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    country: z.string().min(1, "Country is required"),
-    affiliation: z.string().min(1, "Affiliation is required"),
-  })
+import { getData } from "country-list";
+
+const registerSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z
+    .string()
+    .min(1, "Email is Required")
+    .email("Please enter a valid email adress"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  country: z.string().min(1, "Country is required"),
+  affiliation: z.string().min(1, "Affiliation is required"),
+});
 type RegisterFormData = z.infer<typeof registerSchema>;
+
 export default function SignUpForm() {
   const [step, setStep] = useState<"register" | "verify">("register");
   const [email, setEmail] = useState<string>("");
@@ -50,11 +52,11 @@ export default function SignUpForm() {
       affiliation: "",
     },
   });
-  const { mutateAsync, isPending } = trpc.auth.register.useMutation()
+  const { mutateAsync, isPending } = trpc.auth.register.useMutation();
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const result = await mutateAsync(data)
-      console.log('Registered:', result.user)
+      const result = await mutateAsync(data);
+      console.log("Registered:", result.user);
       toast.success("Registered successfully");
       setEmail(data.email);
       setStep("verify");
@@ -85,9 +87,7 @@ export default function SignUpForm() {
               disabled={isSubmitting || isPending}
             />
             {errors.firstName && (
-              <p className="text-sm text-red-500">
-                {errors.firstName.message}
-              </p>
+              <p className="text-sm text-red-500">{errors.firstName.message}</p>
             )}
           </div>
 
@@ -104,9 +104,7 @@ export default function SignUpForm() {
               disabled={isSubmitting || isPending}
             />
             {errors.lastName && (
-              <p className="text-sm text-red-500">
-                {errors.lastName.message}
-              </p>
+              <p className="text-sm text-red-500">{errors.lastName.message}</p>
             )}
           </div>
 
@@ -123,9 +121,7 @@ export default function SignUpForm() {
               disabled={isSubmitting || isPending}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">
-                {errors.email.message}
-              </p>
+              <p className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
 
@@ -142,9 +138,7 @@ export default function SignUpForm() {
               disabled={isSubmitting || isPending}
             />
             {errors.password && (
-              <p className="text-sm text-red-500">
-                {errors.password.message}
-              </p>
+              <p className="text-sm text-red-500">{errors.password.message}</p>
             )}
             <p className="text-[#94a3b8] text-sm">
               Make sure your password has atleast 8 characters, and is a mix of
@@ -169,19 +163,23 @@ export default function SignUpForm() {
                   <SelectTrigger
                     ref={field.ref}
                     onBlur={field.onBlur}
-                    className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg text-[#94a3b8] focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
+                    className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
                   >
                     <SelectValue placeholder="Country/region" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="united states">United States</SelectItem>
-                    <SelectItem value="canada">Canada</SelectItem>
-                    <SelectItem value="united kingdom">United Kingdom</SelectItem>
-                    <SelectItem value="australia">Australia</SelectItem>
-                    <SelectItem value="germany">Germany</SelectItem>
-                    <SelectItem value="france">France</SelectItem>
-                    <SelectItem value="japan">Japan</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    {getData()
+                      .sort((a, b) =>
+                        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+                      )
+                      .map((country: { code: string; name: string }) => (
+                        <SelectItem
+                          key={country.code}
+                          value={country.code.toLowerCase()}
+                        >
+                          {country.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               )}
@@ -227,11 +225,13 @@ export default function SignUpForm() {
         </form>
       </div>
     </div>
-  )
+  );
   return (
     <>
       {step === "register" && <RegisterComponent />}
-      {step === "verify" && <EmailVerificationTrigger email={email} from="sign-up"/>}
+      {step === "verify" && (
+        <EmailVerificationTrigger email={email} from="sign-up" />
+      )}
     </>
   );
 }
