@@ -13,7 +13,22 @@ function Page() {
   const router = useRouter();
 
   const [status, setStatus] = useState<"idle" | "verifying" | "success" | "error">("idle");
-
+  const resetPassTokenMutation = trpc.auth.resetPassTokenVerification.useMutation({
+    onSuccess: (res) => {
+      if (res.success) {
+        toast.success("Token verified successfully!");
+        setStatus("success");
+        router.push(`/sign-in/forgot-password/reset-password/${res.userId}`);
+      } else {
+        toast.error("Invalid token.");
+        setStatus("error");
+      }
+    },
+    onError: () => {
+      toast.error("Verification failed.");
+      setStatus("error");
+    }
+  });
   const verifyMutation = trpc.auth.verifyEmailToken.useMutation({
     onSuccess: (res) => {
       if (res.success) {
@@ -42,7 +57,11 @@ function Page() {
       return;
     }
     setStatus("verifying");
-    verifyMutation.mutate({ token });
+    if (from === "forgot-password") {
+      resetPassTokenMutation.mutate({ token });
+    } else {
+      verifyMutation.mutate({ token });
+    }  
   }, [token]);
 
   const handleBackToHome = () => {
