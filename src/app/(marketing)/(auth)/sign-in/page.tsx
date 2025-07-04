@@ -14,10 +14,12 @@ import Link from "next/link";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react"; 
+import { getSession, signIn } from "next-auth/react"; 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import EmailVerificationTrigger from "../EmailVerificationTrigger";
 const loginSchema = z.object({
   email: z
     .string()
@@ -43,20 +45,31 @@ export default function LoginPage() {
     },
   });
   const router = useRouter();
+  const [step, setStep] = useState<"login" | "verify">("login");
+  const [email, setEmail] = useState<string>("");
   const onSubmit = async (data: LoginFormData) => {
     try {
+      setEmail(data.email);
       const res = await signIn('credentials', { email: data.email, password: data.password, redirect: false });
       if (res?.error) {
         toast.error("Invalid credentials. Please try again.");
       } else {
-        toast.success("Login successful");
-        router.push('/dashboard');
+        const session = await getSession();
+        const user = session?.user as { isVerified: boolean };
+      
+        if (!user?.isVerified) {
+          toast.warning("Please verify your email.");
+          setStep("verify");
+        } else {
+          toast.success("Login successful");
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       console.log("Login error:", error);
     }
   };
-  return (
+  const LoginForm = () => (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
@@ -89,7 +102,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <Link
-                  href="/forgot-password"
+                  href="/sign-in/forgot-password"
                   className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
                 >
                   Forgot password?
@@ -138,5 +151,11 @@ export default function LoginPage() {
         </form>
       </Card>
     </div>
+  )
+  return (
+     <>
+      {step === "login" && <LoginForm />}
+      {step === "verify" && <EmailVerificationTrigger email={email} from="sign-in"/>}
+    </>
   );
 }
