@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/server/client";
 import { User, Mail, Building, Globe } from "lucide-react";
+import { getName } from "country-list";
 
 export default function AccountPage() {
-
   const { data: user, isPending, error } = trpc.user.getProfile.useQuery();
   if (isPending) {
     return (
@@ -55,9 +55,7 @@ export default function AccountPage() {
                   <p className="text-sm font-medium text-[#334155]">
                     First Name
                   </p>
-                  <p className="text-base text-[#0f172a]">
-                    {user.firstName}
-                  </p>
+                  <p className="text-base text-[#0f172a]">{user.firstName}</p>
                 </div>
               </div>
             </div>
@@ -70,9 +68,7 @@ export default function AccountPage() {
                   <p className="text-sm font-medium text-[#334155]">
                     Last Name
                   </p>
-                  <p className="text-base text-[#0f172a]">
-                    {user.lastName}
-                  </p>
+                  <p className="text-base text-[#0f172a]">{user.lastName}</p>
                 </div>
               </div>
             </div>
@@ -96,9 +92,7 @@ export default function AccountPage() {
                   <p className="text-sm font-medium text-[#334155]">
                     Affiliation
                   </p>
-                  <p className="text-base text-[#0f172a]">
-                    {user.affiliation}
-                  </p>
+                  <p className="text-base text-[#0f172a]">{user.affiliation}</p>
                 </div>
               </div>
             </div>
@@ -109,7 +103,9 @@ export default function AccountPage() {
                 <Globe className="h-5 w-5 text-[#64748b]" />
                 <div>
                   <p className="text-sm font-medium text-[#334155]">Country</p>
-                  <p className="text-base text-[#0f172a]">{user.country}</p>
+                  <p className="text-base text-[#0f172a]">
+                    {getName(user.country)}
+                  </p>
                 </div>
               </div>
             </div>
