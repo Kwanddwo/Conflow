@@ -1,7 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { Context } from "./context";
 
-
 const trpc = initTRPC.context<Context>().create();
 
 export const router = trpc.router;
@@ -23,14 +22,13 @@ export const protectedProcedure = trpc.procedure.use(({ ctx, next }) => {
   });
 });
 
-
 export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   const user = await ctx.prisma.user.findUnique({
     where: { id: ctx.session.user.id },
-    select: { isAdmin: true },
+    select: { role: true },
   });
 
-  if (!user?.isAdmin) {
+  if (!user || user.role !== "ADMIN") {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "Admin access required",
