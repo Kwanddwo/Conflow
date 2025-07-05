@@ -1,8 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { User } from "@prisma/client";
 
-type SessionUser = Omit<User, "password" | "createdAt">;
+import type { SessionUser } from "@/lib/auth";
 
 export interface Context {
   session: {
