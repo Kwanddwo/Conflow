@@ -23,10 +23,7 @@ export const protectedProcedure = trpc.procedure.use(({ ctx, next }) => {
 });
 
 export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  const user = await ctx.prisma.user.findUnique({
-    where: { id: ctx.session.user.id },
-    select: { role: true },
-  });
+  const user = ctx.session?.user;
 
   if (!user || user.role !== "ADMIN") {
     throw new TRPCError({
