@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -9,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 export default function MyConferences() {
   const conferences = [
@@ -65,6 +67,11 @@ export default function MyConferences() {
             </Table>
           </CardContent>
         </Card>
+        <div className="flex justify-center">
+          <Link href="/dashboard/my-conferences/create-conference">
+            <Button className="cursor-pointer">Create Conference</Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
