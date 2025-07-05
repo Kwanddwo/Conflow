@@ -2,13 +2,12 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { verifyPassword } from "./hash";
 import { prisma } from "./prisma";
-interface SessionUser {
-  id: string;
-  email: string;
-  name: string;
-  isVerified: boolean;
-  emailVerified: Date | null;
-}
+import { User } from "@prisma/client";
+
+export type SessionUser = Omit<
+  User,
+  "password" | "createdAt" | "affiliation" | "country"
+>;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -18,7 +17,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials):Promise<SessionUser | null> => {
+      authorize: async (credentials): Promise<SessionUser | null> => {
         const { email, password } = credentials as {
           email: string;
           password: string;
@@ -35,6 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             lastName: true,
             password: true,
             isVerified: true,
+            role: true,
           },
         });
 
@@ -43,13 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const isValid = await verifyPassword(password, user.password);
         if (!isValid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: `${user.firstName} ${user.lastName}`,
-          isVerified: user.isVerified,
-          emailVerified: null,
-        };
+        return user as SessionUser;
       },
     }),
   ],
@@ -62,8 +56,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   secret: process.env.AUTH_SECRET,
   pages: {
-    signIn: "/(marketing)/(auth)/sign-in", 
-    error: "/(marketing)/(auth)/sign-in", 
+    signIn: "/(marketing)/(auth)/sign-in",
+    error: "/(marketing)/(auth)/sign-in",
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -73,7 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      session.user = token.user as SessionUser;
+      session.user = { ...(token.user as SessionUser), emailVerified: null };
       return session;
     },
   },

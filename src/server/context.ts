@@ -1,12 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-type SessionUser = {
-  id: string;
-  email: string;
-  name: string;
-  isVerified: boolean;
-  emailVerified: Date | null;
-};
+
+import type { SessionUser } from "@/lib/auth";
 
 export interface Context {
   session: {
