@@ -9,12 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 export default function AllConferences() {
   const conferences = [
-    { acronym: "CONF2024", name: "Chair"},
-    { acronym: "CONF2023", name: "Reviewer" },
-    { acronym: "SIDECONF2023", name: "Author" },
+    {id : "1", acronym: "CONF2024", name: "Chair"},
+    {id : "2", acronym: "CONF2023", name: "Reviewer" },
+    {id : "3", acronym: "SIDECONF2023", name: "Author" },
   ];
 
   return (
@@ -50,9 +51,11 @@ export default function AllConferences() {
                     className="group border-border/30 hover:bg-muted/50 transition-all duration-300 ease-in-out"
                   >
                     <TableCell className="py-6">
+                      <Link href={`/dashboard/conference/${item.id}`} >
                         <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
                           {item.acronym}
                         </p>
+                      </Link>  
                     </TableCell>
                     <TableCell className="py-6">
                       <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
