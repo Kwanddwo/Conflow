@@ -2,17 +2,37 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { trpc } from "@/server/client";
 import { User, Mail, Building, Globe } from "lucide-react";
 
 export default function AccountPage() {
-  const userInfo = {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@university.edu",
-    affiliation: "Stanford University",
-    country: "United States",
-  };
 
+  const { data: user, isPending, error } = trpc.user.getProfile.useQuery();
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-600 text-lg font-semibold">
+          Error: {error.message}
+        </p>
+      </div>
+    );
+  }
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600 text-lg font-semibold">
+          No user data found.
+        </p>
+      </div>
+    );
+  }
   const handleEdit = () => {
     console.log("Edit account clicked");
   };
@@ -36,7 +56,7 @@ export default function AccountPage() {
                     First Name
                   </p>
                   <p className="text-base text-[#0f172a]">
-                    {userInfo.firstName}
+                    {user.firstName}
                   </p>
                 </div>
               </div>
@@ -51,7 +71,7 @@ export default function AccountPage() {
                     Last Name
                   </p>
                   <p className="text-base text-[#0f172a]">
-                    {userInfo.lastName}
+                    {user.lastName}
                   </p>
                 </div>
               </div>
@@ -63,7 +83,7 @@ export default function AccountPage() {
                 <Mail className="h-5 w-5 text-[#64748b]" />
                 <div>
                   <p className="text-sm font-medium text-[#334155]">Email</p>
-                  <p className="text-base text-[#0f172a]">{userInfo.email}</p>
+                  <p className="text-base text-[#0f172a]">{user.email}</p>
                 </div>
               </div>
             </div>
@@ -77,7 +97,7 @@ export default function AccountPage() {
                     Affiliation
                   </p>
                   <p className="text-base text-[#0f172a]">
-                    {userInfo.affiliation}
+                    {user.affiliation}
                   </p>
                 </div>
               </div>
@@ -89,7 +109,7 @@ export default function AccountPage() {
                 <Globe className="h-5 w-5 text-[#64748b]" />
                 <div>
                   <p className="text-sm font-medium text-[#334155]">Country</p>
-                  <p className="text-base text-[#0f172a]">{userInfo.country}</p>
+                  <p className="text-base text-[#0f172a]">{user.country}</p>
                 </div>
               </div>
             </div>
