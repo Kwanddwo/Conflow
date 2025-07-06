@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/server/client";
-import { Mail } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -42,23 +42,23 @@ function Page() {
   const [cooldownMultiplier, setCooldownMultiplier] = useState(1);
   const [resendCount, setResendCount] = useState(0);
   useEffect(() => {
-      const savedData = getCooldownData(email);
-      if (savedData) {
-        const { endTime, multiplier, count } = savedData;
-        const now = Date.now();
-  
-        if (endTime > now) {
-          setCooldownTime(Math.ceil((endTime - now) / 1000));
-          setCooldownMultiplier(multiplier);
-          setResendCount(count);
-          setSent(true);
-        } else {
-          setCooldownMultiplier(multiplier);
-          setResendCount(count);
-          setSent(count > 0);
-        }
+    const savedData = getCooldownData(email);
+    if (savedData) {
+      const { endTime, multiplier, count } = savedData;
+      const now = Date.now();
+
+      if (endTime > now) {
+        setCooldownTime(Math.ceil((endTime - now) / 1000));
+        setCooldownMultiplier(multiplier);
+        setResendCount(count);
+        setSent(true);
+      } else {
+        setCooldownMultiplier(multiplier);
+        setResendCount(count);
+        setSent(count > 0);
       }
-    }, [email]);
+    }
+  }, [email]);
   const { mutate: sendResetPassRequest, isPending } =
     trpc.auth.sendResetPassRequest.useMutation({
       onSuccess: () => {
@@ -81,18 +81,21 @@ function Page() {
       },
       onError: (err) => {
         console.error("Failed to send verification:", err);
-        toast.error(err.message || "Failed to send verification email. Try again.");
-        setError("Failed to send verification email. Try again.");
+        toast.error(
+          err.message ||
+            "Failed to send password reset email. Please try again."
+        );
+        setError("Failed to send password reset email. Please try again.");
       },
     });
   useEffect(() => {
-      if (cooldownTime > 0) {
-        const timer = setTimeout(() => {
-          setCooldownTime((prev) => prev - 1);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    }, [cooldownTime]);
+    if (cooldownTime > 0) {
+      const timer = setTimeout(() => {
+        setCooldownTime((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldownTime]);
   function handleEmailSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -118,15 +121,15 @@ function Page() {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <Mail className="h-6 w-6 text-blue-600" />
+            <RotateCcw className="h-6 w-6 text-blue-600" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            Verify your email
+            Reset Your Password
           </CardTitle>
           <CardDescription>
             {sent
-              ? "A verification link has been sent to your email. Please check your inbox."
-              : "Enter your email address and we will send you a verification link to reset your password."}
+              ? "We've sent a password reset link to your email. Please check your inbox and click the link to reset your password."
+              : "To reset your password, enter your email address below. We'll send you a secure link to create a new password."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -156,7 +159,7 @@ function Page() {
                 className="w-full cursor-pointer"
                 disabled={isPending}
               >
-                {isPending ? "Sending..." : "Send Verification Email"}
+                {isPending ? "Sending..." : "Send Password Reset Link"}
               </Button>
             ) : (
               <div className="space-y-3">
@@ -171,7 +174,7 @@ function Page() {
                     ? "Sending..."
                     : cooldownTime > 0
                     ? `Resend in ${formatTime(cooldownTime)}`
-                    : "Resend Email"}
+                    : "Resend Reset Link"}
                 </Button>
 
                 {resendCount > 0 && cooldownTime === 0 && (
