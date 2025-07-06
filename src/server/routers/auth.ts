@@ -85,10 +85,10 @@ export const authRouter = router({
           data: { isVerified: true },
         });
 
-        return { success: true };
+        return { success: true ,email : decoded.email};
       } catch (error) {
         console.error("Invalid or expired token", error);
-        return { success: false, message: "Invalid or expired token" };
+        return { success: false, message: "Invalid or expired token",email: null };
       }
     }),
 
@@ -132,13 +132,14 @@ export const authRouter = router({
           throw new Error("Invalid token type.");
         }
 
-        return { success: true, userId: decoded.userId };
+        return { success: true, userId: decoded.userId,email : decoded.email };
       } catch (error) {
         console.error("Invalid or expired token", error);
         return {
           success: false,
           message: "Invalid or expired token",
           userId: null,
+          email: null,
         };
       }
     }),
