@@ -41,7 +41,6 @@ export const authRouter = router({
           password: hashedPassword,
           country: input.country,
           affiliation: input.affiliation,
-          isAdmin: false,
           isVerified: false,
         },
         select: {
