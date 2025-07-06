@@ -68,7 +68,7 @@ function Page() {
         const newCooldownTime = baseTime * cooldownMultiplier;
         const endTime = Date.now() + newCooldownTime * 1000;
         setCooldownTime(newCooldownTime);
-        const newMultiplier = cooldownMultiplier * 10;
+        const newMultiplier = cooldownMultiplier * 5;
         const newCount = resendCount + 1;
 
         setCooldownMultiplier(newMultiplier);
