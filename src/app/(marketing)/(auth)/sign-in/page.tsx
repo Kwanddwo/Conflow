@@ -89,9 +89,6 @@ export default function LoginPage() {
                 type="email"
                 placeholder="Enter your email"
                 {...register("email")}
-                className={
-                  errors.email ? "border-red-500 focus:border-red-500" : ""
-                }
                 disabled={isSubmitting}
               />
               {errors.email && (
@@ -113,11 +110,6 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Enter your password"
                 {...register("password")}
-                className={
-                  errors.password
-                    ? "border-red-500 focus:border-red-500 pr-10"
-                    : "pr-10"
-                }
                 disabled={isSubmitting}
               />
               {errors.password && (
@@ -151,7 +143,7 @@ export default function LoginPage() {
         </form>
       </Card>
     </div>
-  )
+  );
   return (
      <>
       {step === "login" && <LoginForm />}
