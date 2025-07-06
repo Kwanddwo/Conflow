@@ -5,6 +5,11 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+const clearCooldownData = (email: string | null) => {
+  if (typeof window === "undefined") return;
+  const key = `email_cooldown_${email}`;
+  sessionStorage.removeItem(key);
+};
 function Page() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -18,6 +23,7 @@ function Page() {
       if (res.success) {
         toast.success("Token verified successfully!");
         setStatus("success");
+        clearCooldownData(res.email);
         router.push(`/sign-in/forgot-password/reset-password/${res.userId}`);
       } else {
         toast.error("Invalid token.");
@@ -34,6 +40,7 @@ function Page() {
       if (res.success) {
         toast.success("Email verified successfully!");
         setStatus("success");
+        clearCooldownData(res.email);
         if (from === "sign-in") {
           router.push("/dashboard");
         } else if (from === "sign-up") {
