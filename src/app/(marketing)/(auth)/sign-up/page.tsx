@@ -65,7 +65,7 @@ const RegisterComponent = ({
   handleSubmit: any;
   onSubmit: (data: any) => void;
 }) => (
-  <div className="min-h-[65vh] bg-[#f8fafc] flex items-center justify-center p-4">
+  <div className="main-content-height bg-[#f8fafc] flex items-center justify-center p-4">
     <div className="w-full max-w-xl bg-white p-8 rounded-lg shadow">
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">

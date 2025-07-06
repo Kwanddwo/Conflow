@@ -10,14 +10,14 @@ export default function AccountPage() {
   const { data: user, isPending, error } = trpc.user.getProfile.useQuery();
   if (isPending) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="main-content-height flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
       </div>
     );
   }
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="main-content-height flex items-center justify-center">
         <p className="text-red-600 text-lg font-semibold">
           Error: {error.message}
         </p>
@@ -26,7 +26,7 @@ export default function AccountPage() {
   }
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="main-content-height flex items-center justify-center">
         <p className="text-gray-600 text-lg font-semibold">
           No user data found.
         </p>
@@ -38,7 +38,7 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="main-content-height bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <Card className="border-[#e2e8f0] shadow-sm">
           <CardHeader className="text-center pb-4">

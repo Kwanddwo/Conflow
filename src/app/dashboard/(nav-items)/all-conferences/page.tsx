@@ -13,13 +13,13 @@ import Link from "next/link";
 
 export default function AllConferences() {
   const conferences = [
-    {id : "1", acronym: "CONF2024", name: "Chair"},
-    {id : "2", acronym: "CONF2023", name: "Reviewer" },
-    {id : "3", acronym: "SIDECONF2023", name: "Author" },
+    { id: "1", acronym: "CONF2024", name: "Chair" },
+    { id: "2", acronym: "CONF2023", name: "Reviewer" },
+    { id: "3", acronym: "SIDECONF2023", name: "Author" },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-muted/40 p-8">
+    <div className="main-content-height bg-gradient-to-br from-background via-muted/20 to-muted/40 p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
@@ -51,11 +51,11 @@ export default function AllConferences() {
                     className="group border-border/30 hover:bg-muted/50 transition-all duration-300 ease-in-out"
                   >
                     <TableCell className="py-6">
-                      <Link href={`/dashboard/conference/${item.id}`} >
+                      <Link href={`/dashboard/conference/${item.id}`}>
                         <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
                           {item.acronym}
                         </p>
-                      </Link>  
+                      </Link>
                     </TableCell>
                     <TableCell className="py-6">
                       <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">

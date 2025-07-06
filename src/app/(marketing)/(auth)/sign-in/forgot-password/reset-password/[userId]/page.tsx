@@ -19,15 +19,15 @@ import { toast } from "sonner";
 import { trpc } from "@/server/client";
 import { Loader2 } from "lucide-react";
 
-const ResetFormDataSchema = z.object({
-  password: z
-    .string()
-    .min(1, "Password is required"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  path: ["confirmPassword"],
-  message: "Passwords do not match",
-});;
+const ResetFormDataSchema = z
+  .object({
+    password: z.string().min(1, "Password is required"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
 
 type ResetFormData = z.infer<typeof ResetFormDataSchema>;
 export default function ResetPassword() {
@@ -36,35 +36,34 @@ export default function ResetPassword() {
   const userId = params.userId as string;
   const resetPassword = trpc.auth.resetUserPassword.useMutation();
   const {
-      register,
-      handleSubmit,
-      formState: { errors, isSubmitting },
-    } = useForm<ResetFormData>({
-      resolver: zodResolver(ResetFormDataSchema),
-      defaultValues: {
-        password: "",
-        confirmPassword: "",
-      },
-    });
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetFormData>({
+    resolver: zodResolver(ResetFormDataSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
   const onSubmit = async (data: ResetFormData) => {
-    
     try {
       await resetPassword.mutateAsync({
-        userId : userId,
+        userId: userId,
         newPassword: data.password,
       });
       toast.success("Password reset successful");
       router.push("/sign-in");
     } catch (error) {
       if (error instanceof TRPCClientError) {
-        toast.error(error.message); 
+        toast.error(error.message);
       } else {
         toast.error("Something went wrong");
       }
     }
-    };
+  };
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+    <div className="main-content-height flex items-center justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">

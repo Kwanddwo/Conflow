@@ -117,7 +117,7 @@ function Page() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   }
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="main-content-height flex items-center justify-center px-4">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
