@@ -17,24 +17,27 @@ function Page() {
   const token = params.token as string;
   const router = useRouter();
 
-  const [status, setStatus] = useState<"idle" | "verifying" | "success" | "error">("idle");
-  const resetPassTokenMutation = trpc.auth.resetPassTokenVerification.useMutation({
-    onSuccess: (res) => {
-      if (res.success) {
-        toast.success("Token verified successfully!");
-        setStatus("success");
-        clearCooldownData(res.email);
-        router.push(`/sign-in/forgot-password/reset-password/${res.userId}`);
-      } else {
-        toast.error("Invalid token.");
+  const [status, setStatus] = useState<
+    "idle" | "verifying" | "success" | "error"
+  >("idle");
+  const resetPassTokenMutation =
+    trpc.auth.resetPassTokenVerification.useMutation({
+      onSuccess: (res) => {
+        if (res.success) {
+          toast.success("Token verified successfully!");
+          setStatus("success");
+          clearCooldownData(res.email);
+          router.push(`/sign-in/forgot-password/reset-password/${res.userId}`);
+        } else {
+          toast.error("Invalid token.");
+          setStatus("error");
+        }
+      },
+      onError: () => {
+        toast.error("Verification failed.");
         setStatus("error");
-      }
-    },
-    onError: () => {
-      toast.error("Verification failed.");
-      setStatus("error");
-    }
-  });
+      },
+    });
   const verifyMutation = trpc.auth.verifyEmailToken.useMutation({
     onSuccess: (res) => {
       if (res.success) {
@@ -68,7 +71,7 @@ function Page() {
       resetPassTokenMutation.mutate({ token });
     } else {
       verifyMutation.mutate({ token });
-    }  
+    }
   }, [token]);
 
   const handleBackToHome = () => {
@@ -76,7 +79,7 @@ function Page() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen space-y-4">
+    <div className="main-content-height flex flex-col justify-center items-center space-y-4">
       {status === "verifying" ? (
         <>
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

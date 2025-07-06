@@ -44,6 +44,7 @@
 }
 
 :root {
+  --navbar-height: 4rem; /* 64px - h-16 */
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -119,4 +120,9 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Utility class for main content height excluding navbar */
+.main-content-height {
+  min-height: calc(100vh - var(--navbar-height));
 }

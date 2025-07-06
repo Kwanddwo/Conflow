@@ -14,7 +14,7 @@ import Link from "next/link";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getSession, signIn } from "next-auth/react"; 
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -25,9 +25,7 @@ const loginSchema = z.object({
     .string()
     .min(1, "Email is required")
     .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
+  password: z.string().min(1, "Password is required"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -50,13 +48,17 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setEmail(data.email);
-      const res = await signIn('credentials', { email: data.email, password: data.password, redirect: false });
+      const res = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
       if (res?.error) {
         toast.error("Invalid credentials. Please try again.");
       } else {
         const session = await getSession();
         const user = session?.user as { isVerified: boolean };
-      
+
         if (!user?.isVerified) {
           toast.warning("Please verify your email.");
           setStep("verify");
@@ -70,7 +72,7 @@ export default function LoginPage() {
     }
   };
   const LoginForm = () => (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="main-content-height flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -145,9 +147,11 @@ export default function LoginPage() {
     </div>
   );
   return (
-     <>
+    <>
       {step === "login" && <LoginForm />}
-      {step === "verify" && <EmailVerificationTrigger email={email} from="sign-in"/>}
+      {step === "verify" && (
+        <EmailVerificationTrigger email={email} from="sign-in" />
+      )}
     </>
   );
 }
