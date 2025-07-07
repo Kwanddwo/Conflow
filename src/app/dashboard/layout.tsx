@@ -1,63 +1,21 @@
 "use client";
-import Logo from '@/components/Logo';
+import { AppSidebar } from '@/components/app-sidebar';
 import ProtectedPage from '@/components/ProtectedPage';
-import { Button } from '@/components/ui/button';
-import { ModeToggle } from '@/components/ui/modeToggle';
-import { signOut } from 'next-auth/react';
-import Link from 'next/link';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import React from 'react'
+import DashboardHeader from './DashboardHeader';
 function DashboardLayout({children}: {children: React.ReactNode}) {
   return (
     <ProtectedPage>
-      <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
-        <Link href="/dashboard">
-          <Logo height={120} width={110} />
-        </Link>
-        <nav className="flex items-center gap-8">
-          <Link
-            href="/dashboard/all-conferences"
-            className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
-          >
-            All Conferences
-          </Link>
-          <Link
-            href="/dashboard/my-conferences"
-            className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
-          >
-            My Conferences
-          </Link>
-          <Link
-            href="/dashboard/my-roles"
-            className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
-          >
-            My Roles
-          </Link>
-          <Link
-            href="/dashboard/account"
-            className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
-          >
-            My Account
-          </Link>
-          <Link
-            href="/dashboard/inbox"
-            className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
-          >
-            Inbox
-          </Link>
-        </nav>
-        <div className="flex gap-4">
-          <Button
-            className="cursor-pointer"
-            onClick={() => signOut({ callbackUrl: "/sign-in" })}
-          >
-            Sign Out
-          </Button>
-          <ModeToggle />
-        </div>
-      </header>
-      {children}
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <DashboardHeader />
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
     </ProtectedPage>
   );
 }
 
-export default DashboardLayout
+export default DashboardLayout;
