@@ -2,12 +2,8 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { verifyPassword } from "./hash";
 import { prisma } from "./prisma";
-import { User } from "@prisma/client";
 
-export type SessionUser = Omit<
-  User,
-  "password" | "createdAt" | "affiliation" | "country"
->;
+import type { SessionUser } from "@/types/next-auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [

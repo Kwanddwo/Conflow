@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import type { SessionUser } from "@/lib/auth";
+import type { SessionUser } from "@/types/next-auth";
 
 export interface Context {
   session: {

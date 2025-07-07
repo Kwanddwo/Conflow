@@ -13,14 +13,28 @@ enum UserRole {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  firstName String
-  lastName  String
-  email     String   @unique
-  role      UserRole @default(USER)
-  password  String
+  id          String         @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String         @unique
+  role        UserRole       @default(USER)
+  password    String
   affiliation String
-  country   String
-  isVerified Boolean @default(false)
-  createdAt DateTime @default(now())
+  country     String
+  isVerified  Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  inbox       Notification[]
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  message    String
+  title      String
+  isRead     Boolean  @default(false)
+  isArchived Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }
