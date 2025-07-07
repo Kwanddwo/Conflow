@@ -8,11 +8,37 @@ const transporter = nodemailer.createTransport({
     pass: "zABVHXqOgMCLYJ7N",
   },
 });
-export async function sendMail(dest: string, token: string,from: string) {
+
+export async function sendMail(
+  dest: string,
+  subject: string,
+  htmlContent: string,
+  sender?: string
+) {
+  try {
+    await transporter.sendMail({
+      from:
+        (sender ? `"${sender} via Conflow"` : '"Conflow"') +
+        " <aymanderrouich3@gmail.com>",
+      to: dest,
+      subject: subject,
+      html: htmlContent,
+    });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return error;
+  }
+}
+
+export async function sendVerificationMail(
+  dest: string,
+  token: string,
+  from: string
+) {
   const verificationURL = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email/${token}?from=${from}`;
   try {
     await transporter.sendMail({
-      from: '"conflow" <aymanderrouich3@gmail.com',
+      from: '"Conflow" <aymanderrouich3@gmail.com>',
       to: dest,
       subject: "Verify your email address",
       html: `
@@ -28,4 +54,3 @@ export async function sendMail(dest: string, token: string,from: string) {
     return error;
   }
 }
-  

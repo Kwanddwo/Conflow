@@ -14,6 +14,13 @@ export const protectedProcedure = trpc.procedure.use(({ ctx, next }) => {
     });
   }
 
+  if (!ctx.session.user.isVerified) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Your account is not verified",
+    });
+  }
+
   return next({
     ctx: {
       ...ctx,

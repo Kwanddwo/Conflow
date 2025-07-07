@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function ProtectedPage({
   children,
@@ -17,12 +18,7 @@ export default function ProtectedPage({
     }
   }, [status, session, router]);
   if (status === "loading" || status === "unauthenticated") {
-    return (
-      <div className="main-content-height flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
   return <>{children}</>;
 }

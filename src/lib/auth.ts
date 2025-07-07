@@ -4,9 +4,9 @@ import { verifyPassword } from "./hash";
 import { prisma } from "./prisma";
 import { User } from "@prisma/client";
 
-export type SessionUser = Omit<
+export type SessionUser = Pick<
   User,
-  "password" | "createdAt" | "affiliation" | "country"
+  "id" | "firstName" | "lastName" | "email" | "role" | "isVerified"
 >;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
