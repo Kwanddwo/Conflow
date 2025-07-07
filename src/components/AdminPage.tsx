@@ -15,7 +15,7 @@ export default function ProtectedPage({
   useEffect(() => {
     if (
       status === "unauthenticated" ||
-      (status === "authenticated" && session.user.role !== "USER")
+      (status === "authenticated" && session.user.role !== "ADMIN")
     ) {
       router.replace("/sign-in");
     }
