@@ -13,7 +13,10 @@ export default function ProtectedPage({
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (
+      status === "unauthenticated" ||
+      (status === "authenticated" && session.user.role !== "USER")
+    ) {
       router.replace("/sign-in");
     }
   }, [status, session, router]);
