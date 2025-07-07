@@ -27,6 +27,214 @@ import {
 } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
+// ✅ Extracted notification item component
+const NotificationItem = ({
+  notification,
+  isArchived = false,
+  onMarkAsRead,
+  onMarkAsUnread,
+  onArchive,
+  onUnarchive,
+  onDelete,
+}: {
+  notification: any;
+  isArchived?: boolean;
+  onMarkAsRead: (id: string) => void;
+  onMarkAsUnread: (id: string) => void;
+  onArchive: (id: string) => void;
+  onUnarchive: (id: string) => void;
+  onDelete: (id: string) => void;
+}) => {
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
+
+    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    return `${diffInWeeks}w ago`;
+  };
+
+  return (
+    <div
+      className={`p-4 hover:bg-muted/50 transition-colors ${
+        isArchived
+          ? "opacity-75"
+          : !notification.isRead
+          ? "bg-blue-50/50 border-l-4 border-l-blue-500"
+          : ""
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 mt-1">
+          {isArchived ? (
+            <Archive className="h-4 w-4 text-muted-foreground" />
+          ) : notification.isRead ? (
+            <MailOpen className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <Mail className="h-4 w-4 text-blue-600" />
+          )}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <h3
+              className={`font-medium text-sm leading-5 ${
+                isArchived || notification.isRead
+                  ? "text-muted-foreground"
+                  : "text-foreground"
+              }`}
+            >
+              {notification.title}
+            </h3>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                {formatTimeAgo(new Date(notification.createdAt))}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <MoreVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {isArchived ? (
+                    <DropdownMenuItem
+                      onClick={() => onUnarchive(notification.id)}
+                    >
+                      <ArchiveRestore className="h-4 w-4 mr-2" />
+                      Unarchive
+                    </DropdownMenuItem>
+                  ) : (
+                    <>
+                      {notification.isRead ? (
+                        <DropdownMenuItem
+                          onClick={() => onMarkAsUnread(notification.id)}
+                        >
+                          <Mail className="h-4 w-4 mr-2" />
+                          Mark as unread
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem
+                          onClick={() => onMarkAsRead(notification.id)}
+                        >
+                          <MailOpen className="h-4 w-4 mr-2" />
+                          Mark as read
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem
+                        onClick={() => onArchive(notification.id)}
+                      >
+                        <Archive className="h-4 w-4 mr-2" />
+                        Archive
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <Separator className="my-1" />
+                  <DropdownMenuItem
+                    onClick={() => onDelete(notification.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          <p className="text-sm text-muted-foreground mt-1 leading-5">
+            {notification.message}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ✅ Extracted notification list component
+const NotificationList = ({
+  notifications,
+  isArchived = false,
+  searchQuery,
+  onMarkAsRead,
+  onMarkAsUnread,
+  onArchive,
+  onUnarchive,
+  onDelete,
+}: {
+  notifications: any[];
+  isArchived?: boolean;
+  searchQuery: string;
+  onMarkAsRead: (id: string) => void;
+  onMarkAsUnread: (id: string) => void;
+  onArchive: (id: string) => void;
+  onUnarchive: (id: string) => void;
+  onDelete: (id: string) => void;
+}) => {
+  if (notifications.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        {searchQuery.trim() ? (
+          <>
+            <Search className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">No results found</h3>
+            <p className="text-muted-foreground">
+              No {isArchived ? "archived " : ""}notifications match "
+              {searchQuery}". Try a different search term.
+            </p>
+          </>
+        ) : (
+          <>
+            {isArchived ? (
+              <Archive className="h-12 w-12 text-muted-foreground mb-4" />
+            ) : (
+              <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
+            )}
+            <h3 className="text-lg font-medium mb-2">
+              No {isArchived ? "archived " : ""}notifications
+            </h3>
+            <p className="text-muted-foreground">
+              {isArchived
+                ? "Notifications you archive will appear here."
+                : "You're all caught up! Check back later for new updates."}
+            </p>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <ScrollArea className="h-[600px]">
+      <div className="divide-y">
+        {notifications.map((notification) => (
+          <NotificationItem
+            key={notification.id}
+            notification={notification}
+            isArchived={isArchived}
+            onMarkAsRead={onMarkAsRead}
+            onMarkAsUnread={onMarkAsUnread}
+            onArchive={onArchive}
+            onUnarchive={onUnarchive}
+            onDelete={onDelete}
+          />
+        ))}
+      </div>
+    </ScrollArea>
+  );
+};
+
 export default function InboxPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("inbox");
@@ -142,31 +350,9 @@ export default function InboxPage() {
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div>Error: {error.message}</div>;
 
-  // Filter notifications based on active tab and search query
-  const displayNotifications = filteredNotifications;
-
-  const formatTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diffInMinutes = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60)
-    );
-
-    if (diffInMinutes < 1) return "Just now";
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    return `${diffInWeeks}w ago`;
-  };
-
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <Card>
+    <div className="container mx-auto p-6 w-4xl">
+      <Card className="px-2">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -218,234 +404,31 @@ export default function InboxPage() {
 
           <TabsContent value="inbox" className="mt-0">
             <CardContent className="p-0">
-              {displayNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  {searchQuery.trim() ? (
-                    <>
-                      <Search className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">
-                        No results found
-                      </h3>
-                      <p className="text-muted-foreground">
-                        No notifications match "{searchQuery}". Try a different
-                        search term.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">
-                        No notifications
-                      </h3>
-                      <p className="text-muted-foreground">
-                        {
-                          "You're all caught up! Check back later for new updates."
-                        }
-                      </p>
-                    </>
-                  )}
-                </div>
-              ) : (
-                <ScrollArea className="h-[600px]">
-                  <div className="divide-y">
-                    {displayNotifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 hover:bg-muted/50 transition-colors ${
-                          !notification.isRead
-                            ? "bg-blue-50/50 border-l-4 border-l-blue-500"
-                            : ""
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 mt-1">
-                            {notification.isRead ? (
-                              <MailOpen className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <Mail className="h-4 w-4 text-blue-600" />
-                            )}
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <h3
-                                className={`font-medium text-sm leading-5 ${
-                                  !notification.isRead
-                                    ? "text-foreground"
-                                    : "text-muted-foreground"
-                                }`}
-                              >
-                                {notification.title}
-                              </h3>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Clock className="h-3 w-3" />
-                                  {formatTimeAgo(
-                                    new Date(notification.createdAt)
-                                  )}
-                                </div>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-6 w-6 p-0"
-                                    >
-                                      <MoreVertical className="h-3 w-3" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    {notification.isRead ? (
-                                      <DropdownMenuItem
-                                        onClick={() =>
-                                          markAsUnread(notification.id)
-                                        }
-                                      >
-                                        <Mail className="h-4 w-4 mr-2" />
-                                        Mark as unread
-                                      </DropdownMenuItem>
-                                    ) : (
-                                      <DropdownMenuItem
-                                        onClick={() =>
-                                          markAsRead(notification.id)
-                                        }
-                                      >
-                                        <MailOpen className="h-4 w-4 mr-2" />
-                                        Mark as read
-                                      </DropdownMenuItem>
-                                    )}
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        archiveNotification(notification.id)
-                                      }
-                                    >
-                                      <Archive className="h-4 w-4 mr-2" />
-                                      Archive
-                                    </DropdownMenuItem>
-                                    <Separator className="my-1" />
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        deleteNotification(notification.id)
-                                      }
-                                      className="text-destructive focus:text-destructive"
-                                    >
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      Delete
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mt-1 leading-5">
-                              {notification.message}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
+              <NotificationList
+                notifications={filteredNotifications}
+                isArchived={false}
+                searchQuery={searchQuery}
+                onMarkAsRead={markAsRead}
+                onMarkAsUnread={markAsUnread}
+                onArchive={archiveNotification}
+                onUnarchive={unarchiveNotification}
+                onDelete={deleteNotification}
+              />
             </CardContent>
           </TabsContent>
 
           <TabsContent value="archived" className="mt-0">
             <CardContent className="p-0">
-              {displayNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  {searchQuery.trim() ? (
-                    <>
-                      <Search className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">
-                        No results found
-                      </h3>
-                      <p className="text-muted-foreground">
-                        No archived notifications match "{searchQuery}". Try a
-                        different search term.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <Archive className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">
-                        No archived notifications
-                      </h3>
-                      <p className="text-muted-foreground">
-                        Notifications you archive will appear here.
-                      </p>
-                    </>
-                  )}
-                </div>
-              ) : (
-                <ScrollArea className="h-[600px]">
-                  <div className="divide-y">
-                    {displayNotifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className="p-4 hover:bg-muted/50 transition-colors opacity-75"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 mt-1">
-                            <Archive className="h-4 w-4 text-muted-foreground" />
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <h3 className="font-medium text-sm leading-5 text-muted-foreground">
-                                {notification.title}
-                              </h3>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Clock className="h-3 w-3" />
-                                  {formatTimeAgo(
-                                    new Date(notification.createdAt)
-                                  )}
-                                </div>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-6 w-6 p-0"
-                                    >
-                                      <MoreVertical className="h-3 w-3" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        unarchiveNotification(notification.id)
-                                      }
-                                    >
-                                      <ArchiveRestore className="h-4 w-4 mr-2" />
-                                      Unarchive
-                                    </DropdownMenuItem>
-                                    <Separator className="my-1" />
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        deleteNotification(notification.id)
-                                      }
-                                      className="text-destructive focus:text-destructive"
-                                    >
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      Delete
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mt-1 leading-5">
-                              {notification.message}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
+              <NotificationList
+                notifications={filteredNotifications}
+                isArchived={true}
+                searchQuery={searchQuery}
+                onMarkAsRead={markAsRead}
+                onMarkAsUnread={markAsUnread}
+                onArchive={archiveNotification}
+                onUnarchive={unarchiveNotification}
+                onDelete={deleteNotification}
+              />
             </CardContent>
           </TabsContent>
         </Tabs>
