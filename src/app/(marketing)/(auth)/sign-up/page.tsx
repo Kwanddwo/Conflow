@@ -3,13 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { trpc } from "@/server/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TRPCClientError } from "@trpc/client";
@@ -19,7 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import EmailVerificationTrigger from "../EmailVerificationTrigger";
-import { getData } from "country-list";
+import CountrySelect from "@/components/CountrySelect";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -148,42 +141,9 @@ const RegisterComponent = ({
           <Controller
             name="country"
             control={control}
-            render={({ field }) => (
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                defaultValue={field.value}
-                disabled={isSubmitting || isPending}
-              >
-                <SelectTrigger
-                  ref={field.ref}
-                  onBlur={field.onBlur}
-                  className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
-                >
-                  <SelectValue placeholder="Country/region" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getData()
-                    .sort(
-                      (
-                        a: { code: string; name: string },
-                        b: { code: string; name: string }
-                      ) =>
-                        a.name.localeCompare(b.name, "en", {
-                          sensitivity: "base",
-                        })
-                    )
-                    .map((country: { code: string; name: string }) => (
-                      <SelectItem
-                        key={country.code}
-                        value={country.code.toLowerCase()}
-                      >
-                        {country.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            )}
+            render={({ field }) =>
+              CountrySelect(field, isSubmitting, isPending)
+            }
           />
 
           {errors.country && (

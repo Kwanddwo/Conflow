@@ -24,6 +24,10 @@ model User {
   isVerified  Boolean        @default(false)
   createdAt   DateTime       @default(now())
   inbox       Notification[]
+
+  chairs     Conference[] @relation("ConferenceChairs")
+  reviewers  Conference[] @relation("ConferenceReviewers")
+  mainChairs Conference[] @relation("ConferenceMainChair")
 }
 
 model Notification {
@@ -37,4 +41,39 @@ model Notification {
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
+}
+
+enum ConferenceStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model Conference {
+  id                  String           @id @default(cuid())
+  title               String
+  acronym             String           @unique
+  description         String
+  locationVenue       String
+  locationCity        String
+  locationCountry     String
+  callForPapers       String //String for now, can be changed to JSON or Bytes if needed.
+  websiteUrl          String?
+  startDate           DateTime
+  endDate             DateTime
+  abstractDeadline    DateTime
+  submissionDeadline  DateTime
+  cameraReadyDeadline DateTime
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  status              ConferenceStatus @default(PENDING)
+  isPublic            Boolean          @default(false)
+  isDeleted           Boolean          @default(false)
+  researchAreas       Json
+
+  mainChairId String
+  mainChair User @relation("ConferenceMainChair", fields: [mainChairId], references: [id])
+  chairs     User[] @relation("ConferenceChairs")
+  reviewers User[] @relation("ConferenceReviewers")
 }

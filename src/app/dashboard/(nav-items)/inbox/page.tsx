@@ -1,4 +1,4 @@
-import InboxPage from "@/components/shared/InboxPage";
+import InboxPage from "@/components/InboxPage";
 
 export default function Page() {
   return <InboxPage />;

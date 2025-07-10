@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router } from "../trpc";
+import { userProcedure, router } from "../trpc";
 import { z } from "zod";
 export const userRouter = router({
-  getProfile: protectedProcedure.query(async ({ ctx }) => {
+  getProfile: userProcedure.query(async ({ ctx }) => {
     const user = await ctx.prisma.user.findUnique({
       where: { id: ctx.session.user.id },
       select: {
@@ -27,7 +27,7 @@ export const userRouter = router({
     return user;
   }),
 
-  updateProfile: protectedProcedure
+  updateProfile: userProcedure
     .input(
       z.object({
         firstName: z.string().optional(),
@@ -53,4 +53,4 @@ export const userRouter = router({
 
       return updatedUser;
     }),
-})
+});

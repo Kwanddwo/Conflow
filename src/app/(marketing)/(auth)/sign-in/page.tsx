@@ -57,14 +57,15 @@ export default function LoginPage() {
         toast.error("Invalid credentials. Please try again.");
       } else {
         const session = await getSession();
-        const user = session?.user as { isVerified: boolean };
+        const user = session?.user as { isVerified: boolean; role: string };
 
         if (!user?.isVerified) {
           toast.warning("Please verify your email.");
           setStep("verify");
         } else {
           toast.success("Login successful");
-          router.push("/dashboard");
+          if (user.role === "ADMIN") router.push("/admin");
+          if (user.role === "USER") router.push("/dashboard");
         }
       }
     } catch (error) {

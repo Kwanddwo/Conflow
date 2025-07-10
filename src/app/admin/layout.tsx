@@ -10,8 +10,9 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminPage>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
-        <Link href="/admin">
-          <Logo height={120} width={110} /> Admin
+        <Link href="/admin" className="flex items-center gap-2">
+          <Logo height={120} width={110} />
+          <span className="text-xl text-slate-900 font-bold">Admin</span>
         </Link>
         <nav className="flex items-center gap-8">
           <Link
@@ -21,7 +22,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
             Conference Requests
           </Link>
           <Link
-            href="/admin/Inbox"
+            href="/admin/inbox"
             className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
           >
             Inbox
