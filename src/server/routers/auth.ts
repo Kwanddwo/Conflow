@@ -3,7 +3,7 @@ import { procedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { hashPassword } from "@/lib/hash";
 import jwt from "jsonwebtoken";
-import { sendVerificationMail } from "@/lib/mail";
+import { sendPasswordMail, sendVerificationMail } from "@/lib/mail";
 import { sendNotification } from "@/lib/notification";
 
 const EMAIL_TOKEN_SECRET = process.env.EMAIL_TOKEN_SECRET!;
@@ -175,7 +175,7 @@ export const authRouter = router({
         { expiresIn: "15m" }
       );
 
-      await sendVerificationMail(input.email, token, input.from);
+      await sendPasswordMail(input.email, token, input.from);
       return { success: true };
     }),
 });

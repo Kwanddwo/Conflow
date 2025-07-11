@@ -54,3 +54,28 @@ export async function sendVerificationMail(
     return error;
   }
 }
+
+export async function sendPasswordMail(
+  dest: string,
+  token: string,
+  from: string
+) {
+  const verificationURL = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email/${token}?from=${from}`;
+  try {
+    await transporter.sendMail({
+      from: '"Conflow" <aymanderrouich3@gmail.com>',
+      to: dest,
+      subject: "Verify your password reset",
+      html: `
+          <p>Click the link below to reset your password:</p>
+          <a href="${verificationURL}" target="_blank" rel="noopener noreferrer">
+            Reset Password
+          </a>
+          <p>If you did not request this, you can ignore this email.</p>
+        `,
+    });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return error;
+  }
+}
