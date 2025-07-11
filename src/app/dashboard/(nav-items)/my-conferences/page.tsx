@@ -30,7 +30,7 @@ export default function AllConferences() {
       <ConferenceList
         title={"Your Conferences"}
         conferences={conferences}
-        route={"/dashboard/my-conferences"}
+        route={"/dashboard/conference"}
       />
     </div>
   );
