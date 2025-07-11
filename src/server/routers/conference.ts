@@ -54,12 +54,12 @@ export const conferenceRouter = router({
     return conferences;
   }),
   // I want to only get public conferences for users BUT admins can see all conferences...
+  // TODO: change this so it's more secure
   getConference: protectedProcedure
     .input(z.string())
     .query(async ({ input, ctx }) => {
-      const isAdmin = ctx.session.user.role === "ADMIN";
       const conference = await ctx.prisma.conference.findUnique({
-        where: { id: input, isDeleted: false},
+        where: { id: input, isDeleted: false },
         select: {
           id: true,
           title: true,
@@ -77,8 +77,8 @@ export const conferenceRouter = router({
           cameraReadyDeadline: true,
           status: true,
           researchAreas: true,
-          mainChairId: isAdmin,
-          mainChair: isAdmin && {
+          mainChairId: true,
+          mainChair: true && {
             select: {
               id: true,
               firstName: true,
@@ -86,7 +86,7 @@ export const conferenceRouter = router({
               email: true,
             },
           },
-          isPublic: isAdmin,
+          isPublic: true,
         },
       });
 
@@ -244,7 +244,11 @@ export const conferenceRouter = router({
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return ctx.prisma.conference.findMany({
-        where: { mainChairId: input, isDeleted: false, status: {not: "PENDING"} },
+        where: {
+          mainChairId: input,
+          isDeleted: false,
+          status: { not: "PENDING" },
+        },
         select: {
           id: true,
           title: true,
