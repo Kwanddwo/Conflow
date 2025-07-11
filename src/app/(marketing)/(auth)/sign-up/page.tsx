@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import z from "zod";
 import EmailVerificationTrigger from "../EmailVerificationTrigger";
 import CountrySelect from "@/components/CountrySelect";
+import { passwordValidation, PASSWORD_REQUIREMENTS_TEXT } from "@/lib/validations/password";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -21,14 +22,7 @@ const registerSchema = z.object({
     .string()
     .min(1, "Email is required")
     .email("Must be a valid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(100, "Password must be less than 100 characters")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).+$/,
-      "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character"
-    ),
+  password: passwordValidation,
   country: z
     .string()
     .min(1, "Country is required")
@@ -128,8 +122,7 @@ const RegisterComponent = ({
             <p className="text-sm text-red-500">{errors.password.message}</p>
           ) : (
             <p className="text-[#94a3b8] text-sm">
-              Password must be at least 8 characters, and include uppercase,
-              lowercase, numbers, and special characters.
+              {PASSWORD_REQUIREMENTS_TEXT}
             </p>
           )}
         </div>

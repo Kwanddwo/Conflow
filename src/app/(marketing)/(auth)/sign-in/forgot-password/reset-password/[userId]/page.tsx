@@ -18,10 +18,11 @@ import { TRPCClientError } from "@trpc/client";
 import { toast } from "sonner";
 import { trpc } from "@/server/client";
 import { Loader2 } from "lucide-react";
+import { passwordValidation, PASSWORD_REQUIREMENTS_TEXT } from "@/lib/validations/password";
 
 const ResetFormDataSchema = z
   .object({
-    password: z.string().min(1, "Password is required"),
+    password: passwordValidation,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -84,10 +85,12 @@ export default function ResetPassword() {
                 {...register("password")}
                 disabled={isSubmitting}
               />
+              {errors.password ? (
+                <p className="text-sm text-red-500">{errors.password.message}</p>
+              ) : (
+                <p className="text-sm text-gray-500">{PASSWORD_REQUIREMENTS_TEXT}</p>
+              )}
             </div>
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
-            )}
             <div className="space-y-2 mb-4">
               <Label htmlFor="confirm-password">Confirm Password</Label>
               <Input
