@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,16 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { UploadButton } from "@/lib/uploadthing";
 
 export default function PaperSubmissionForm() {
-  const [selectedFile, setSelectedFile] = useState("C:/Documents/Paper.pdf");
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file.name);
-    }
-  };
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
 
   return (
     <div>
@@ -96,21 +90,32 @@ export default function PaperSubmissionForm() {
             Files
           </Label>
           <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              className="bg-[#0f172a] hover:bg-[#000000] text-[#ffffff] px-4 py-2"
-              onClick={() => document.getElementById("file-input")?.click()}
-            >
-              Browse...
-            </Button>
-            <span className="text-[#64748b] text-sm">{selectedFile}</span>
-            <input
-              id="file-input"
-              type="file"
-              accept=".pdf"
-              onChange={handleFileChange}
-              className="hidden"
+            <UploadButton
+              endpoint="mediaUploader"
+              onClientUploadComplete={(res) => {
+                // Do something with the response
+                console.log("Files: ", res);
+                if (res && res[0]) {
+                  setSelectedFile(res[0].name);
+                  setUploadedFileUrl(res[0].url);
+                }
+              }}
+              onUploadError={(error: Error) => {
+                // Do something with the error.
+                alert(`ERROR! ${error.message}`);
+              }}
+              content={{
+                button: "Browse...",
+                allowedContent: "PDF files only",
+              }}
+              appearance={{
+                button: "bg-[#0f172a] hover:bg-[#000000] text-[#ffffff] px-4 py-2 rounded-md font-medium",
+                allowedContent: "text-[#64748b] text-sm",
+              }}
             />
+            {selectedFile && (
+              <span className="text-[#64748b] text-sm">{selectedFile}</span>
+            )}
           </div>
           <p className="text-[#64748b] text-sm">
             Upload your paper, which must be in PDF format

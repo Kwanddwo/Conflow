@@ -34,6 +34,7 @@
     "@trpc/next": "^11.4.3",
     "@trpc/react-query": "^11.4.2",
     "@trpc/server": "^11.4.2",
+    "@uploadthing/react": "^7.3.2",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -50,6 +51,7 @@
     "react-hook-form": "^7.59.0",
     "sonner": "^2.0.5",
     "tailwind-merge": "^3.3.1",
+    "uploadthing": "^7.7.3",
     "zod": "^3.25.67"
   },
   "devDependencies": {

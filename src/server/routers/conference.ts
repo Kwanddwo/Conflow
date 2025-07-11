@@ -59,7 +59,7 @@ export const conferenceRouter = router({
     .query(async ({ input, ctx }) => {
       const isAdmin = ctx.session.user.role === "ADMIN";
       const conference = await ctx.prisma.conference.findUnique({
-        where: { id: input, isDeleted: false, isPublic: !isAdmin },
+        where: { id: input, isDeleted: false},
         select: {
           id: true,
           title: true,
@@ -244,7 +244,7 @@ export const conferenceRouter = router({
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return ctx.prisma.conference.findMany({
-        where: { mainChairId: input, isDeleted: false },
+        where: { mainChairId: input, isDeleted: false, status: {not: "PENDING"} },
         select: {
           id: true,
           title: true,
