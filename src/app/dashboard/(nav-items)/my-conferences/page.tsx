@@ -5,6 +5,7 @@ import { trpc } from "@/server/client";
 import { toast } from "sonner";
 import ConferenceList from "@/components/ConferenceList";
 import { useSession } from "next-auth/react";
+import { Plus } from "lucide-react";
 
 export default function AllConferences() {
   const { data: session } = useSession();
@@ -31,6 +32,11 @@ export default function AllConferences() {
         title={"Your Conferences"}
         conferences={conferences}
         route={"/dashboard/conference"}
+        actionButton={{
+          label: "New Conference Request",
+          href: "/dashboard/my-conferences/create-conference",
+          icon: Plus,
+        }}
       />
     </div>
   );

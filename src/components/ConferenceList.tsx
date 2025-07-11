@@ -9,15 +9,23 @@ import {
   TableBody,
   TableCell,
 } from "./ui/table";
+import { Button } from "./ui/button";
+import { Plus } from "lucide-react";
 
 export default function ConferenceList({
   conferences,
   title = "All Conferences",
   route,
+  actionButton,
 }: {
   conferences: Pick<Conference, "id" | "acronym" | "title">[];
   title?: string;
   route: string;
+  actionButton?: {
+    label: string;
+    href: string;
+    icon?: React.ComponentType<{ className?: string }>;
+  };
 }) {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -25,6 +33,16 @@ export default function ConferenceList({
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
           {title}
         </h1>
+        {actionButton && (
+          <div className="flex justify-center">
+            <Button asChild className="gap-2">
+              <Link href={actionButton.href}>
+                {actionButton.icon && <actionButton.icon className="h-4 w-4" />}
+                {actionButton.label}
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
       <Card className="border-0 shadow-2xl bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <CardHeader className="pb-4">
