@@ -31,39 +31,51 @@ export default function ConferenceList({
           <CardTitle className="text-2xl font-semibold">Conferences</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border/50 hover:bg-transparent">
-                <TableHead className="text-base font-semibold">
-                  Acronym
-                </TableHead>
-                <TableHead className="text-base font-semibold">Name</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {conferences.map((conf) => (
-                <TableRow
-                  key={conf.id}
-                  className="group border-border/30 hover:bg-muted/50 transition-all duration-300 ease-in-out"
-                >
-                  <TableCell className="py-6">
-                    <Link href={`${route}/${conf.id}`}>
-                      <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
-                        {conf.acronym}
-                      </p>
-                    </Link>
-                  </TableCell>
-                  <TableCell className="py-6">
-                    <Link href={`${route}/${conf.id}`}>
-                      <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
-                        {conf.title}
-                      </p>
-                    </Link>
-                  </TableCell>
+          {conferences.length === 0 ? (
+            <div className="text-center py-12 space-y-4">
+              <div className="text-6xl">📚</div>
+              <h3 className="text-xl font-semibold text-muted-foreground">
+                No conferences found
+              </h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                There are currently no conferences available. Check back later or create a new conference to get started.
+              </p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border/50 hover:bg-transparent">
+                  <TableHead className="text-base font-semibold">
+                    Acronym
+                  </TableHead>
+                  <TableHead className="text-base font-semibold">Name</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {conferences.map((conf) => (
+                  <TableRow
+                    key={conf.id}
+                    className="group border-border/30 hover:bg-muted/50 transition-all duration-300 ease-in-out"
+                  >
+                    <TableCell className="py-6">
+                      <Link href={`${route}/${conf.id}`}>
+                        <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
+                          {conf.acronym}
+                        </p>
+                      </Link>
+                    </TableCell>
+                    <TableCell className="py-6">
+                      <Link href={`${route}/${conf.id}`}>
+                        <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
+                          {conf.title}
+                        </p>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
