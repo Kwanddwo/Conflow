@@ -28,6 +28,8 @@ model User {
   chairs     Conference[] @relation("ConferenceChairs")
   reviewers  Conference[] @relation("ConferenceReviewers")
   mainChairs Conference[] @relation("ConferenceMainChair")
+
+  Submission Submission[]
 }
 
 model Notification {
@@ -76,4 +78,50 @@ model Conference {
   mainChair User @relation("ConferenceMainChair", fields: [mainChairId], references: [id])
   chairs     User[] @relation("ConferenceChairs")
   reviewers User[] @relation("ConferenceReviewers")
+
+  Submission Submission[]
+}
+
+enum SubmissionStatus {
+  DRAFT
+  ACCEPTED
+  REFUSED
+  UNDER_REVIEW
+  REVISION
+}
+
+model Submission {
+  id                     String           @id @default(cuid())
+  title                  String
+  abstract               String
+  keywords               Json
+  paper_file_path        String
+  paper_file_name        String
+  camera_ready_file_path String
+  camera_ready_file_name String
+  primary_area           String
+  secondary_areas        String
+  submitted_by           String
+  submitted_at           String
+  status                 SubmissionStatus @default(DRAFT)
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  conferenceId           String
+  conference             Conference       @relation(fields: [conferenceId], references: [id])
+  user           User             @relation(fields: [submitted_by], references: [id])
+
+  SubmissonAuthor SubmissonAuthor[]
+}
+
+model SubmissonAuthor {
+  id              String   @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String
+  affiliation     String
+  country         String
+  submissionId    String
+  submission      Submission @relation(fields: [submissionId], references: [id])
+  isCorresponding Boolean
+  createdAt       DateTime @default(now())
 }

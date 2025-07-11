@@ -72,12 +72,12 @@ export default function PaperSubmissionForm() {
           <Label htmlFor="keywords" className="text-[#000000] font-medium">
             Keywords
           </Label>
-          <Textarea
-            id="keywords"
-            placeholder="Keyword 1&#10;Keyword 2&#10;Keyword 3"
-            rows={3}
-            className="w-full border-[#cbd5e1] text-[#94a3b8] placeholder:text-[#94a3b8] resize-none"
-          />
+            <Textarea
+              id="keywords"
+              placeholder={`Keyword 1\nKeyword 2\nKeyword 3`}
+              rows={3}
+              className="w-full border-[#cbd5e1] text-[#94a3b8] placeholder:text-[#94a3b8] resize-none"
+            />
           <p className="text-[#64748b] text-sm">
             Type a list of keywords for your paper, each keyword should be in
             its own line!!
