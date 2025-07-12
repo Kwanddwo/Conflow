@@ -97,11 +97,11 @@ export default function ConferenceForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white">
+    <div className="max-w-2xl mx-auto p-6 bg-background">
       <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
         {/* Conference Name & Acronym */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#0f172a]">
+          <h2 className="text-lg font-medium text-foreground">
             Conference Title & Acronym
           </h2>
 
@@ -109,12 +109,12 @@ export default function ConferenceForm() {
             <Input
               {...register("title")}
               placeholder="Title"
-              className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+              className="border-border text-foreground placeholder:text-muted-foreground"
             />
             {errors.title && (
-              <p className="text-sm text-red-500">{errors.title.message}</p>
+              <p className="text-sm text-destructive">{errors.title.message}</p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Enter The conference&apos;s full name
             </p>
           </div>
@@ -123,27 +123,29 @@ export default function ConferenceForm() {
             <Input
               {...register("acronym")}
               placeholder="ACR20XX"
-              className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+              className="border-border text-foreground placeholder:text-muted-foreground"
             />
             {errors.acronym && (
-              <p className="text-sm text-red-500">{errors.acronym.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.acronym.message}
+              </p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Acronym must contain atleast one digit
             </p>
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <h2 className="text-lg font-medium text-[#0f172a]">Description</h2>
+            <h2 className="text-lg font-medium text-foreground">Description</h2>
             <div className="space-y-2">
               <textarea
                 {...register("description")}
                 placeholder="Enter conference description"
-                className="w-full p-3 border border-[#e2e8f0] rounded-md text-slate-900 placeholder:text-[#94a3b8] min-h-[100px]"
+                className="w-full p-3 border border-border rounded-md text-foreground placeholder:text-muted-foreground min-h-[100px] bg-background"
               />
               {errors.description && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-destructive">
                   {errors.description.message}
                 </p>
               )}
@@ -153,7 +155,7 @@ export default function ConferenceForm() {
 
         {/* Conference Location */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#0f172a]">
+          <h2 className="text-lg font-medium text-foreground">
             Conference Location
           </h2>
 
@@ -161,10 +163,10 @@ export default function ConferenceForm() {
             <Input
               {...register("locationVenue")}
               placeholder="Venue"
-              className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+              className="border-border text-foreground placeholder:text-muted-foreground"
             />
             {errors.locationVenue && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.locationVenue.message}
               </p>
             )}
@@ -174,10 +176,10 @@ export default function ConferenceForm() {
             <Input
               {...register("locationCity")}
               placeholder="City"
-              className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+              className="border-border text-foreground placeholder:text-muted-foreground"
             />
             {errors.locationCity && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.locationCity.message}
               </p>
             )}
@@ -196,7 +198,7 @@ export default function ConferenceForm() {
               )}
             />
             {errors.locationCountry && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.locationCountry.message}
               </p>
             )}
@@ -205,19 +207,19 @@ export default function ConferenceForm() {
 
         {/* Web Page */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#0f172a]">Web Page</h2>
+          <h2 className="text-lg font-medium text-foreground">Web Page</h2>
           <div className="space-y-2">
             <Input
               {...register("websiteUrl")}
               placeholder="https://www.example.com"
-              className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+              className="border-border text-foreground placeholder:text-muted-foreground"
             />
             {errors.websiteUrl && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.websiteUrl.message}
               </p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Enter The conference&apos;s web page
             </p>
           </div>
@@ -225,7 +227,7 @@ export default function ConferenceForm() {
 
         {/* Dates and deadlines */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#0f172a]">
+          <h2 className="text-lg font-medium text-foreground">
             Dates and deadlines
           </h2>
 
@@ -235,13 +237,15 @@ export default function ConferenceForm() {
                 {...register("startDate")}
                 type="date"
                 placeholder="Start date"
-                className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+                className="border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             {errors.startDate && (
-              <p className="text-sm text-red-500">{errors.startDate.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.startDate.message}
+              </p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Enter The conference&apos;s start date
             </p>
           </div>
@@ -252,13 +256,15 @@ export default function ConferenceForm() {
                 {...register("endDate")}
                 type="date"
                 placeholder="End date"
-                className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+                className="border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             {errors.endDate && (
-              <p className="text-sm text-red-500">{errors.endDate.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.endDate.message}
+              </p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Enter The conference&apos;s end date
             </p>
           </div>
@@ -269,15 +275,15 @@ export default function ConferenceForm() {
                 {...register("abstractDeadline")}
                 type="date"
                 placeholder="Abstract deadline"
-                className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+                className="border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             {errors.abstractDeadline && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.abstractDeadline.message}
               </p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Enter The CFP Abstraction registration deadline
             </p>
           </div>
@@ -288,15 +294,15 @@ export default function ConferenceForm() {
                 {...register("submissionDeadline")}
                 type="date"
                 placeholder="Submission deadline"
-                className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+                className="border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             {errors.submissionDeadline && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.submissionDeadline.message}
               </p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Enter The CFP submission deadline
             </p>
           </div>
@@ -307,15 +313,15 @@ export default function ConferenceForm() {
                 {...register("cameraReadyDeadline")}
                 type="date"
                 placeholder="Camera ready deadline"
-                className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+                className="border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             {errors.cameraReadyDeadline && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.cameraReadyDeadline.message}
               </p>
             )}
-            <p className="text-sm text-[#64748b]">
+            <p className="text-sm text-muted-foreground">
               Enter The camera ready deadline
             </p>
           </div>
@@ -323,8 +329,10 @@ export default function ConferenceForm() {
 
         {/* Research Areas */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#0f172a]">Research Areas</h2>
-          <p className="text-sm text-[#64748b]">
+          <h2 className="text-lg font-medium text-foreground">
+            Research Areas
+          </h2>
+          <p className="text-sm text-muted-foreground">
             Enter the primary research areas of the conference, and the
             secondary areas corresponding to each primary area
           </p>
@@ -335,7 +343,7 @@ export default function ConferenceForm() {
           />
 
           <div className="space-y-2 flex items-center gap-2">
-            <Label className="text-sm font-medium text-[#0f172a] m-0">
+            <Label className="text-sm font-medium text-foreground m-0">
               Make this conference public on approval?
             </Label>
             <Input
@@ -344,30 +352,26 @@ export default function ConferenceForm() {
               {...register("isPublic")}
             />
             {errors.isPublic && (
-              <p className="text-sm text-red-500">{errors.isPublic.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.isPublic.message}
+              </p>
             )}
           </div>
         </div>
 
         {/* Call for Papers */}
-        {/* TODO: replace with rich text editor and put in a separate page if necessary*/}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#0f172a]">
+          <h2 className="text-lg font-medium text-foreground">
             Call for Papers
           </h2>
           <div className="space-y-2">
-            {/* <textarea
-              {...register("callForPapers")}
-              placeholder="Enter call for papers"
-              className="w-full p-3 border border-[#e2e8f0] rounded-md text-slate-900 placeholder:text-[#94a3b8] min-h-[100px]"
-            /> */}
             <Controller
               control={control}
               name="callForPapers"
               defaultValue={`<h1>Call for Papers</h1>
                 <br/>
                 <h2>[Event Name]</h2>
-                <p><strong>Date:</strong> [Month DD–DD, YYYY] &nbsp;|&nbsp; <strong>Location:</strong> [City, Country or “Virtual”]</p>
+                <p><strong>Date:</strong> [Month DD–DD, YYYY] &nbsp;|&nbsp; <strong>Location:</strong> [City, Country or "Virtual"]</p>
                 <p><strong>Organized by:</strong> [Organization / Host Institution]</p>
               
                 <br/>
@@ -430,7 +434,7 @@ export default function ConferenceForm() {
                   <strong>Dr. A. Smith</strong> – <a href="mailto:asmith@example.com">asmith@example.com</a><br/>
                   <strong>Prof. B. Lee</strong> – <a href="mailto:blee@example.com">blee@example.com</a>
                 </p>`}
-              render={({ field: { onChange, onBlur, value, ref } }) => (
+              render={({ field: { onChange, onBlur, value } }) => (
                 <ReactQuill
                   style={{ lineHeight: 2 }}
                   theme="snow"
@@ -442,7 +446,7 @@ export default function ConferenceForm() {
             />
 
             {errors.callForPapers && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.callForPapers.message}
               </p>
             )}
@@ -453,7 +457,7 @@ export default function ConferenceForm() {
         <Button
           type="submit"
           disabled={isPending}
-          className="w-full bg-[#1e293b] hover:bg-[#334155] text-white py-3 text-base font-medium disabled:opacity-50"
+          className="w-full py-3 text-base font-medium disabled:opacity-50"
         >
           {isPending ? "Sending Request..." : "Send Creation Request"}
         </Button>
@@ -514,7 +518,7 @@ const ResearchAreasSection = ({
     <div className="space-y-6">
       {/* Add new primary area */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-[#0f172a]">
+        <Label className="text-sm font-medium text-foreground">
           Add new primary research area
         </Label>
         <div className="flex gap-2">
@@ -522,7 +526,7 @@ const ResearchAreasSection = ({
             value={newPrimaryArea}
             onChange={(e) => setNewPrimaryArea(e.target.value)}
             placeholder="Enter primary research area"
-            className="border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8]"
+            className="border-border text-foreground placeholder:text-muted-foreground"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -536,13 +540,12 @@ const ResearchAreasSection = ({
             disabled={
               !newPrimaryArea.trim() || !!researchAreas[newPrimaryArea.trim()]
             }
-            className="bg-[#1e293b] hover:bg-[#334155] text-white"
           >
             Add
           </Button>
         </div>
       </div>
-      <div className="border-[#e2e8f0] flex flex-col gap-2 border-1 rounded-xl p-2">
+      <div className="border border-border flex flex-col gap-2 rounded-xl p-2">
         {Object.entries(researchAreas).map(
           ([primaryArea, secondaryAreas], index) => (
             <PrimaryAreaComponent
@@ -586,44 +589,44 @@ const PrimaryAreaComponent = ({
   };
 
   return (
-    <div className="space-y-3 border border-[#e2e8f0] p-4 rounded-lg">
+    <div className="space-y-3 border border-border p-4 rounded-lg bg-card">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium text-[#0f172a]">
+        <Label className="text-sm font-medium text-foreground">
           Primary area no. {index}
         </Label>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-6 w-6 hover:bg-red-100"
+          className="h-6 w-6 hover:bg-destructive/10"
           onClick={() => onRemovePrimary(primaryArea)}
         >
-          <X className="h-4 w-4 text-red-500" />
+          <X className="h-4 w-4 text-destructive" />
         </Button>
       </div>
 
-      <div className="bg-[#f8fafc] p-2 rounded border">
-        <span className="text-sm font-medium text-[#0f172a]">
+      <div className="bg-accent p-2 rounded border">
+        <span className="text-sm font-medium text-accent-foreground">
           {primaryArea}
         </span>
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-[#334155] bg-[#cbd5e1] px-2 py-1 rounded">
+        <Label className="text-sm font-medium text-accent-foreground bg-accent px-2 py-1 rounded">
           Secondary areas
         </Label>
-        <div className="bg-[#cbd5e1] p-3 rounded-md space-y-2">
+        <div className="bg-accent p-3 rounded-md space-y-2">
           <div className="flex flex-wrap gap-2">
             {secondaryAreas.map((secondaryArea) => (
               <div key={secondaryArea} className="flex items-center gap-1">
-                <span className="bg-white px-3 py-1 rounded-full text-sm text-[#0f172a] border border-[#e2e8f0]">
+                <span className="bg-background px-3 py-1 rounded-full text-sm text-foreground border border-border">
                   {secondaryArea}
                 </span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 hover:bg-[#94a3b8]"
+                  className="h-6 w-6 hover:bg-muted"
                   onClick={() => onRemoveSecondary(primaryArea, secondaryArea)}
                 >
                   <X className="h-3 w-3" />
@@ -638,7 +641,7 @@ const PrimaryAreaComponent = ({
               value={newSecondaryArea}
               onChange={(e) => setNewSecondaryArea(e.target.value)}
               placeholder="Add secondary area"
-              className="bg-white border-[#e2e8f0] text-slate-900 placeholder:text-[#94a3b8] text-sm"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground text-sm"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -654,7 +657,7 @@ const PrimaryAreaComponent = ({
                 !newSecondaryArea.trim() ||
                 secondaryAreas.includes(newSecondaryArea.trim())
               }
-              className="bg-[#64748b] hover:bg-[#475569] text-white"
+              variant="outline"
             >
               <Plus className="h-4 w-4" />
             </Button>

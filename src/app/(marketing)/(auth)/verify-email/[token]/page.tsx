@@ -82,13 +82,13 @@ function Page() {
     <div className="main-content-height flex flex-col justify-center items-center space-y-4">
       {status === "verifying" ? (
         <>
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="text-gray-700">Verifying your email...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Verifying your email...</p>
         </>
       ) : status === "error" ? (
         <>
           <div className="text-center">
-            <p className="text-red-600 mb-4">
+            <p className="text-destructive mb-4">
               Verification failed. Please try again.
             </p>
           </div>

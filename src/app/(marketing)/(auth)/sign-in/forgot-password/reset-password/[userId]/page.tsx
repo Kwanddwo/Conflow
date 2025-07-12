@@ -64,7 +64,7 @@ export default function ResetPassword() {
     }
   };
   return (
-    <div className="main-content-height flex items-center justify-center p-4 bg-gray-50">
+    <div className="main-content-height flex items-center justify-center p-4 bg-muted/50">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -86,9 +86,9 @@ export default function ResetPassword() {
                 disabled={isSubmitting}
               />
               {errors.password ? (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
+                <p className="text-sm text-destructive">{errors.password.message}</p>
               ) : (
-                <p className="text-sm text-gray-500">{PASSWORD_REQUIREMENTS_TEXT}</p>
+                <p className="text-sm text-muted-foreground">{PASSWORD_REQUIREMENTS_TEXT}</p>
               )}
             </div>
             <div className="space-y-2 mb-4">
@@ -102,7 +102,7 @@ export default function ResetPassword() {
               />
             </div>
             {errors.confirmPassword && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.confirmPassword.message}
               </p>
             )}

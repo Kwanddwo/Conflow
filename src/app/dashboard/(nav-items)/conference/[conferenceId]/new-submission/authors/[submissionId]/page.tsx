@@ -74,10 +74,10 @@ export default function AuthorForm() {
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Add Authors
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Please provide information for all authors of this submission
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function AuthorForm() {
             <Label>First Name</Label>
             <Input {...register(`authors.${index}.firstName`)} />
             {errors.authors?.[index]?.firstName && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.authors[index].firstName.message}
               </p>
             )}
@@ -118,7 +118,7 @@ export default function AuthorForm() {
             <Label>Last Name</Label>
             <Input {...register(`authors.${index}.lastName`)} />
             {errors.authors?.[index]?.lastName && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.authors[index].lastName.message}
               </p>
             )}
@@ -128,7 +128,7 @@ export default function AuthorForm() {
             <Label>Email</Label>
             <Input type="email" {...register(`authors.${index}.email`)} />
             {errors.authors?.[index]?.email && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.authors[index].email.message}
               </p>
             )}
@@ -144,7 +144,7 @@ export default function AuthorForm() {
               )}
             />
             {errors.authors?.[index]?.country && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.authors[index].country.message}
               </p>
             )}
@@ -157,7 +157,7 @@ export default function AuthorForm() {
               Enter the laboratory you are associated with.
             </p>
             {errors.authors?.[index]?.affiliation && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.authors[index].affiliation.message}
               </p>
             )}

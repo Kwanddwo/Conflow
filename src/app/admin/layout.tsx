@@ -12,18 +12,18 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
         <Link href="/admin" className="flex items-center gap-2">
           <Logo height={120} width={110} />
-          <span className="text-xl text-slate-900 font-bold">Admin</span>
+          <span className="text-xl text-foreground font-bold">Admin</span>
         </Link>
         <nav className="flex items-center gap-8">
           <Link
             href="/admin/conference-requests"
-            className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
             Conference Requests
           </Link>
           <Link
             href="/admin/inbox"
-            className="text-[#64748b] hover:text-[#0f172a] transition-colors font-medium"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
             Inbox
           </Link>

@@ -52,121 +52,123 @@ const RegisterComponent = ({
   handleSubmit: any;
   onSubmit: (data: any) => void;
 }) => (
-  <div className="main-content-height bg-[#f8fafc] flex items-center justify-center p-4">
-    <div className="w-full max-w-xl bg-white p-8 rounded-lg shadow">
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+  <div className="main-content-height bg-muted/50 flex items-center justify-center p-4">
+    <div className="w-full max-w-md">
+      <form
+        className="space-y-4 border rounded-lg p-6"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div className="space-y-2">
-          <Label htmlFor="firstName" className="text-[#0f172a] font-medium">
+          <Label htmlFor="firstName" className="text-foreground font-medium">
             First Name
           </Label>
           <Input
             id="firstName"
             type="text"
             placeholder="First Name"
-            className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg placeholder:text-[#94a3b8] focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
+            className="w-full px-4 py-3 border border-border rounded-lg placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             {...register("firstName")}
             disabled={isSubmitting || isPending}
           />
           {errors.firstName && (
-            <p className="text-sm text-red-500">{errors.firstName.message}</p>
+            <p className="text-sm text-destructive">{errors.firstName.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="lastName" className="text-[#0f172a] font-medium">
+          <Label htmlFor="lastName" className="text-foreground font-medium">
             Last Name
           </Label>
           <Input
             id="lastName"
             type="text"
             placeholder="Last Name"
-            className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg placeholder:text-[#94a3b8] focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
+            className="w-full px-4 py-3 border border-border rounded-lg placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             {...register("lastName")}
             disabled={isSubmitting || isPending}
           />
           {errors.lastName && (
-            <p className="text-sm text-red-500">{errors.lastName.message}</p>
+            <p className="text-sm text-destructive">{errors.lastName.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-[#0f172a] font-medium">
+          <Label htmlFor="email" className="text-foreground font-medium">
             Email
           </Label>
           <Input
             id="email"
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg placeholder:text-[#94a3b8] focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
+            className="w-full px-4 py-3 border border-border rounded-lg placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             {...register("email")}
             disabled={isSubmitting || isPending}
           />
           {errors.email && (
-            <p className="text-sm text-red-500">{errors.email.message}</p>
+            <p className="text-sm text-destructive">{errors.email.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-[#0f172a] font-medium">
+          <Label htmlFor="password" className="text-foreground font-medium">
             Password
           </Label>
           <Input
             id="password"
             type="password"
             placeholder="Password"
-            className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg placeholder:text-[#94a3b8] focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
+            className="w-full px-4 py-3 border border-border rounded-lg placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             {...register("password")}
             disabled={isSubmitting || isPending}
           />
-          {errors.password ? (
-            <p className="text-sm text-red-500">{errors.password.message}</p>
-          ) : (
-            <p className="text-[#94a3b8] text-sm">
-              {PASSWORD_REQUIREMENTS_TEXT}
-            </p>
+          {errors.password && (
+            <p className="text-sm text-destructive">{errors.password.message}</p>
           )}
+          <p className="text-muted-foreground text-sm">
+            {PASSWORD_REQUIREMENTS_TEXT}
+          </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="country" className="text-[#0f172a] font-medium">
+          <Label htmlFor="country" className="text-foreground font-medium">
             Country
           </Label>
           <Controller
-            name="country"
             control={control}
-            render={({ field }) =>
-              CountrySelect(field, isSubmitting, isPending)
-            }
+            name="country"
+            render={({ field }) => (
+              <CountrySelect
+                field={field}
+                isSubmitting={isSubmitting}
+                isPending={isPending}
+              />
+            )}
           />
-
           {errors.country && (
-            <p className="text-sm text-red-500">{errors.country.message}</p>
+            <p className="text-sm text-destructive">{errors.country.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="affiliation" className="text-[#0f172a] font-medium">
+          <Label htmlFor="affiliation" className="text-foreground font-medium">
             Affiliation
           </Label>
           <Input
             id="affiliation"
             type="text"
             placeholder="Affiliation"
-            className="w-full px-4 py-3 border border-[#cbd5e1] rounded-lg placeholder:text-[#94a3b8] focus:border-[#64748b] focus:ring-1 focus:ring-[#64748b]"
+            className="w-full px-4 py-3 border border-border rounded-lg placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
             {...register("affiliation")}
             disabled={isSubmitting || isPending}
           />
           {errors.affiliation && (
-            <p className="text-sm text-red-500">{errors.affiliation.message}</p>
+            <p className="text-sm text-destructive">{errors.affiliation.message}</p>
           )}
-          <p className="text-[#94a3b8] text-sm">
-            Enter the laboratory you are associated with.
-          </p>
         </div>
 
         <Button
           type="submit"
-          className="w-full bg-[#0f172a] hover:bg-[#0f172a]/90 text-white py-3 rounded-lg font-medium cursor-pointer"
+          className="w-full py-3 rounded-lg font-medium cursor-pointer"
           disabled={isSubmitting || isPending}
         >
           {(isSubmitting || isPending) && (
