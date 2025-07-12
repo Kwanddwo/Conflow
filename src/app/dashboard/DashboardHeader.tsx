@@ -1,8 +1,7 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList} from '@/components/ui/breadcrumb'
 import { ModeToggle } from '@/components/ui/modeToggle'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { LayoutDashboard } from 'lucide-react'
 import React from 'react'
 
 function DashboardHeader() {
@@ -14,10 +13,6 @@ function DashboardHeader() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbPage className="line-clamp-1 flex items-center gap-2">
-                  <LayoutDashboard className="h-5 w-5" />
-                  <span className="text-xl font-bold">Dashboard</span>
-                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>

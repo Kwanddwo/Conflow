@@ -8,6 +8,7 @@ import {
 } from "../trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+type ResearchAreas = Record<string, string[]>;
 import DOMPurify from "isomorphic-dompurify";
 
 export const conferenceRouter = router({
@@ -335,4 +336,21 @@ export const conferenceRouter = router({
         data: updateData,
       });
     }),
+    getAreas : userProcedure.input(z.string()).query(async ({ ctx, input }) => {
+      const conference = await ctx.prisma.conference.findUnique({
+        where: { id: input },
+        select: {
+          researchAreas: true,
+        },
+      });
+
+      if (!conference) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Conference not found",
+        });
+      }
+
+      return conference.researchAreas as ResearchAreas;
+    })
 });
