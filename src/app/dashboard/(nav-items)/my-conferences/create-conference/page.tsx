@@ -12,11 +12,9 @@ import { TRPCClientError } from "@trpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import CountrySelect from "@/components/CountrySelect";
-
-// TODO: add verification for dates to be in the correct order!!!
-// TODO: add editing for research areas
-// TODO: replace these weird styles with a universal theme
-// TODO: replace textarea with a rich text editor for call for papers (Slate.js)
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css"; // Import Quill styles
+import { useRouter } from "next/navigation";
 
 const conferenceSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -44,6 +42,8 @@ export default function ConferenceForm() {
   }>({
     "Machine Learning": ["Deep Learning", "Neural Networks"],
   });
+
+  const router = useRouter();
 
   const {
     register,
@@ -84,6 +84,7 @@ export default function ConferenceForm() {
       const result = await mutateAsync(formattedData);
       console.log("Success:", result); // Debug log
       toast.success("Conference creation request sent successfully!");
+      router.push("/dashboard/my-conferences");
     } catch (err) {
       const errorMessage =
         err instanceof TRPCClientError
@@ -355,11 +356,91 @@ export default function ConferenceForm() {
             Call for Papers
           </h2>
           <div className="space-y-2">
-            <textarea
+            {/* <textarea
               {...register("callForPapers")}
               placeholder="Enter call for papers"
               className="w-full p-3 border border-[#e2e8f0] rounded-md text-slate-900 placeholder:text-[#94a3b8] min-h-[100px]"
+            /> */}
+            <Controller
+              control={control}
+              name="callForPapers"
+              defaultValue={`<h1>Call for Papers</h1>
+                <br/>
+                <h2>[Event Name]</h2>
+                <p><strong>Date:</strong> [Month DD–DD, YYYY] &nbsp;|&nbsp; <strong>Location:</strong> [City, Country or “Virtual”]</p>
+                <p><strong>Organized by:</strong> [Organization / Host Institution]</p>
+              
+                <br/>
+                <h2>About the Event</h2>
+                <p>
+                  The <em>[Event Name]</em> is a [type: conference/workshop/special issue] aiming to bring together researchers, practitioners, and industry experts
+                  working on [broad theme]. We welcome original contributions that advance the understanding of [primary focus area], and that
+                  foster innovative approaches or interdisciplinary collaborations.
+                </p>
+
+                <br/>
+                <h2>Themes &amp; Topics</h2>
+                <p>We invite authors to submit papers on topics including, but not limited to:</p>
+                <ul>
+                  <li>Topic A (e.g., Machine Learning for Healthcare)</li>
+                  <li>Topic B (e.g., Renewable Energy Systems)</li>
+                  <li>Topic C (e.g., Sustainability and Policy Frameworks)</li>
+                  <li>Topic D (e.g., AI Ethics and Governance)</li>
+                </ul>
+              
+                <br/>
+                <h2>Submission Guidelines</h2>
+                <ul>
+                  <li><strong>Abstract:</strong> Max 300 words, structured (objective, method, expected results)</li>
+                  <li><strong>Full paper:</strong> [e.g., Up to 8,000 words in APA/IEEE/ACM format]</li>
+                  <li><strong>Review process:</strong> Double-blind peer review</li>
+                </ul>
+              
+                <br/>
+                <h2>Important Dates</h2>
+                <ul>
+                  <li>Abstract Submission Deadline: [Month DD, YYYY]</li>
+                  <li>Full Paper Submission Deadline: [Month DD, YYYY]</li>
+                  <li>Notification of Acceptance: [Month DD, YYYY]</li>
+                  <li>Camera-ready Submission: [Month DD, YYYY]</li>
+                  <li>Event Dates: [Month DD–DD, YYYY]</li>
+                </ul>
+                
+                <br/>
+                <h2>Evaluation Criteria</h2>
+                <p>Submissions will be reviewed based on:</p>
+                <ul>
+                  <li>Relevance to the themes and topics</li>
+                  <li>Originality and novelty</li>
+                  <li>Technical soundness and rigor</li>
+                  <li>Clarity and structure of the presentation</li>
+                </ul>
+                
+                <br/>
+                <h2>Publication &amp; Presentation</h2>
+                <p>
+                  Accepted papers will be published in the official conference proceedings (indexed in [e.g., Scopus, EI]) and presented
+                  during the event, with opportunities for full‑paper publication in a special journal or edited volume.
+                </p>
+                
+                <br/>
+                <h2>Contact</h2>
+                <p>
+                  For inquiries, please contact the Program Chairs:<br/>
+                  <strong>Dr. A. Smith</strong> – <a href="mailto:asmith@example.com">asmith@example.com</a><br/>
+                  <strong>Prof. B. Lee</strong> – <a href="mailto:blee@example.com">blee@example.com</a>
+                </p>`}
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <ReactQuill
+                  style={{ lineHeight: 2 }}
+                  theme="snow"
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                />
+              )}
             />
+
             {errors.callForPapers && (
               <p className="text-sm text-red-500">
                 {errors.callForPapers.message}

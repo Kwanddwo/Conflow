@@ -23,6 +23,7 @@ export default function AllConferences() {
   return (
     <div className="main-content-height bg-gradient-to-br from-background via-muted/20 to-muted/40 p-8">
       <ConferenceList
+        title="Conference Requests"
         conferences={conferences}
         route={"/admin/conference-requests"}
       />

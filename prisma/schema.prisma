@@ -29,7 +29,9 @@ model User {
   reviewers  Conference[] @relation("ConferenceReviewers")
   mainChairs Conference[] @relation("ConferenceMainChair")
 
-  Submission Submission[]
+  submissions Submission[]
+
+  authorEntries SubmissonAuthor[] @relation("AuthorUser")
 }
 
 model Notification {
@@ -95,10 +97,10 @@ model Submission {
   title                  String
   abstract               String
   keywords               Json
-  paper_file_path        String
-  paper_file_name        String
-  camera_ready_file_path String
-  camera_ready_file_name String
+  paper_file_path        String?
+  paper_file_name        String?
+  camera_ready_file_path String?
+  camera_ready_file_name String?
   primary_area           String
   secondary_areas        String
   submitted_by           String
@@ -124,4 +126,7 @@ model SubmissonAuthor {
   submission      Submission @relation(fields: [submissionId], references: [id])
   isCorresponding Boolean
   createdAt       DateTime @default(now())
+
+  userId String?
+  user User? @relation("AuthorUser", fields: [userId], references: [id])
 }

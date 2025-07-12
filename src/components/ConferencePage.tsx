@@ -28,6 +28,8 @@ import {
 import { TRPCError } from "@trpc/server";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import DOMPurify from "isomorphic-dompurify";
+import ReactQuill from "react-quill-new";
 
 export default function ConferencePage() {
   const { conferenceId } = useParams<{ conferenceId: string }>();
@@ -345,23 +347,22 @@ export default function ConferencePage() {
               {editable && isEditing ? (
                 <div>
                   <Label htmlFor="callForPapers">Call for Papers</Label>
-                  <Textarea
+                  <ReactQuill
                     id="callForPapers"
                     value={editableData?.callForPapers || ""}
-                    onChange={(e) =>
-                      handleInputChange("callForPapers", e.target.value)
+                    onChange={(value) =>
+                      handleInputChange("callForPapers", value)
                     }
-                    placeholder="Call for Papers content"
-                    rows={10}
-                    className="mt-2"
+                    placeholder="Call for Papers"
                   />
                 </div>
               ) : (
-                <div className="prose prose-slate max-w-none">
-                  <div className="whitespace-pre-wrap text-foreground leading-relaxed">
-                    {conference.callForPapers}
-                  </div>
-                </div>
+                <div
+                  className="text-foreground max-w-none [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mb-4 [&>h2]:text-xl [&>h2]:font-semibold [&>h2]:mb-3 [&>h3]:text-lg [&>h3]:font-medium [&>h3]:mb-2 [&>p]:mb-4 [&>p]:leading-relaxed [&>ul]:mb-4 [&>ol]:mb-4 [&>li]:mb-1"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(conference.callForPapers),
+                  }}
+                ></div>
               )}
             </CardContent>
           </Card>

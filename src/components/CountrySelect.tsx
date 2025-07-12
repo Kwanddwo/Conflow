@@ -12,6 +12,7 @@ export default function CountrySelect(
   isSubmitting: boolean = false,
   isPending: boolean = false
 ) {
+  const countries = getData();
   return (
     <Select
       onValueChange={field.onChange}
@@ -27,7 +28,7 @@ export default function CountrySelect(
         <SelectValue placeholder="Country/region" />
       </SelectTrigger>
       <SelectContent>
-        {getData()
+        {countries
           .sort(
             (
               a: { code: string; name: string },

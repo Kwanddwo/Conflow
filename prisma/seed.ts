@@ -142,8 +142,20 @@ async function main() {
       locationVenue: "Grand Convention Center",
       locationCity: "San Francisco",
       locationCountry: "United States",
-      callForPapers:
-        "We invite submissions on all aspects of artificial intelligence including but not limited to: Machine Learning, Deep Learning, Natural Language Processing, Computer Vision, Robotics, and AI Ethics.",
+      callForPapers: `
+        <h2>Call for Papers</h2>
+        <p>We invite submissions on all aspects of artificial intelligence including but not limited to:</p>
+        <ul>
+          <li><strong>Machine Learning:</strong> Deep Learning, Reinforcement Learning, Transfer Learning</li>
+          <li><strong>Natural Language Processing:</strong> Language Models, Machine Translation, Text Mining</li>
+          <li><strong>Computer Vision:</strong> Image Recognition, Object Detection, Medical Imaging</li>
+          <li><strong>Robotics:</strong> Autonomous Systems, Human-Robot Interaction, Robot Learning</li>
+          <li><strong>AI Ethics:</strong> Algorithmic Bias, Explainable AI, Privacy Protection</li>
+        </ul>
+        <h3>Submission Guidelines</h3>
+        <p>All submissions must be original work and not previously published. Papers should be formatted according to the conference template and not exceed 8 pages including references.</p>
+        <p><em>Submission deadline: June 15, 2024</em></p>
+      `,
       websiteUrl: "https://icai2024.conference.org",
       startDate: new Date("2024-09-15"),
       endDate: new Date("2024-09-18"),
@@ -201,8 +213,25 @@ async function main() {
       locationVenue: "Tech Innovation Hub",
       locationCity: "Toronto",
       locationCountry: "Canada",
-      callForPapers:
-        "Submit your research on cybersecurity, data privacy, cryptography, network security, incident response, and emerging security technologies.",
+      callForPapers: `
+        <h2>Call for Papers</h2>
+        <p>Submit your research on the following topics:</p>
+        <h3>Core Areas</h3>
+        <ul>
+          <li><strong>Cybersecurity:</strong> Malware Analysis, Penetration Testing, Threat Intelligence</li>
+          <li><strong>Data Privacy:</strong> GDPR Compliance, Privacy by Design, Data Anonymization</li>
+          <li><strong>Cryptography:</strong> Blockchain Security, Quantum Cryptography, Digital Signatures</li>
+          <li><strong>Network Security:</strong> Intrusion Detection, Firewall Technologies, VPN Security</li>
+        </ul>
+        <h3>Special Focus</h3>
+        <p>This year we particularly encourage submissions on:</p>
+        <ul>
+          <li>AI-powered security solutions</li>
+          <li>Zero-trust architecture implementations</li>
+          <li>Privacy-preserving technologies</li>
+        </ul>
+        <p><strong>Important:</strong> All submissions will undergo double-blind peer review.</p>
+      `,
       websiteUrl: "https://cdps2024.securityconf.ca",
       startDate: new Date("2024-11-10"),
       endDate: new Date("2024-11-12"),
@@ -260,8 +289,37 @@ async function main() {
       locationVenue: "Medical Research Institute",
       locationCity: "London",
       locationCountry: "United Kingdom",
-      callForPapers:
-        "We welcome papers on healthcare informatics, medical AI, telemedicine, digital health, biomedical engineering, and health data analytics.",
+      callForPapers: `
+        <h2>Call for Papers</h2>
+        <p>We welcome papers on healthcare technology innovations and their practical applications:</p>
+        <h3>Research Areas</h3>
+        <ol>
+          <li><strong>Healthcare Informatics</strong>
+            <ul>
+              <li>Electronic Health Records</li>
+              <li>Health Information Systems</li>
+              <li>Clinical Decision Support</li>
+            </ul>
+          </li>
+          <li><strong>Medical AI</strong>
+            <ul>
+              <li>Diagnostic AI</li>
+              <li>Drug Discovery</li>
+              <li>Predictive Analytics</li>
+            </ul>
+          </li>
+          <li><strong>Telemedicine & Digital Health</strong>
+            <ul>
+              <li>Remote Patient Monitoring</li>
+              <li>Virtual Consultations</li>
+              <li>Wearable Technology</li>
+            </ul>
+          </li>
+        </ol>
+        <h3>Submission Requirements</h3>
+        <p>Papers must demonstrate <em>practical healthcare applications</em> and include validation with real-world data where possible.</p>
+        <p class="highlight">⚠️ Note: This conference is invitation-only until further notice.</p>
+      `,
       websiteUrl: "https://fhtc2025.healthtech.uk",
       startDate: new Date("2025-03-20"),
       endDate: new Date("2025-03-23"),
@@ -315,8 +373,25 @@ async function main() {
       locationVenue: "Quantum Research Laboratory",
       locationCity: "Boston",
       locationCountry: "United States",
-      callForPapers:
-        "Submit theoretical and experimental work in quantum computing, quantum algorithms, quantum cryptography, and quantum information processing.",
+      callForPapers: `
+        <h2>Call for Papers</h2>
+        <p>Submit theoretical and experimental work in quantum sciences:</p>
+        <h3>Theoretical Contributions</h3>
+        <ul>
+          <li><strong>Quantum Algorithms:</strong> Shor's Algorithm, Grover's Algorithm, Variational Quantum Algorithms</li>
+          <li><strong>Quantum Information:</strong> Entanglement, Quantum Communication, State Estimation</li>
+          <li><strong>Quantum Physics:</strong> Quantum Mechanics, Field Theory, Many-Body Systems</li>
+        </ul>
+        <h3>Experimental Work</h3>
+        <ul>
+          <li><strong>Quantum Computing:</strong> Hardware implementations, Gate fidelity, Error correction</li>
+          <li><strong>Quantum Optics:</strong> Photonic quantum systems, Quantum sensing</li>
+        </ul>
+        <div style="background-color: #f0f0f0; padding: 10px; border-left: 4px solid #007acc;">
+          <p><strong>Note:</strong> This symposium is limited to 100 participants to encourage in-depth discussions and networking.</p>
+        </div>
+        <p><small>Paper length: 4-6 pages maximum</small></p>
+      `,
       startDate: new Date("2024-12-05"),
       endDate: new Date("2024-12-07"),
       abstractDeadline: new Date("2024-08-15"),
@@ -369,9 +444,36 @@ async function main() {
       locationVenue: "Eco-Tech Convention Center",
       locationCity: "Copenhagen",
       locationCountry: "Denmark",
-      callForPapers:
-        "Papers are invited on sustainable computing, green data centers, renewable energy, environmental monitoring systems, and sustainable software engineering.",
-      websiteUrl: "https://stgc2024.greentech.dk",
+      callForPapers: `
+        <h2>Call for Papers</h2>
+        <p>Papers are invited on sustainable technology solutions and environmental computing:</p>
+        <h3>🌱 Primary Tracks</h3>
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+          <tr>
+            <td><strong>Sustainable Computing</strong></td>
+            <td>Energy-Efficient Algorithms, Green Software Engineering, Carbon-Aware Computing</td>
+          </tr>
+          <tr>
+            <td><strong>Green Data Centers</strong></td>
+            <td>Energy Management, Cooling Technologies, Renewable Energy Integration</td>
+          </tr>
+          <tr>
+            <td><strong>Renewable Energy</strong></td>
+            <td>Solar Power Systems, Wind Energy Technology, Smart Grid Integration</td>
+          </tr>
+          <tr>
+            <td><strong>Environmental Monitoring</strong></td>
+            <td>IoT Environmental Sensors, Climate Change Modeling, Biodiversity Tracking</td>
+          </tr>
+        </table>
+        <h3>🎯 Special Sessions</h3>
+        <ul>
+          <li><em>Industry best practices</em> for sustainable computing</li>
+          <li><em>Policy and regulation</em> in green technology</li>
+          <li><em>Emerging technologies</em> for environmental protection</li>
+        </ul>
+        <p><strong style="color: green;">Sustainability Impact Statement Required:</strong> All submissions must include a brief statement on the environmental impact and sustainability benefits of the proposed work.</p>
+      `,
       startDate: new Date("2024-10-08"),
       endDate: new Date("2024-10-10"),
       abstractDeadline: new Date("2024-06-20"),
@@ -416,6 +518,368 @@ async function main() {
   });
 
   console.log(`✅ Created ${5} conferences`);
+
+  // Create submissions with authors
+  console.log("📝 Creating submissions...");
+
+  // Submission 1 for ICAI2024 - with linked user authors
+  const submission1 = await prisma.submission.create({
+    data: {
+      title: "Deep Learning Approaches for Natural Language Understanding",
+      abstract:
+        "This paper presents novel deep learning architectures for natural language understanding tasks. We propose a transformer-based model that achieves state-of-the-art performance on multiple benchmarks including GLUE and SuperGLUE. Our approach combines attention mechanisms with graph neural networks to better capture semantic relationships in text.",
+      keywords: [
+        "deep learning",
+        "natural language processing",
+        "transformers",
+        "attention mechanisms",
+        "graph neural networks",
+      ],
+      paper_file_path: "/uploads/submissions/paper_001.pdf",
+      paper_file_name: "deep_learning_nlu.pdf",
+      camera_ready_file_path: "/uploads/camera_ready/cr_001.pdf",
+      camera_ready_file_name: "deep_learning_nlu_camera_ready.pdf",
+      primary_area: "Natural Language Processing",
+      secondary_areas: "Machine Learning",
+      submitted_by: johnUser.id,
+      submitted_at: new Date("2024-06-10").toISOString(),
+      status: "UNDER_REVIEW",
+      conferenceId: conference1.id,
+    },
+  });
+
+  // Authors for submission 1 - mix of linked and non-linked users
+  await prisma.submissonAuthor.createMany({
+    data: [
+      {
+        firstName: "John",
+        lastName: "Doe",
+        email: userEmail,
+        affiliation: "University of Technology",
+        country: "us",
+        submissionId: submission1.id,
+        isCorresponding: true,
+        userId: johnUser.id, // Linked to existing user
+      },
+      {
+        firstName: "Alice",
+        lastName: "Johnson",
+        email: "alice@university.edu",
+        affiliation: "State University",
+        country: "us",
+        submissionId: submission1.id,
+        isCorresponding: false,
+        userId: aliceUser.id, // Linked to existing user
+      },
+      {
+        firstName: "Michael",
+        lastName: "Chen",
+        email: "m.chen@research.ai",
+        affiliation: "AI Research Lab",
+        country: "cn",
+        submissionId: submission1.id,
+        isCorresponding: false,
+        userId: null, // Not linked to any user
+      },
+    ],
+  });
+
+  // Submission 2 for CDPS2024
+  const submission2 = await prisma.submission.create({
+    data: {
+      title: "Zero-Trust Architecture for Cloud Security",
+      abstract:
+        "In this work, we present a comprehensive zero-trust security architecture specifically designed for cloud environments. Our framework includes identity verification, device authentication, and continuous monitoring capabilities. We demonstrate significant improvements in threat detection and response times compared to traditional perimeter-based security models.",
+      keywords: [
+        "zero-trust",
+        "cloud security",
+        "identity verification",
+        "threat detection",
+        "cybersecurity",
+      ],
+      paper_file_path: "/uploads/submissions/paper_002.pdf",
+      paper_file_name: "zero_trust_cloud_security.pdf",
+      camera_ready_file_path: "",
+      camera_ready_file_name: "",
+      primary_area: "Cybersecurity",
+      secondary_areas: "Network Security",
+      submitted_by: janeUser.id,
+      submitted_at: new Date("2024-07-20").toISOString(),
+      status: "ACCEPTED",
+      conferenceId: conference2.id,
+    },
+  });
+
+  await prisma.submissonAuthor.createMany({
+    data: [
+      {
+        firstName: "Jane",
+        lastName: "Smith",
+        email: "jane@example.com",
+        affiliation: "Research Institute",
+        country: "ca",
+        submissionId: submission2.id,
+        isCorresponding: true,
+        userId: janeUser.id,
+      },
+      {
+        firstName: "David",
+        lastName: "Rodriguez",
+        email: "d.rodriguez@cybersec.com",
+        affiliation: "CyberSec Solutions",
+        country: "es",
+        submissionId: submission2.id,
+        isCorresponding: false,
+        userId: null,
+      },
+    ],
+  });
+
+  // Submission 3 for FHTC2025 - Draft status
+  const submission3 = await prisma.submission.create({
+    data: {
+      title: "AI-Powered Diagnostic System for Early Disease Detection",
+      abstract:
+        "We propose an AI-powered diagnostic system that leverages machine learning algorithms to detect early signs of various diseases from medical imaging data. Our system achieves 95% accuracy in detecting early-stage cancer and shows promising results for cardiovascular disease prediction.",
+      keywords: [
+        "medical AI",
+        "diagnostic systems",
+        "machine learning",
+        "medical imaging",
+        "early detection",
+      ],
+      paper_file_path: "/uploads/submissions/paper_003.pdf",
+      paper_file_name: "ai_diagnostic_system.pdf",
+      camera_ready_file_path: "",
+      camera_ready_file_name: "",
+      primary_area: "Medical AI",
+      secondary_areas: "Healthcare Informatics",
+      submitted_by: aliceUser.id,
+      submitted_at: new Date("2024-11-15").toISOString(),
+      status: "DRAFT",
+      conferenceId: conference3.id,
+    },
+  });
+
+  await prisma.submissonAuthor.createMany({
+    data: [
+      {
+        firstName: "Alice",
+        lastName: "Johnson",
+        email: "alice@university.edu",
+        affiliation: "State University",
+        country: "us",
+        submissionId: submission3.id,
+        isCorresponding: true,
+        userId: aliceUser.id,
+      },
+      {
+        firstName: "Dr. Sarah",
+        lastName: "Williams",
+        email: "s.williams@medical.center",
+        affiliation: "Metropolitan Medical Center",
+        country: "us",
+        submissionId: submission3.id,
+        isCorresponding: false,
+        userId: null,
+      },
+      {
+        firstName: "Robert",
+        lastName: "Kumar",
+        email: "r.kumar@biotech.in",
+        affiliation: "BioTech Research Institute",
+        country: "in",
+        submissionId: submission3.id,
+        isCorresponding: false,
+        userId: null,
+      },
+    ],
+  });
+
+  // Submission 4 for STGC2024 - Revision required
+  const submission4 = await prisma.submission.create({
+    data: {
+      title: "Energy-Efficient Algorithms for Large-Scale Data Processing",
+      abstract:
+        "This paper introduces novel energy-efficient algorithms for processing large datasets in distributed computing environments. Our approach reduces energy consumption by up to 40% while maintaining computational performance. We validate our methods on real-world datasets from various domains.",
+      keywords: [
+        "energy efficiency",
+        "green computing",
+        "distributed systems",
+        "data processing",
+        "sustainability",
+      ],
+      paper_file_path: "/uploads/submissions/paper_004.pdf",
+      paper_file_name: "energy_efficient_algorithms.pdf",
+      camera_ready_file_path: "",
+      camera_ready_file_name: "",
+      primary_area: "Sustainable Computing",
+      secondary_areas: "Green Data Centers",
+      submitted_by: testUser.id,
+      submitted_at: new Date("2024-06-25").toISOString(),
+      status: "REVISION",
+      conferenceId: conference5.id,
+    },
+  });
+
+  await prisma.submissonAuthor.createMany({
+    data: [
+      {
+        firstName: "Test",
+        lastName: "User",
+        email: "test@conflow.com",
+        affiliation: "Test Organization",
+        country: "us",
+        submissionId: submission4.id,
+        isCorresponding: true,
+        userId: testUser.id,
+      },
+      {
+        firstName: "Emma",
+        lastName: "Thompson",
+        email: "e.thompson@greentech.org",
+        affiliation: "Green Technology Institute",
+        country: "uk",
+        submissionId: submission4.id,
+        isCorresponding: false,
+        userId: null,
+      },
+    ],
+  });
+
+  // Submission 5 for ICAI2024 - Refused
+  const submission5 = await prisma.submission.create({
+    data: {
+      title: "Quantum-Classical Hybrid Neural Networks",
+      abstract:
+        "We explore the potential of quantum-classical hybrid neural networks for solving complex optimization problems. Our approach combines quantum computing principles with classical deep learning architectures to achieve quantum advantage in specific problem domains.",
+      keywords: [
+        "quantum computing",
+        "neural networks",
+        "hybrid systems",
+        "optimization",
+        "quantum advantage",
+      ],
+      paper_file_path: "/uploads/submissions/paper_005.pdf",
+      paper_file_name: "quantum_hybrid_networks.pdf",
+      camera_ready_file_path: "",
+      camera_ready_file_name: "",
+      primary_area: "Machine Learning",
+      secondary_areas: "Quantum Computing",
+      submitted_by: charlieUser.id,
+      submitted_at: new Date("2024-06-08").toISOString(),
+      status: "REFUSED",
+      conferenceId: conference1.id,
+    },
+  });
+
+  await prisma.submissonAuthor.createMany({
+    data: [
+      {
+        firstName: "Charlie",
+        lastName: "Brown",
+        email: "charlie@research.org",
+        affiliation: "Research Organization",
+        country: "uk",
+        submissionId: submission5.id,
+        isCorresponding: true,
+        userId: charlieUser.id,
+      },
+      {
+        firstName: "Dr. Lisa",
+        lastName: "Zhang",
+        email: "l.zhang@quantum.lab",
+        affiliation: "Quantum Computing Lab",
+        country: "ca",
+        submissionId: submission5.id,
+        isCorresponding: false,
+        userId: null,
+      },
+      {
+        firstName: "Professor Alex",
+        lastName: "Petrov",
+        email: "a.petrov@physics.edu",
+        affiliation: "Institute of Theoretical Physics",
+        country: "ru",
+        submissionId: submission5.id,
+        isCorresponding: false,
+        userId: null,
+      },
+    ],
+  });
+
+  // Submission 6 for CDPS2024 - Multiple authors, some linked
+  const submission6 = await prisma.submission.create({
+    data: {
+      title: "Privacy-Preserving Machine Learning in Healthcare",
+      abstract:
+        "This research presents privacy-preserving techniques for machine learning applications in healthcare. We develop federated learning approaches that enable collaborative model training without compromising patient data privacy, ensuring HIPAA compliance while maintaining model accuracy.",
+      keywords: [
+        "privacy preservation",
+        "federated learning",
+        "healthcare",
+        "HIPAA compliance",
+        "data protection",
+      ],
+      paper_file_path: "/uploads/submissions/paper_006.pdf",
+      paper_file_name: "privacy_ml_healthcare.pdf",
+      camera_ready_file_path: "/uploads/camera_ready/cr_006.pdf",
+      camera_ready_file_name: "privacy_ml_healthcare_camera_ready.pdf",
+      primary_area: "Data Privacy",
+      secondary_areas: "Healthcare Informatics",
+      submitted_by: bobUser.id,
+      submitted_at: new Date("2024-07-28").toISOString(),
+      status: "ACCEPTED",
+      conferenceId: conference2.id,
+    },
+  });
+
+  await prisma.submissonAuthor.createMany({
+    data: [
+      {
+        firstName: "Bob",
+        lastName: "Wilson",
+        email: "bob@example.com",
+        affiliation: "Tech Corp",
+        country: "gb",
+        submissionId: submission6.id,
+        isCorresponding: true,
+        userId: bobUser.id,
+      },
+      {
+        firstName: "Jane",
+        lastName: "Smith",
+        email: "jane@example.com",
+        affiliation: "Research Institute",
+        country: "ca",
+        submissionId: submission6.id,
+        isCorresponding: false,
+        userId: janeUser.id, // Co-author who is also a user
+      },
+      {
+        firstName: "Dr. Maria",
+        lastName: "Garcia",
+        email: "m.garcia@hospital.es",
+        affiliation: "Barcelona General Hospital",
+        country: "es",
+        submissionId: submission6.id,
+        isCorresponding: false,
+        userId: null,
+      },
+      {
+        firstName: "Prof. James",
+        lastName: "Anderson",
+        email: "j.anderson@privacy.org",
+        affiliation: "Privacy Research Foundation",
+        country: "us",
+        submissionId: submission6.id,
+        isCorresponding: false,
+        userId: null,
+      },
+    ],
+  });
+
+  console.log(`✅ Created 6 submissions with multiple authors`);
 
   // Create notifications (existing + conference-related)
   console.log("🔔 Creating notifications...");
