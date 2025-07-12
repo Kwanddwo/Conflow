@@ -70,7 +70,7 @@ const NotificationItem = ({
         isArchived
           ? "opacity-75"
           : !notification.isRead
-          ? "bg-blue-50/50 border-l-4 border-l-blue-500"
+          ? "bg-primary/5 border-l-4 border-l-primary"
           : ""
       }`}
     >
@@ -81,7 +81,7 @@ const NotificationItem = ({
           ) : notification.isRead ? (
             <MailOpen className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <Mail className="h-4 w-4 text-blue-600" />
+            <Mail className="h-4 w-4 text-primary" />
           )}
         </div>
 

@@ -178,15 +178,15 @@ export default function ConferencePage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "APPROVED":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-status-success text-status-success-foreground border-status-success-border";
       case "PENDING":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-status-warning text-status-warning-foreground border-status-warning-border";
       case "REJECTED":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-status-error text-status-error-foreground border-status-error-border";
       case "COMPLETED":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-status-info text-status-info-foreground border-status-info-border";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-muted text-muted-foreground border-border";
     }
   };
 
@@ -200,7 +200,7 @@ export default function ConferencePage() {
         {Object.entries(researchAreas).map(
           ([primary, secondary]: [string, string[]]) => (
             <div key={primary} className="space-y-2">
-              <h4 className="font-semibold text-lg text-slate-900">
+              <h4 className="font-semibold text-lg text-foreground">
                 {primary}
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -219,10 +219,10 @@ export default function ConferencePage() {
   };
 
   return (
-    <div className="w-full mx-auto p-6 space-y-6">
+    <div className="w-full mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header Section */}
       <div className="space-y-4">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="space-y-2 flex-1">
             {editable && isEditing ? (
               <div className="space-y-4">
@@ -252,7 +252,7 @@ export default function ConferencePage() {
                 </div>
               </div>
             ) : (
-              <h1 className="text-xl font-bold text-slate-900">
+              <h1 className="text-xl font-bold text-foreground">
                 ({conference.acronym}) - {conference.title}
               </h1>
             )}
@@ -274,7 +274,7 @@ export default function ConferencePage() {
                         onClick={handleSave}
                         disabled={isUpdateLoading}
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-success-action hover:bg-success-action/90 text-success-action-foreground"
                       >
                         <Save className="h-4 w-4 mr-2" />
                         {isUpdateLoading ? "Saving..." : "Save"}
@@ -304,7 +304,7 @@ export default function ConferencePage() {
           {session?.user.role === "USER" &&
             conference.status === "APPROVED" && (
               <Link href={`/dashboard/conference/${conferenceId}/new-submission`}>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   <FileText className="h-4 w-4 mr-2" />
                   Make a Submission
                 </Button>
@@ -324,15 +324,15 @@ export default function ConferencePage() {
             />
           </div>
         ) : (
-          <p className="text-lg text-slate-600 leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             {conference.description}
           </p>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Call for Papers */}
           <Card>
             <CardHeader>
@@ -358,7 +358,7 @@ export default function ConferencePage() {
                 </div>
               ) : (
                 <div className="prose prose-slate max-w-none">
-                  <div className="whitespace-pre-wrap text-slate-700 leading-relaxed">
+                  <div className="whitespace-pre-wrap text-foreground leading-relaxed">
                     {conference.callForPapers}
                   </div>
                 </div>
@@ -383,7 +383,7 @@ export default function ConferencePage() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
           {/* Conference Details */}
           <Card>
             <CardHeader>
@@ -422,10 +422,10 @@ export default function ConferencePage() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <Calendar className="h-4 w-4 text-slate-500" />
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm font-medium">Conference Dates</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         {formatDate(conference.startDate)} -{" "}
                         {formatDate(conference.endDate)}
                       </p>
@@ -471,13 +471,13 @@ export default function ConferencePage() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <MapPin className="h-4 w-4 text-slate-500" />
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm font-medium">Location</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         {conference.locationVenue}
                       </p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         {conference.locationCity},{" "}
                         {conference.locationCountry.toUpperCase()}
                       </p>
@@ -501,14 +501,14 @@ export default function ConferencePage() {
                 ) : (
                   conference.websiteUrl && (
                     <div className="flex items-center gap-3">
-                      <Globe className="h-4 w-4 text-slate-500" />
+                      <Globe className="h-4 w-4 text-muted-foreground" />
                       <div className="flex-1">
                         <p className="text-sm font-medium">Website</p>
                         <a
                           href={conference.websiteUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                          className="text-sm text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
                         >
                           {conference.websiteUrl}{" "}
                           <ExternalLink className="h-3 w-3" />
@@ -576,7 +576,7 @@ export default function ConferencePage() {
                     <span className="text-sm font-medium">
                       Abstract Deadline
                     </span>
-                    <span className="text-sm text-slate-600 text-right">
+                    <span className="text-sm text-muted-foreground text-right">
                       {formatDate(conference.abstractDeadline)}
                     </span>
                   </div>
@@ -586,7 +586,7 @@ export default function ConferencePage() {
                     <span className="text-sm font-medium">
                       Submission Deadline
                     </span>
-                    <span className="text-sm text-slate-600 text-right">
+                    <span className="text-sm text-muted-foreground text-right">
                       {formatDate(conference.submissionDeadline)}
                     </span>
                   </div>
@@ -594,7 +594,7 @@ export default function ConferencePage() {
 
                   <div className="flex justify-between items-start">
                     <span className="text-sm font-medium">Camera Ready</span>
-                    <span className="text-sm text-slate-600 text-right">
+                    <span className="text-sm text-muted-foreground text-right">
                       {formatDate(conference.cameraReadyDeadline)}
                     </span>
                   </div>
@@ -618,11 +618,11 @@ export default function ConferencePage() {
                   <div className="space-y-2">
                     <div>
                       <p className="text-sm font-medium">Main Chair</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         {conference.mainChair.firstName}{" "}
                         {conference.mainChair.lastName}
                       </p>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-muted-foreground">
                         {conference.mainChair.email}
                       </p>
                     </div>
@@ -658,7 +658,7 @@ export default function ConferencePage() {
               {conference.status === "PENDING" && (
                 <div className="flex justify-center gap-2">
                   <Button
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-success-action hover:bg-success-action/90 text-success-action-foreground"
                     disabled={isApproveLoading}
                     onClick={async () => {
                       try {
@@ -677,7 +677,7 @@ export default function ConferencePage() {
                     {isApproveLoading ? "Approving..." : "Approve Conference"}
                   </Button>
                   <Button
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                     disabled={isRejectLoading}
                     onClick={async () => {
                       try {
