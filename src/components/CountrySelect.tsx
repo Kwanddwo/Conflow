@@ -8,7 +8,7 @@ import {
 import { getData } from "country-list";
 import { ControllerRenderProps } from "react-hook-form";
 type Props = {
-  field: ControllerRenderProps<any, any>; 
+  field: ControllerRenderProps<any, any>;
   isSubmitting?: boolean;
   isPending?: boolean;
 };
@@ -16,11 +16,8 @@ type Props = {
 export default function CountrySelect({
   field,
   isSubmitting = false,
-  isPending = false
+  isPending = false,
 }: Props) {
-  isSubmitting: boolean = false,
-  isPending: boolean = false
-) {
   const countries = getData();
   return (
     <Select
