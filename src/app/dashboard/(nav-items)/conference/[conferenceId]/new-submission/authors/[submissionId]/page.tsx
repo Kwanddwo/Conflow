@@ -71,7 +71,7 @@ export default function AuthorForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="main-content-height flex items-center justify-center p-6">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -81,15 +81,14 @@ export default function AuthorForm() {
             Please provide information for all authors of this submission
           </p>
         </div>
-        
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-8"
-        >
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {fields.map((field, index) => (
             <div key={field.id} className="space-y-4 border rounded-lg p-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Author No. {index + 1}</h2>
+                <h2 className="text-lg font-semibold">
+                  Author No. {index + 1}
+                </h2>
                 {index > 0 && (
                   <Button
                     type="button"
@@ -104,73 +103,77 @@ export default function AuthorForm() {
                 )}
               </div>
 
-          <div className="space-y-2">
-            <Label>First Name</Label>
-            <Input {...register(`authors.${index}.firstName`)} />
-            {errors.authors?.[index]?.firstName && (
-              <p className="text-sm text-destructive">
-                {errors.authors[index].firstName.message}
-              </p>
-            )}
-          </div>
+              <div className="space-y-2">
+                <Label>First Name</Label>
+                <Input {...register(`authors.${index}.firstName`)} />
+                {errors.authors?.[index]?.firstName && (
+                  <p className="text-sm text-destructive">
+                    {errors.authors[index].firstName.message}
+                  </p>
+                )}
+              </div>
 
-          <div className="space-y-2">
-            <Label>Last Name</Label>
-            <Input {...register(`authors.${index}.lastName`)} />
-            {errors.authors?.[index]?.lastName && (
-              <p className="text-sm text-destructive">
-                {errors.authors[index].lastName.message}
-              </p>
-            )}
-          </div>
+              <div className="space-y-2">
+                <Label>Last Name</Label>
+                <Input {...register(`authors.${index}.lastName`)} />
+                {errors.authors?.[index]?.lastName && (
+                  <p className="text-sm text-destructive">
+                    {errors.authors[index].lastName.message}
+                  </p>
+                )}
+              </div>
 
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input type="email" {...register(`authors.${index}.email`)} />
-            {errors.authors?.[index]?.email && (
-              <p className="text-sm text-destructive">
-                {errors.authors[index].email.message}
-              </p>
-            )}
-          </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input type="email" {...register(`authors.${index}.email`)} />
+                {errors.authors?.[index]?.email && (
+                  <p className="text-sm text-destructive">
+                    {errors.authors[index].email.message}
+                  </p>
+                )}
+              </div>
 
-          <div className="space-y-2">
-            <Label>Country</Label>
-            <Controller
-              control={control}
-              name={`authors.${index}.country`}
-              render={({ field }) => (
-                <CountrySelect field={field} isSubmitting={isSubmitting} isPending={isPending} />
-              )}
-            />
-            {errors.authors?.[index]?.country && (
-              <p className="text-sm text-destructive">
-                {errors.authors[index].country.message}
-              </p>
-            )}
-          </div>
+              <div className="space-y-2">
+                <Label>Country</Label>
+                <Controller
+                  control={control}
+                  name={`authors.${index}.country`}
+                  render={({ field }) => (
+                    <CountrySelect
+                      field={field}
+                      isSubmitting={isSubmitting}
+                      isPending={isPending}
+                    />
+                  )}
+                />
+                {errors.authors?.[index]?.country && (
+                  <p className="text-sm text-destructive">
+                    {errors.authors[index].country.message}
+                  </p>
+                )}
+              </div>
 
-          <div className="space-y-2">
-            <Label>Affiliation</Label>
-            <Input {...register(`authors.${index}.affiliation`)} />
-            <p className="text-sm text-muted-foreground">
-              Enter the laboratory you are associated with.
-            </p>
-            {errors.authors?.[index]?.affiliation && (
-              <p className="text-sm text-destructive">
-                {errors.authors[index].affiliation.message}
-              </p>
-            )}
-          </div>
+              <div className="space-y-2">
+                <Label>Affiliation</Label>
+                <Input {...register(`authors.${index}.affiliation`)} />
+                <p className="text-sm text-muted-foreground">
+                  Enter the laboratory you are associated with.
+                </p>
+                {errors.authors?.[index]?.affiliation && (
+                  <p className="text-sm text-destructive">
+                    {errors.authors[index].affiliation.message}
+                  </p>
+                )}
+              </div>
 
-          <div className="flex items-center space-x-2 pt-2">
-            <Input
-              type="checkbox"
-              {...register(`authors.${index}.isCorresponding`)}
-              className="h-4 w-4"
-            />
-            <Label className="cursor-pointer">Corresponding Author</Label>
-          </div>
+              <div className="flex items-center space-x-2 pt-2">
+                <Input
+                  type="checkbox"
+                  {...register(`authors.${index}.isCorresponding`)}
+                  className="h-4 w-4"
+                />
+                <Label className="cursor-pointer">Corresponding Author</Label>
+              </div>
             </div>
           ))}
 
