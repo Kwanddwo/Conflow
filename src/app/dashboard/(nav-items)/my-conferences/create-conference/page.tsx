@@ -186,12 +186,12 @@ export default function ConferenceForm() {
           </div>
 
           <div className="space-y-2">
-            <Controller
-              name="locationCountry"
+             <Controller
               control={control}
+              name="locationCountry"
               render={({ field }) => (
                 <CountrySelect
-                  {...field}
+                  field={field}
                   isSubmitting={isSubmitting}
                   isPending={isPending}
                 />
