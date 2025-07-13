@@ -50,9 +50,6 @@ export const submissionRouter = router({
           paper_file_name : fileName,
           conferenceId,
           submitted_by : ctx.session.user.id,
-          submitted_at : "",
-          camera_ready_file_path : "",
-          camera_ready_file_name : ""
         },
       });
 
