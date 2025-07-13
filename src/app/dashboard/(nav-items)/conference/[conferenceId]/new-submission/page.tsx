@@ -25,8 +25,8 @@ import { z } from "zod";
 const paperSubmissionSchema = z.object({
   title: z.string().min(1, "Title is required"),
   abstract: z.string().min(1, "Abstract is required"),
-  primary_area: z.string(),
-  secondary_area: z.string(),
+  primaryArea: z.string(),
+  secondaryArea: z.string(),
   keywords: z.string().min(1, "Keywords are required"),
   fileUrl: z.string().url("File upload is required"),
   fileName: z.string(),
@@ -95,7 +95,7 @@ function PaperSubmission() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="main-content-height flex items-center justify-center p-6">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -157,8 +157,8 @@ function PaperSubmission() {
                   area.secondary.includes(val)
                 );
                 if (found) {
-                  setValue("primary_area", found.title);
-                  setValue("secondary_area", val);
+                  setValue("primaryArea", found.title);
+                  setValue("secondaryArea", val);
                 }
               }}
               disabled={isSubmitting || isPending}
