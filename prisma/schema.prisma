@@ -104,7 +104,6 @@ model Submission {
   primary_area           String
   secondary_areas        String
   submitted_by           String
-  submitted_at           String
   status                 SubmissionStatus @default(DRAFT)
   createdAt              DateTime         @default(now())
   updatedAt              DateTime         @updatedAt
