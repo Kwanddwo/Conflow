@@ -2,12 +2,13 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getSession, signIn } from "next-auth/react";
+import { getSession, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmailVerificationTrigger from "../EmailVerificationTrigger";
 import LoginForm from "@/components/LoginForm";
+
 const loginSchema = z.object({
   email: z
     .string()
@@ -19,6 +20,16 @@ const loginSchema = z.object({
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const { status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [status, router]);
+
   const {
     register,
     handleSubmit,
@@ -30,9 +41,10 @@ export default function LoginPage() {
       password: "",
     },
   });
-  const router = useRouter();
+
   const [step, setStep] = useState<"login" | "verify">("login");
   const [email, setEmail] = useState<string>("");
+
   const onSubmit = async (data: LoginFormData) => {
     try {
       setEmail(data.email);
@@ -60,9 +72,18 @@ export default function LoginPage() {
       console.log("Login error:", error);
     }
   };
+
   return (
     <>
-      {step === "login" && <LoginForm handleSubmit={handleSubmit} onSubmit={onSubmit} isSubmitting={isSubmitting} register={register} errors={errors} />}
+      {step === "login" && (
+        <LoginForm
+          handleSubmit={handleSubmit}
+          onSubmit={onSubmit}
+          isSubmitting={isSubmitting}
+          register={register}
+          errors={errors}
+        />
+      )}
       {step === "verify" && (
         <EmailVerificationTrigger email={email} from="sign-in" />
       )}
