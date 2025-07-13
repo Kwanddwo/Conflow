@@ -21,18 +21,18 @@ export default function LandingPage() {
             Manage your conference with ease.
           </h1>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none">
+          <div className="flex flex-col sm:flex-row sm:justify-center gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none">
             <Button
               size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 py-3 text-base sm:text-lg cursor-pointer w-full sm:w-auto"
+              className="hover:bg-primary/90 px-6 sm:px-8 py-3 text-base sm:text-lg cursor-pointer w-full sm:w-auto"
             >
               Learn More
             </Button>
             <Link href="/sign-up" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                variant="outline"
-                className="bg-white text-foreground border-white hover:bg-accent hover:text-accent-foreground px-6 sm:px-8 py-3 text-base sm:text-lg cursor-pointer w-full"
+                variant="secondary"
+                className="px-6 sm:px-8 py-3 text-base sm:text-lg cursor-pointer w-full"
               >
                 Sign Up
               </Button>
@@ -47,7 +47,9 @@ export default function LandingPage() {
         <div className="flex flex-col lg:flex-row justify-between gap-6 lg:gap-4 px-4 sm:px-6">
           <div className="text-center lg:text-left">
             <Logo height={32} width={110} />
-            <p className="text-muted-foreground mt-2">A simplified conference manager.</p>
+            <p className="text-muted-foreground mt-2">
+              A simplified conference manager.
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 lg:gap-3 text-center sm:text-left">
@@ -55,10 +57,20 @@ export default function LandingPage() {
               <p className="font-semibold text-foreground mb-3">Learn</p>
               <ul className="flex flex-col gap-2">
                 <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Guides</Link>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Guides
+                  </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Tutorials</Link>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Tutorials
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -66,10 +78,20 @@ export default function LandingPage() {
               <p className="font-semibold text-foreground mb-3">Resources</p>
               <ul className="flex flex-col gap-2">
                 <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Documentation</Link>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Documentation
+                  </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Github</Link>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Github
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -77,7 +99,12 @@ export default function LandingPage() {
               <p className="font-semibold text-foreground mb-3">Legal</p>
               <ul className="flex flex-col gap-2">
                 <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Terms of Service</Link>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Terms of Service
+                  </Link>
                 </li>
               </ul>
             </div>
