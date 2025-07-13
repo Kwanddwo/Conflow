@@ -29,9 +29,8 @@ model User {
   reviewers  Conference[] @relation("ConferenceReviewers")
   mainChairs Conference[] @relation("ConferenceMainChair")
 
-  submissions Submission[]
-
-  authorEntries SubmissonAuthor[] @relation("AuthorUser")
+  directSubmissions Submission[]
+  authorEntries     SubmissonAuthor[] @relation("AuthorUser")
 }
 
 model Notification {
@@ -62,7 +61,7 @@ model Conference {
   locationVenue       String
   locationCity        String
   locationCountry     String
-  callForPapers       String //String for now, can be changed to JSON or Bytes if needed.
+  callForPapers       String
   websiteUrl          String?
   startDate           DateTime
   endDate             DateTime
@@ -77,11 +76,11 @@ model Conference {
   researchAreas       Json
 
   mainChairId String
-  mainChair User @relation("ConferenceMainChair", fields: [mainChairId], references: [id])
-  chairs     User[] @relation("ConferenceChairs")
-  reviewers User[] @relation("ConferenceReviewers")
+  mainChair   User   @relation("ConferenceMainChair", fields: [mainChairId], references: [id])
+  chairs      User[] @relation("ConferenceChairs")
+  reviewers   User[] @relation("ConferenceReviewers")
 
-  Submission Submission[]
+  submissions Submission[]
 }
 
 enum SubmissionStatus {
@@ -93,30 +92,29 @@ enum SubmissionStatus {
 }
 
 model Submission {
-  id                     String           @id @default(cuid())
-  title                  String
-  abstract               String
-  keywords               Json
-  paper_file_path        String?
-  paper_file_name        String?
-  camera_ready_file_path String?
-  camera_ready_file_name String?
-  primary_area           String
-  secondary_areas        String
-  submitted_by           String
-  submitted_at           String
-  status                 SubmissionStatus @default(DRAFT)
-  createdAt              DateTime         @default(now())
-  updatedAt              DateTime         @updatedAt
-  conferenceId           String
-  conference             Conference       @relation(fields: [conferenceId], references: [id])
-  user           User             @relation(fields: [submitted_by], references: [id])
+  id                  String           @id @default(cuid())
+  title               String
+  abstract            String
+  keywords            Json
+  paperFilePath       String?
+  paperFileName       String?
+  cameraReadyFilepath String?
+  cameraReadyFilename String?
+  primaryArea         String
+  secondaryArea       String
+  status              SubmissionStatus @default(DRAFT)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  conferenceId        String
+  conference          Conference       @relation(fields: [conferenceId], references: [id])
+  submittedById       String
+  submittedBy         User             @relation(fields: [submittedById], references: [id])
 
-  SubmissonAuthor SubmissonAuthor[]
+  submissionAuthors SubmissonAuthor[]
 }
 
 model SubmissonAuthor {
-  id              String   @id @default(cuid())
+  id              String     @id @default(cuid())
   firstName       String
   lastName        String
   email           String
@@ -125,8 +123,9 @@ model SubmissonAuthor {
   submissionId    String
   submission      Submission @relation(fields: [submissionId], references: [id])
   isCorresponding Boolean
-  createdAt       DateTime @default(now())
+  createdAt       DateTime   @default(now())
 
   userId String?
-  user User? @relation("AuthorUser", fields: [userId], references: [id])
+  user   User?   @relation("AuthorUser", fields: [userId], references: [id])
+  @@unique([submissionId, email]) // Ensure unique authors per submission by email
 }
