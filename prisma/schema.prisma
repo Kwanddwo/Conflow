@@ -25,10 +25,7 @@ model User {
   createdAt   DateTime       @default(now())
   inbox       Notification[]
 
-  chairs     Conference[] @relation("ConferenceChairs")
-  reviewers  Conference[] @relation("ConferenceReviewers")
-  mainChairs Conference[] @relation("ConferenceMainChair")
-
+  conferenceRoles ConferenceRoleEntries[]
   directSubmissions Submission[]
   authorEntries     SubmissonAuthor[] @relation("AuthorUser")
 }
@@ -75,12 +72,8 @@ model Conference {
   isDeleted           Boolean          @default(false)
   researchAreas       Json
 
-  mainChairId String
-  mainChair   User   @relation("ConferenceMainChair", fields: [mainChairId], references: [id])
-  chairs      User[] @relation("ConferenceChairs")
-  reviewers   User[] @relation("ConferenceReviewers")
-
-  submissions Submission[]
+  conferenceRoles ConferenceRoleEntries[]
+  submissions     Submission[]
 }
 
 enum SubmissionStatus {
@@ -128,4 +121,25 @@ model SubmissonAuthor {
   userId String?
   user   User?   @relation("AuthorUser", fields: [userId], references: [id])
   @@unique([submissionId, email]) // Ensure unique authors per submission by email
+}
+
+enum ConferenceRole {
+  MAIN_CHAIR
+  CHAIR
+  REVIEWER
+}
+
+model ConferenceRoleEntries {
+  id           String        @id @default(cuid())
+  userId       String
+  conferenceId String
+  role         ConferenceRole
+  createdAt    DateTime      @default(now())
+
+  user       User       @relation(fields: [userId], references: [id])
+  conference Conference @relation(fields: [conferenceId], references: [id])
+
+  // Enforce unique role per user per conference
+  @@unique([userId, conferenceId])
+  @@index([conferenceId, role]) // For efficient role-based queries
 }

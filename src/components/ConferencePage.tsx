@@ -44,14 +44,15 @@ export default function ConferencePage() {
     enabled: !!conferenceId,
   });
 
-  const editable = session?.user.id === conference?.mainChairId;
+  // Check if user is main chair using the role system
+  const editable = conference?.conferenceRoles?.some(
+    (role) => role.role === "MAIN_CHAIR" && role.user.id === session?.user.id
+  );
+
   // Debug logging for session and main chair comparison
   console.log("Session user:", session?.user);
-  console.log("Main chair ID:", conference?.mainChairId);
-  console.log(
-    "Are they the same?",
-    session?.user.id === conference?.mainChairId
-  );
+  console.log("Conference roles:", conference?.conferenceRoles);
+  console.log("Is main chair?", editable);
 
   // State for editable fields
   const [editableData, setEditableData] = useState<{
@@ -259,8 +260,7 @@ export default function ConferencePage() {
               </h1>
             )}
             <div className="flex items-center gap-4">
-              {(session?.user.role === "ADMIN" ||
-                session?.user.id === conference.mainChairId) && (
+              {(session?.user.role === "ADMIN" || editable) && (
                 <Badge
                   variant="outline"
                   className={`${getStatusColor(conference.status)} font-medium`}
@@ -305,7 +305,9 @@ export default function ConferencePage() {
 
           {session?.user.role === "USER" &&
             conference.status === "APPROVED" && (
-              <Link href={`/dashboard/conference/${conferenceId}/new-submission`}>
+              <Link
+                href={`/dashboard/conference/${conferenceId}/new-submission`}
+              >
                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   <FileText className="h-4 w-4 mr-2" />
                   Make a Submission
@@ -605,8 +607,7 @@ export default function ConferencePage() {
           </Card>
 
           {/* Admin Info (if admin) */}
-          {(session?.user.role === "ADMIN" ||
-            conference.mainChairId === session?.user.id) && (
+          {(session?.user.role === "ADMIN" || editable) && (
             <>
               <Card>
                 <CardHeader>
@@ -619,13 +620,21 @@ export default function ConferencePage() {
                   <div className="space-y-2">
                     <div>
                       <p className="text-sm font-medium">Main Chair</p>
-                      <p className="text-sm text-muted-foreground">
-                        {conference.mainChair.firstName}{" "}
-                        {conference.mainChair.lastName}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {conference.mainChair.email}
-                      </p>
+                      {conference.mainChair ? (
+                        <>
+                          <p className="text-sm text-muted-foreground">
+                            {conference.mainChair.firstName}{" "}
+                            {conference.mainChair.lastName}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {conference.mainChair.email}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No main chair assigned
+                        </p>
+                      )}
                     </div>
 
                     <div className="pt-2">

@@ -79,20 +79,40 @@ export const conferenceRouter = router({
           cameraReadyDeadline: true,
           status: true,
           researchAreas: true,
-          mainChairId: true,
-          mainChair: true && {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+          isPublic: true,
+          conferenceRoles: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
             },
           },
-          isPublic: true,
         },
       });
 
-      return conference;
+      if (!conference) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Conference not found",
+        });
+      }
+
+      // Find the main chair from the roles
+      const mainChair = conference.conferenceRoles.find(
+        (role) => role.role === "MAIN_CHAIR"
+      )?.user;
+
+      // Transform the response to match the existing structure
+      return {
+        ...conference,
+        mainChairId: mainChair?.id,
+        mainChair,
+      };
     }),
   approveConference: adminProcedure
     .input(z.string())
@@ -105,10 +125,15 @@ export const conferenceRouter = router({
           status: true,
           title: true,
           acronym: true,
-          mainChair: {
-            select: {
-              id: true,
-              email: true,
+          conferenceRoles: {
+            where: { role: "MAIN_CHAIR" },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                },
+              },
             },
           },
         },
@@ -119,7 +144,6 @@ export const conferenceRouter = router({
           message: "Conference not found",
         });
       }
-
       if (conference.status != "PENDING") {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -134,12 +158,15 @@ export const conferenceRouter = router({
         },
       });
 
-      sendNotification(
-        conference.mainChair,
-        "Conference Request Approved",
-        `Your request to create the conference ${conference.title}(${conference.acronym}) has been approved.
-          You can now manage the conference and start inviting reviewers and participants.`
-      );
+      const mainChair = conference.conferenceRoles[0]?.user;
+      if (mainChair) {
+        sendNotification(
+          mainChair,
+          "Conference Request Approved",
+          `Your request to create the conference ${conference.title}(${conference.acronym}) has been approved.
+        You can now manage the conference and start inviting reviewers and participants.`
+        );
+      }
 
       return updatedConference;
     }),
@@ -154,10 +181,15 @@ export const conferenceRouter = router({
           status: true,
           title: true,
           acronym: true,
-          mainChair: {
-            select: {
-              id: true,
-              email: true,
+          conferenceRoles: {
+            where: { role: "MAIN_CHAIR" },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                },
+              },
             },
           },
         },
@@ -183,12 +215,15 @@ export const conferenceRouter = router({
         },
       });
 
-      sendNotification(
-        conference.mainChair,
-        "Conference Request Rejected",
-        `Your request to create the conference ${conference.title}(${conference.acronym}) has been rejected by a Conflow Admin.
-          You can contact an admin to ask why this is the case.`
-      );
+      const mainChair = conference.conferenceRoles[0]?.user;
+      if (mainChair) {
+        sendNotification(
+          mainChair,
+          "Conference Request Rejected",
+          `Your request to create the conference ${conference.title}(${conference.acronym}) has been rejected by a Conflow Admin.
+        You can contact an admin to ask why this is the case.`
+        );
+      }
 
       return updatedConference;
     }),
@@ -224,8 +259,23 @@ export const conferenceRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       input.callForPapers = DOMPurify.sanitize(input.callForPapers);
-      const conferenceRequest = ctx.prisma.conference.create({
-        data: { ...input, mainChairId: ctx.session.user.id },
+
+      // Create the conference first
+      const conferenceRequest = await ctx.prisma.conference.create({
+        data: {
+          ...input,
+          // Remove mainChairId since we're using the role system
+          // mainChairId: ctx.session.user.id
+        },
+      });
+
+      // Create the MAIN_CHAIR role entry for the creator
+      await ctx.prisma.conferenceRoleEntries.create({
+        data: {
+          userId: ctx.session.user.id,
+          conferenceId: conferenceRequest.id,
+          role: "MAIN_CHAIR",
+        },
       });
 
       const admins = await ctx.prisma.user.findMany({
@@ -248,9 +298,14 @@ export const conferenceRouter = router({
     .query(async ({ ctx, input }) => {
       return ctx.prisma.conference.findMany({
         where: {
-          mainChairId: input,
           isDeleted: false,
           status: { not: "PENDING" },
+          conferenceRoles: {
+            some: {
+              userId: input,
+              role: "MAIN_CHAIR",
+            },
+          },
         },
         select: {
           id: true,
@@ -269,8 +324,20 @@ export const conferenceRouter = router({
           cameraReadyDeadline: true,
           status: true,
           researchAreas: true,
-          mainChair: true,
           isPublic: true,
+          conferenceRoles: {
+            where: { role: "MAIN_CHAIR" },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
         },
       });
     }),
@@ -308,10 +375,15 @@ export const conferenceRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { id, ...updateData } = input;
 
-      // Check if user is the main chair or admin
+      // Check if user is the main chair or admin using the role system
       const conference = await ctx.prisma.conference.findUnique({
         where: { id },
-        select: { mainChairId: true },
+        select: {
+          conferenceRoles: {
+            where: { role: "MAIN_CHAIR" },
+            select: { userId: true },
+          },
+        },
       });
 
       if (!conference) {
@@ -321,7 +393,9 @@ export const conferenceRouter = router({
         });
       }
 
-      const isMainChair = conference.mainChairId === ctx.session.user.id;
+      const isMainChair = conference.conferenceRoles.some(
+        (role) => role.userId === ctx.session.user.id
+      );
       const isAdmin = ctx.session.user.role === "ADMIN";
 
       if (!isMainChair && !isAdmin) {
@@ -336,11 +410,41 @@ export const conferenceRouter = router({
         data: updateData,
       });
     }),
-    getAreas : userProcedure.input(z.string()).query(async ({ ctx, input }) => {
+  getAreas: userProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const conference = await ctx.prisma.conference.findUnique({
+      where: { id: input },
+      select: {
+        researchAreas: true,
+      },
+    });
+
+    if (!conference) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Conference not found",
+      });
+    }
+
+    return conference.researchAreas as ResearchAreas;
+  }),
+
+  addConferenceRole: userProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+        userId: z.string(),
+        role: z.enum(["CHAIR", "REVIEWER"]), // Main chair can't be added this way
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Check if user is main chair or admin
       const conference = await ctx.prisma.conference.findUnique({
-        where: { id: input },
+        where: { id: input.conferenceId },
         select: {
-          researchAreas: true,
+          conferenceRoles: {
+            where: { role: "MAIN_CHAIR" },
+            select: { userId: true },
+          },
         },
       });
 
@@ -351,6 +455,72 @@ export const conferenceRouter = router({
         });
       }
 
-      return conference.researchAreas as ResearchAreas;
-    })
+      const isMainChair = conference.conferenceRoles.some(
+        (role) => role.userId === ctx.session.user.id
+      );
+      const isAdmin = ctx.session.user.role === "ADMIN";
+
+      if (!isMainChair && !isAdmin) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to manage conference roles",
+        });
+      }
+
+      return ctx.prisma.conferenceRoleEntries.create({
+        data: {
+          userId: input.userId,
+          conferenceId: input.conferenceId,
+          role: input.role,
+        },
+      });
+    }),
+
+  removeConferenceRole: userProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+        userId: z.string(),
+        role: z.enum(["CHAIR", "REVIEWER"]), // Main chair can't be removed this way
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Check permissions similar to addConferenceRole
+      const conference = await ctx.prisma.conference.findUnique({
+        where: { id: input.conferenceId },
+        select: {
+          conferenceRoles: {
+            where: { role: "MAIN_CHAIR" },
+            select: { userId: true },
+          },
+        },
+      });
+
+      if (!conference) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Conference not found",
+        });
+      }
+
+      const isMainChair = conference.conferenceRoles.some(
+        (role) => role.userId === ctx.session.user.id
+      );
+      const isAdmin = ctx.session.user.role === "ADMIN";
+
+      if (!isMainChair && !isAdmin) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to manage conference roles",
+        });
+      }
+
+      return ctx.prisma.conferenceRoleEntries.deleteMany({
+        where: {
+          userId: input.userId,
+          conferenceId: input.conferenceId,
+          role: input.role,
+        },
+      });
+    }),
 });

@@ -94,7 +94,10 @@ export const mainChairProcedure = protectedProcedure.use(
         conference: {
           select: {
             id: true,
-            mainChairId: true,
+            conferenceRoles: {
+              where: { role: "MAIN_CHAIR" },
+              select: { userId: true },
+            },
           },
         },
       },
@@ -108,7 +111,11 @@ export const mainChairProcedure = protectedProcedure.use(
     }
 
     // Check if the current user is the main chair of the conference
-    if (submission.conference.mainChairId !== ctx.session.user.id) {
+    const isMainChair = submission.conference.conferenceRoles.some(
+      (role) => role.userId === ctx.session.user.id
+    );
+
+    if (!isMainChair) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message:
@@ -156,7 +163,7 @@ export const chairProcedure = protectedProcedure.use(
       });
     }
 
-    // Check if the submission exists and get its conference with chairs
+    // Check if the submission exists and get its conference with roles
     const submission = await ctx.prisma.submission.findUnique({
       where: { id: submissionId },
       select: {
@@ -164,10 +171,13 @@ export const chairProcedure = protectedProcedure.use(
         conference: {
           select: {
             id: true,
-            mainChairId: true,
-            chairs: {
+            conferenceRoles: {
+              where: {
+                role: { in: ["MAIN_CHAIR", "CHAIR"] },
+              },
               select: {
-                id: true,
+                userId: true,
+                role: true,
               },
             },
           },
@@ -183,10 +193,12 @@ export const chairProcedure = protectedProcedure.use(
     }
 
     // Check if the current user is the main chair OR a regular chair
-    const isMainChair =
-      submission.conference.mainChairId === ctx.session.user.id;
-    const isChair = submission.conference.chairs.some(
-      (chair) => chair.id === ctx.session.user.id
+    const isMainChair = submission.conference.conferenceRoles.some(
+      (role) =>
+        role.userId === ctx.session.user.id && role.role === "MAIN_CHAIR"
+    );
+    const isChair = submission.conference.conferenceRoles.some(
+      (role) => role.userId === ctx.session.user.id && role.role === "CHAIR"
     );
 
     if (!isMainChair && !isChair) {
@@ -242,7 +254,10 @@ export const conferenceMainChairProcedure = protectedProcedure.use(
       where: { id: conferenceId },
       select: {
         id: true,
-        mainChairId: true,
+        conferenceRoles: {
+          where: { role: "MAIN_CHAIR" },
+          select: { userId: true },
+        },
       },
     });
 
@@ -254,7 +269,11 @@ export const conferenceMainChairProcedure = protectedProcedure.use(
     }
 
     // Check if the current user is the main chair of the conference
-    if (conference.mainChairId !== ctx.session.user.id) {
+    const isMainChair = conference.conferenceRoles.some(
+      (role) => role.userId === ctx.session.user.id
+    );
+
+    if (!isMainChair) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "You must be the main chair of this conference",
@@ -310,7 +329,10 @@ export const adminOrMainChairProcedure = protectedProcedure.use(
       where: { id: conferenceId },
       select: {
         id: true,
-        mainChairId: true,
+        conferenceRoles: {
+          where: { role: "MAIN_CHAIR" },
+          select: { userId: true },
+        },
       },
     });
 
@@ -322,7 +344,11 @@ export const adminOrMainChairProcedure = protectedProcedure.use(
     }
 
     // Check if the current user is the main chair of the conference
-    if (conference.mainChairId !== ctx.session.user.id) {
+    const isMainChair = conference.conferenceRoles.some(
+      (role) => role.userId === ctx.session.user.id
+    );
+
+    if (!isMainChair) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "You must be an admin or the main chair of this conference",
@@ -381,7 +407,10 @@ export const adminOrSubmissionMainChairProcedure = protectedProcedure.use(
         conference: {
           select: {
             id: true,
-            mainChairId: true,
+            conferenceRoles: {
+              where: { role: "MAIN_CHAIR" },
+              select: { userId: true },
+            },
           },
         },
       },
@@ -395,7 +424,11 @@ export const adminOrSubmissionMainChairProcedure = protectedProcedure.use(
     }
 
     // Check if the current user is the main chair of the conference
-    if (submission.conference.mainChairId !== ctx.session.user.id) {
+    const isMainChair = submission.conference.conferenceRoles.some(
+      (role) => role.userId === ctx.session.user.id
+    );
+
+    if (!isMainChair) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message:
@@ -464,15 +497,10 @@ export const verifiedNoConferenceRoleProcedure = protectedProcedure.use(
       select: {
         id: true,
         title: true,
-        mainChairId: true,
-        chairs: {
+        conferenceRoles: {
           select: {
-            id: true,
-          },
-        },
-        reviewers: {
-          select: {
-            id: true,
+            userId: true,
+            role: true,
           },
         },
       },
@@ -488,13 +516,11 @@ export const verifiedNoConferenceRoleProcedure = protectedProcedure.use(
     const userId = ctx.session.user.id;
 
     // Check if user has any role in the conference
-    const isMainChair = conference.mainChairId === userId;
-    const isChair = conference.chairs.some((chair) => chair.id === userId);
-    const isReviewer = conference.reviewers.some(
-      (reviewer) => reviewer.id === userId
+    const hasRole = conference.conferenceRoles.some(
+      (role) => role.userId === userId
     );
 
-    if (isMainChair || isChair || isReviewer) {
+    if (hasRole) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message:

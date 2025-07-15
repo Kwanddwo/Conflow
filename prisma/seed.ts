@@ -190,17 +190,6 @@ async function main() {
           "Fairness in AI",
         ],
       },
-      mainChairId: johnUser.id,
-      chairs: {
-        connect: [{ id: janeUser.id }, { id: aliceUser.id }],
-      },
-      reviewers: {
-        connect: [
-          { id: bobUser.id },
-          { id: charlieUser.id },
-          { id: testUser.id },
-        ],
-      },
     },
   });
 
@@ -264,17 +253,6 @@ async function main() {
           "Firewall Technologies",
           "VPN Security",
           "Wireless Security",
-        ],
-      },
-      mainChairId: janeUser.id,
-      chairs: {
-        connect: [{ id: johnUser.id }, { id: charlieUser.id }],
-      },
-      reviewers: {
-        connect: [
-          { id: aliceUser.id },
-          { id: bobUser.id },
-          { id: testUser.id },
         ],
       },
     },
@@ -354,13 +332,6 @@ async function main() {
           "Digital Therapeutics",
         ],
       },
-      mainChairId: aliceUser.id,
-      chairs: {
-        connect: [{ id: charlieUser.id }, { id: janeUser.id }],
-      },
-      reviewers: {
-        connect: [{ id: johnUser.id }, { id: bobUser.id }],
-      },
     },
   });
 
@@ -424,13 +395,6 @@ async function main() {
           "Quantum Optics",
           "Quantum Many-Body Systems",
         ],
-      },
-      mainChairId: charlieUser.id,
-      chairs: {
-        connect: [{ id: testUser.id }],
-      },
-      reviewers: {
-        connect: [{ id: aliceUser.id }, { id: johnUser.id }],
       },
     },
   });
@@ -507,17 +471,154 @@ async function main() {
           "Biodiversity Tracking",
         ],
       },
-      mainChairId: testUser.id,
-      chairs: {
-        connect: [{ id: aliceUser.id }],
-      },
-      reviewers: {
-        connect: [{ id: janeUser.id }, { id: charlieUser.id }],
-      },
     },
   });
 
   console.log(`✅ Created ${5} conferences`);
+
+  // Create conference role entries
+  console.log("👥 Creating conference role entries...");
+
+  await prisma.conferenceRoleEntries.createMany({
+    data: [
+      // Conference 1 (ICAI2024) - John as main chair, Jane and Alice as chairs, Bob, Charlie, Test as reviewers
+      {
+        userId: johnUser.id,
+        conferenceId: conference1.id,
+        role: "MAIN_CHAIR",
+      },
+      {
+        userId: janeUser.id,
+        conferenceId: conference1.id,
+        role: "CHAIR",
+      },
+      {
+        userId: aliceUser.id,
+        conferenceId: conference1.id,
+        role: "CHAIR",
+      },
+      {
+        userId: bobUser.id,
+        conferenceId: conference1.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: charlieUser.id,
+        conferenceId: conference1.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: testUser.id,
+        conferenceId: conference1.id,
+        role: "REVIEWER",
+      },
+
+      // Conference 2 (CDPS2024) - Jane as main chair, John and Charlie as chairs, Alice, Bob, Test as reviewers
+      {
+        userId: janeUser.id,
+        conferenceId: conference2.id,
+        role: "MAIN_CHAIR",
+      },
+      {
+        userId: johnUser.id,
+        conferenceId: conference2.id,
+        role: "CHAIR",
+      },
+      {
+        userId: charlieUser.id,
+        conferenceId: conference2.id,
+        role: "CHAIR",
+      },
+      {
+        userId: aliceUser.id,
+        conferenceId: conference2.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: bobUser.id,
+        conferenceId: conference2.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: testUser.id,
+        conferenceId: conference2.id,
+        role: "REVIEWER",
+      },
+
+      // Conference 3 (FHTC2025) - Alice as main chair, Charlie and Jane as chairs, John and Bob as reviewers
+      {
+        userId: aliceUser.id,
+        conferenceId: conference3.id,
+        role: "MAIN_CHAIR",
+      },
+      {
+        userId: charlieUser.id,
+        conferenceId: conference3.id,
+        role: "CHAIR",
+      },
+      {
+        userId: janeUser.id,
+        conferenceId: conference3.id,
+        role: "CHAIR",
+      },
+      {
+        userId: johnUser.id,
+        conferenceId: conference3.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: bobUser.id,
+        conferenceId: conference3.id,
+        role: "REVIEWER",
+      },
+
+      // Conference 4 (QCPS2024) - Charlie as main chair, Test as chair, Alice and John as reviewers
+      {
+        userId: charlieUser.id,
+        conferenceId: conference4.id,
+        role: "MAIN_CHAIR",
+      },
+      {
+        userId: testUser.id,
+        conferenceId: conference4.id,
+        role: "CHAIR",
+      },
+      {
+        userId: aliceUser.id,
+        conferenceId: conference4.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: johnUser.id,
+        conferenceId: conference4.id,
+        role: "REVIEWER",
+      },
+
+      // Conference 5 (STGC2024) - Test as main chair, Alice as chair, Jane and Charlie as reviewers
+      {
+        userId: testUser.id,
+        conferenceId: conference5.id,
+        role: "MAIN_CHAIR",
+      },
+      {
+        userId: aliceUser.id,
+        conferenceId: conference5.id,
+        role: "CHAIR",
+      },
+      {
+        userId: janeUser.id,
+        conferenceId: conference5.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: charlieUser.id,
+        conferenceId: conference5.id,
+        role: "REVIEWER",
+      },
+    ],
+  });
+
+  console.log(`✅ Created conference role entries`);
 
   // Create submissions with authors
   console.log("📝 Creating submissions...");
