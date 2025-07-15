@@ -264,7 +264,7 @@ function PaperSubmission() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span className="text-muted-foreground text-sm">
+                  <span className="text-primary text-md text-ellipsis">
                     {selectedFile}
                   </span>
                 </Link>
@@ -277,12 +277,10 @@ function PaperSubmission() {
           <div className="flex justify-center">
             <Button
               type="submit"
-              disabled={isSubmitting || isPending}
+              disabled={isUploading || isSubmitting || isPending}
               className="w-full max-w-md cursor-pointer"
             >
-              {isUploading || isSubmitting || isPending
-                ? "Submitting..."
-                : "Submit Paper"}
+              {isSubmitting || isPending ? "Submitting..." : "Submit Paper"}
             </Button>
           </div>
         </form>
