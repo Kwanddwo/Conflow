@@ -1,4 +1,4 @@
-// server/api/routers/submission.ts
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   userProcedure,
@@ -75,6 +75,28 @@ export const submissionRouter = router({
         fileName,
         conferenceId,
       } = input;
+
+      const conference = await ctx.prisma.conference.findUnique({
+        where: { id: conferenceId },
+        select: { researchAreas: true },
+      });
+
+      if (!conference) {
+        throw new Error("Conference not found");
+      }
+      if (conference.researchAreas) {
+        const areaKeys = Object.keys(conference.researchAreas);
+        if (
+          !areaKeys.includes(primaryArea) ||
+          conference.researchAreas[primaryArea] !== secondaryArea
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Primary and secondary areas must be valid conference research areas",
+          });
+        }
+      }
 
       const submission = await ctx.prisma.submission.create({
         data: {
