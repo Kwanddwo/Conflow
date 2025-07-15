@@ -70,6 +70,10 @@ export const submissionRouter = router({
         },
       });
 
+      if (!submission) {
+        throw new Error("Failed to create submission");
+      }
+
       return { success: true, submissionId: submission.id };
     }),
 });
