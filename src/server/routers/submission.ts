@@ -1,6 +1,11 @@
-// server/api/routers/author.ts
+// server/api/routers/submission.ts
 import { z } from "zod";
-import { userProcedure, router } from "../trpc";
+import {
+  userProcedure,
+  router,
+  chairProcedure,
+  verifiedNoConferenceRoleProcedure,
+} from "../trpc";
 const authorSchema = z.object({
   firstName: z.string().min(1, "First Name is Required"),
   lastName: z.string().min(1, "Last Name is Required"),
@@ -10,6 +15,21 @@ const authorSchema = z.object({
   isCorresponding: z.boolean(),
 });
 export const submissionRouter = router({
+  getConferenceSubmissions: chairProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { conferenceId } = input;
+
+      const submissions = await ctx.prisma.submission.findMany({
+        where: { conferenceId },
+      });
+
+      return submissions || [];
+    }),
   addSubmissionAuthors: userProcedure
     .input(
       z.object({
@@ -31,7 +51,7 @@ export const submissionRouter = router({
 
       return { success: true };
     }),
-  addPaperSubmission: userProcedure
+  addPaperSubmission: verifiedNoConferenceRoleProcedure
     .input(
       z.object({
         title: z.string(),
