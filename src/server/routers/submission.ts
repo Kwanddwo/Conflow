@@ -76,46 +76,141 @@ export const submissionRouter = router({
         conferenceId,
       } = input;
 
+      // First, verify the user exists
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: ctx.session.user.id },
+        select: { id: true, email: true, isVerified: true },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found. Please log out and log back in.",
+        });
+      }
+
+      // Verify the conference exists and get research areas
       const conference = await ctx.prisma.conference.findUnique({
         where: { id: conferenceId },
-        select: { researchAreas: true },
+        select: {
+          id: true,
+          title: true,
+          researchAreas: true,
+          status: true,
+          submissionDeadline: true,
+        },
       });
 
       if (!conference) {
-        throw new Error("Conference not found");
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Conference not found",
+        });
       }
+
+      // Check if conference is approved and submissions are open
+      if (conference.status !== "APPROVED") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Submissions are only allowed for approved conferences",
+        });
+      }
+
+      // Check if submission deadline has passed
+      // if (new Date() > conference.submissionDeadline) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "Submission deadline has passed",
+      //   });
+      // }
+
+      // Validate research areas
       if (conference.researchAreas) {
-        const areaKeys = Object.keys(conference.researchAreas);
+        const researchAreas = conference.researchAreas as Record<
+          string,
+          string[]
+        >;
+        const areaKeys = Object.keys(researchAreas);
+
+        console.log("Research areas validation:");
+        console.log("Available areas:", areaKeys);
+        console.log("Primary area:", primaryArea);
+        console.log("Secondary area:", secondaryArea);
+
+        if (!areaKeys.includes(primaryArea)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Primary area '${primaryArea}' is not valid for this conference. Available areas: ${areaKeys.join(
+              ", "
+            )}`,
+          });
+        }
+
+        const validSecondaryAreas = researchAreas[primaryArea];
         if (
-          !areaKeys.includes(primaryArea) ||
-          conference.researchAreas[primaryArea] !== secondaryArea
+          !validSecondaryAreas ||
+          !validSecondaryAreas.includes(secondaryArea)
         ) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message:
-              "Primary and secondary areas must be valid conference research areas",
+            message: `Secondary area '${secondaryArea}' is not valid for primary area '${primaryArea}'. Available secondary areas: ${
+              validSecondaryAreas?.join(", ") || "none"
+            }`,
           });
         }
       }
 
-      const submission = await ctx.prisma.submission.create({
-        data: {
-          title,
-          abstract,
-          primaryArea,
-          secondaryArea,
-          keywords,
-          paperFilePath: fileUrl,
-          paperFileName: fileName,
-          conferenceId,
-          submittedById: ctx.session.user.id,
-        },
-      });
+      try {
+        const submission = await ctx.prisma.submission.create({
+          data: {
+            title,
+            abstract,
+            primaryArea,
+            secondaryArea,
+            keywords,
+            paperFilePath: fileUrl,
+            paperFileName: fileName,
+            conferenceId,
+            submittedById: ctx.session.user.id,
+          },
+          include: {
+            conference: {
+              select: { title: true, acronym: true },
+            },
+            submittedBy: {
+              select: { firstName: true, lastName: true, email: true },
+            },
+          },
+        });
 
-      if (!submission) {
-        throw new Error("Failed to create submission");
+        console.log(`✅ Submission created successfully: ${submission.id}`);
+        console.log(`Conference: ${submission.conference.title}`);
+        console.log(
+          `Submitted by: ${submission.submittedBy.firstName} ${submission.submittedBy.lastName}`
+        );
+
+        return {
+          success: true,
+          submissionId: submission.id,
+          message: `Paper submitted successfully to ${submission.conference.acronym}`,
+        };
+      } catch (error) {
+        console.error("Error creating submission:", error);
+
+        if (error instanceof Error) {
+          if (error.message.includes("Foreign key constraint")) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "Invalid user or conference reference. Please refresh and try again.",
+            });
+          }
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create submission. Please try again.",
+        });
       }
-
-      return { success: true, submissionId: submission.id };
     }),
 });

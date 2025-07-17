@@ -25,6 +25,9 @@ async function main() {
   // Clear existing data (optional - remove if you want to keep existing data)
   console.log("🗑️  Clearing existing data...");
   await prisma.notification.deleteMany();
+  await prisma.submissonAuthor.deleteMany();
+  await prisma.submission.deleteMany();
+  await prisma.conferenceRoleEntries.deleteMany();
   await prisma.conference.deleteMany();
   await prisma.user.deleteMany();
 
@@ -305,7 +308,7 @@ async function main() {
       submissionDeadline: new Date("2024-12-15"),
       cameraReadyDeadline: new Date("2025-02-01"),
       status: ConferenceStatus.PENDING,
-      isPublic: false,
+      isPublic: true,
       researchAreas: {
         "Healthcare Informatics": [
           "Electronic Health Records",
@@ -474,7 +477,81 @@ async function main() {
     },
   });
 
-  console.log(`✅ Created ${5} conferences`);
+  const conference6 = await prisma.conference.create({
+    data: {
+      title: "International Symposium on Software Engineering and Innovation",
+      acronym: "ISSEI2024",
+      description:
+        "A leading symposium bringing together software engineers, researchers, and industry professionals to discuss the latest innovations in software development, DevOps, cloud computing, and emerging technologies.",
+      locationVenue: "Silicon Valley Convention Center",
+      locationCity: "San Jose",
+      locationCountry: "United States",
+      callForPapers: `
+        <h2>Call for Papers</h2>
+        <p>We invite high-quality research papers on all aspects of software engineering and innovation:</p>
+        <h3>Technical Tracks</h3>
+        <ul>
+          <li><strong>Software Architecture:</strong> Microservices, Distributed Systems, Design Patterns</li>
+          <li><strong>DevOps & CI/CD:</strong> Automation, Testing, Deployment Strategies</li>
+          <li><strong>Cloud Computing:</strong> Serverless Architecture, Container Orchestration, Multi-cloud</li>
+          <li><strong>Software Quality:</strong> Testing Methodologies, Code Quality, Performance Optimization</li>
+          <li><strong>Emerging Technologies:</strong> AI/ML in Software Engineering, Blockchain, IoT</li>
+        </ul>
+        <h3>Industry Track</h3>
+        <p>We also welcome industry papers showcasing:</p>
+        <ul>
+          <li>Real-world case studies and lessons learned</li>
+          <li>Innovative tools and frameworks</li>
+          <li>Best practices in software development</li>
+        </ul>
+        <h3>Submission Guidelines</h3>
+        <p>Papers should be 6-8 pages for full papers, 2-4 pages for short papers. All submissions undergo rigorous peer review.</p>
+        <p><strong>Important:</strong> Authors must disclose any potential conflicts of interest.</p>
+      `,
+      websiteUrl: "https://issei2024.softwareconf.org",
+      startDate: new Date("2024-11-25"),
+      endDate: new Date("2024-11-27"),
+      abstractDeadline: new Date("2024-08-10"),
+      submissionDeadline: new Date("2024-08-25"),
+      cameraReadyDeadline: new Date("2024-10-10"),
+      status: ConferenceStatus.APPROVED,
+      isPublic: true,
+      researchAreas: {
+        "Software Architecture": [
+          "Microservices",
+          "Distributed Systems",
+          "Design Patterns",
+          "System Integration",
+        ],
+        "DevOps & CI/CD": [
+          "Automation",
+          "Testing Strategies",
+          "Deployment Pipelines",
+          "Infrastructure as Code",
+        ],
+        "Cloud Computing": [
+          "Serverless Architecture",
+          "Container Orchestration",
+          "Multi-cloud Strategies",
+          "Cloud Security",
+        ],
+        "Software Quality": [
+          "Testing Methodologies",
+          "Code Quality Metrics",
+          "Performance Optimization",
+          "Security Testing",
+        ],
+        "Emerging Technologies": [
+          "AI/ML in Software Engineering",
+          "Blockchain Applications",
+          "IoT Development",
+          "Edge Computing",
+        ],
+      },
+    },
+  });
+
+  console.log(`✅ Created ${6} conferences`);
 
   // Create conference role entries
   console.log("👥 Creating conference role entries...");
@@ -613,6 +690,34 @@ async function main() {
       {
         userId: charlieUser.id,
         conferenceId: conference5.id,
+        role: "REVIEWER",
+      },
+
+      // Conference 6 (ISSEI2024) - Bob as main chair, Alice and Charlie as chairs, Jane and Test as reviewers
+      // NOTE: John (marouanelemghari@gmail.com) has NO role in this conference
+      {
+        userId: bobUser.id,
+        conferenceId: conference6.id,
+        role: "MAIN_CHAIR",
+      },
+      {
+        userId: aliceUser.id,
+        conferenceId: conference6.id,
+        role: "CHAIR",
+      },
+      {
+        userId: charlieUser.id,
+        conferenceId: conference6.id,
+        role: "CHAIR",
+      },
+      {
+        userId: janeUser.id,
+        conferenceId: conference6.id,
+        role: "REVIEWER",
+      },
+      {
+        userId: testUser.id,
+        conferenceId: conference6.id,
         role: "REVIEWER",
       },
     ],
@@ -1163,6 +1268,9 @@ async function main() {
 
   const userCount = await prisma.user.count();
   const conferenceCount = await prisma.conference.count();
+  const submissionCount = await prisma.submission.count();
+  const authorCount = await prisma.submissonAuthor.count();
+  const roleEntriesCount = await prisma.conferenceRoleEntries.count();
   const notificationCount = await prisma.notification.count();
   const unreadCount = await prisma.notification.count({
     where: { isRead: false, isDeleted: false },
@@ -1185,12 +1293,29 @@ async function main() {
     where: { status: ConferenceStatus.COMPLETED },
   });
 
+  // Role distribution stats
+  const mainChairRoles = await prisma.conferenceRoleEntries.count({
+    where: { role: "MAIN_CHAIR" },
+  });
+  const chairRoles = await prisma.conferenceRoleEntries.count({
+    where: { role: "CHAIR" },
+  });
+  const reviewerRoles = await prisma.conferenceRoleEntries.count({
+    where: { role: "REVIEWER" },
+  });
+
   console.log(`👤 Total Users: ${userCount}`);
   console.log(`🏛️ Total Conferences: ${conferenceCount}`);
   console.log(`  ✅ Approved: ${approvedConferences}`);
   console.log(`  ⏳ Pending: ${pendingConferences}`);
   console.log(`  ❌ Rejected: ${rejectedConferences}`);
   console.log(`  🏁 Completed: ${completedConferences}`);
+  console.log(`📝 Total Submissions: ${submissionCount}`);
+  console.log(`👥 Total Authors: ${authorCount}`);
+  console.log(`🎭 Conference Roles: ${roleEntriesCount}`);
+  console.log(`  🎯 Main Chairs: ${mainChairRoles}`);
+  console.log(`  🪑 Chairs: ${chairRoles}`);
+  console.log(`  👀 Reviewers: ${reviewerRoles}`);
   console.log(`🔔 Total Notifications: ${notificationCount}`);
   console.log(`📬 Unread Notifications: ${unreadCount}`);
   console.log(`📦 Archived Notifications: ${archivedCount}`);
@@ -1200,7 +1325,9 @@ async function main() {
   console.log(`Admin: ${adminEmail} / Password123!`);
   console.log(`User 1: ${userEmail} / Password123! (Main Chair ICAI2024)`);
   console.log("User 2: jane@example.com / Password123! (Main Chair CDPS2024)");
-  console.log("User 3: bob@example.com / Password123! (unverified)");
+  console.log(
+    "User 3: bob@example.com / Password123! (Main Chair ISSEI2024, unverified)"
+  );
   console.log(
     "User 4: alice@university.edu / Password123! (Main Chair FHTC2025)"
   );
@@ -1217,9 +1344,30 @@ async function main() {
     "✅ ICAI2024 - International Conference on AI (Approved, Public)"
   );
   console.log("✅ CDPS2024 - Cybersecurity Summit (Approved, Public)");
-  console.log("⏳ FHTC2025 - Healthcare Technology (Pending, Private)");
+  console.log("⏳ FHTC2025 - Healthcare Technology (Pending, Public)");
   console.log("❌ QCPS2024 - Quantum Computing (Rejected, Private)");
   console.log("🏁 STGC2024 - Sustainable Technology (Completed, Public)");
+  console.log(
+    "✅ ISSEI2024 - Software Engineering Symposium (Approved, Public) - John has NO role"
+  );
+
+  console.log("\n🎯 For Testing Paper Submissions:");
+  console.log("==================================");
+  console.log(`📝 ${userEmail} (John) can submit papers to:`);
+  console.log("   - ISSEI2024 (Software Engineering Symposium)");
+  console.log("   - Any other public conferences where he has no role");
+  console.log("🚫 John CANNOT submit to ICAI2024 (he's Main Chair)");
+  console.log("🚫 John CANNOT submit to CDPS2024 (he's Chair)");
+  console.log("🚫 John CANNOT submit to FHTC2025 (he's Reviewer)");
+  console.log("🚫 John CANNOT submit to QCPS2024 (he's Reviewer)");
+
+  console.log("\n🎭 Role System Features:");
+  console.log("========================");
+  console.log("✅ Multi-role support per conference");
+  console.log("✅ Conflict of interest prevention");
+  console.log("✅ Hierarchical permissions (MAIN_CHAIR > CHAIR > REVIEWER)");
+  console.log("✅ Role-based access control");
+  console.log("✅ Flexible role assignment/removal");
 
   console.log("\n🌱 Database seeding completed successfully!");
   if (argc < 3) {

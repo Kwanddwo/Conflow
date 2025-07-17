@@ -46,7 +46,9 @@ export default function ConferencePage() {
 
   // Check if user is main chair using the role system
   const editable = conference?.conferenceRoles?.some(
-    (role) => role.role === "MAIN_CHAIR" && role.user.id === session?.user.id
+    (role) =>
+      (role.role === "MAIN_CHAIR" || role.role === "CHAIR") &&
+      role.user.id === session?.user.id
   );
 
   // Debug logging for session and main chair comparison
@@ -304,7 +306,10 @@ export default function ConferencePage() {
           </div>
 
           {session?.user.role === "USER" &&
-            conference.status === "APPROVED" && (
+            conference.status === "APPROVED" &&
+            !conference.conferenceRoles.some(
+              (role) => role.userId === session?.user.id
+            ) && (
               <Link
                 href={`/dashboard/conference/${conferenceId}/new-submission`}
               >
