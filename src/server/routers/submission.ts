@@ -6,6 +6,7 @@ import {
   chairProcedure,
   verifiedNoConferenceRoleProcedure,
 } from "../trpc";
+import { sendNotificationToChairs } from "@/lib/notification";
 const authorSchema = z.object({
   firstName: z.string().min(1, "First Name is Required"),
   lastName: z.string().min(1, "Last Name is Required"),
@@ -117,12 +118,12 @@ export const submissionRouter = router({
       }
 
       // Check if submission deadline has passed
-      // if (new Date() > conference.submissionDeadline) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Submission deadline has passed",
-      //   });
-      // }
+      if (new Date() > conference.submissionDeadline) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Submission deadline has passed",
+        });
+      }
 
       // Validate research areas
       if (conference.researchAreas) {
@@ -132,10 +133,10 @@ export const submissionRouter = router({
         >;
         const areaKeys = Object.keys(researchAreas);
 
-        console.log("Research areas validation:");
-        console.log("Available areas:", areaKeys);
-        console.log("Primary area:", primaryArea);
-        console.log("Secondary area:", secondaryArea);
+        // console.log("Research areas validation:");
+        // console.log("Available areas:", areaKeys);
+        // console.log("Primary area:", primaryArea);
+        // console.log("Secondary area:", secondaryArea);
 
         if (!areaKeys.includes(primaryArea)) {
           throw new TRPCError({
@@ -175,7 +176,7 @@ export const submissionRouter = router({
           },
           include: {
             conference: {
-              select: { title: true, acronym: true },
+              select: { id: true, title: true, acronym: true },
             },
             submittedBy: {
               select: { firstName: true, lastName: true, email: true },
@@ -187,6 +188,12 @@ export const submissionRouter = router({
         console.log(`Conference: ${submission.conference.title}`);
         console.log(
           `Submitted by: ${submission.submittedBy.firstName} ${submission.submittedBy.lastName}`
+        );
+
+        sendNotificationToChairs(
+          submission.conference.id,
+          `New submission to ${submission.conference.acronym}`,
+          "You have a new submission to a conference you are a chair of, you can now assign the paper to a reviewer."
         );
 
         return {

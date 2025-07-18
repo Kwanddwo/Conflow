@@ -4,7 +4,14 @@ import { User } from "@prisma/client";
 
 export type SessionUser = Pick<
   User,
-  "id" | "firstName" | "lastName" | "email" | "role" | "isVerified"
+  | "id"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "role"
+  | "isVerified"
+  | "country"
+  | "affiliation"
 >;
 
 declare module "next-auth" {

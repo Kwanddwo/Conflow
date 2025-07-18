@@ -37,3 +37,52 @@ export async function sendNotification(
     throw new Error("Failed to create notification");
   }
 }
+
+export async function sendNotificationToChairs(
+  conferenceId: string,
+  title: string,
+  message: string
+): Promise<Notification[]> {
+  try {
+    const conference = await prisma.conference.findUnique({
+      where: { id: conferenceId },
+      include: {
+        conferenceRoles: {
+          where: {
+            role: { in: ["MAIN_CHAIR", "CHAIR"] },
+          },
+          select: {
+            role: true,
+            user: {
+              select: {
+                id: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!conference) {
+      throw new Error("Conference not found");
+    }
+
+    const notifications: Notification[] = [];
+
+    // Send to all chairs
+    for (const chair of conference.conferenceRoles) {
+      const notification = await sendNotification(
+        { id: chair.user.id, email: chair.user.email },
+        title,
+        message
+      );
+      notifications.push(notification);
+    }
+
+    return notifications;
+  } catch (error) {
+    console.error("Failed to send notifications to chairs:", error.message);
+    throw new Error("Failed to send notifications to chairs");
+  }
+}

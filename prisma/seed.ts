@@ -480,7 +480,7 @@ async function main() {
   const conference6 = await prisma.conference.create({
     data: {
       title: "International Symposium on Software Engineering and Innovation",
-      acronym: "ISSEI2024",
+      acronym: "ISSEI2025",
       description:
         "A leading symposium bringing together software engineers, researchers, and industry professionals to discuss the latest innovations in software development, DevOps, cloud computing, and emerging technologies.",
       locationVenue: "Silicon Valley Convention Center",
@@ -508,12 +508,12 @@ async function main() {
         <p>Papers should be 6-8 pages for full papers, 2-4 pages for short papers. All submissions undergo rigorous peer review.</p>
         <p><strong>Important:</strong> Authors must disclose any potential conflicts of interest.</p>
       `,
-      websiteUrl: "https://issei2024.softwareconf.org",
-      startDate: new Date("2024-11-25"),
-      endDate: new Date("2024-11-27"),
-      abstractDeadline: new Date("2024-08-10"),
-      submissionDeadline: new Date("2024-08-25"),
-      cameraReadyDeadline: new Date("2024-10-10"),
+      websiteUrl: "https://issei2025.softwareconf.org",
+      startDate: new Date("2025-11-25"),
+      endDate: new Date("2025-11-27"),
+      abstractDeadline: new Date("2025-08-10"),
+      submissionDeadline: new Date("2025-08-25"),
+      cameraReadyDeadline: new Date("2025-10-10"),
       status: ConferenceStatus.APPROVED,
       isPublic: true,
       researchAreas: {

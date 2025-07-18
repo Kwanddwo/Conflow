@@ -51,6 +51,14 @@ export default function ConferencePage() {
       role.user.id === session?.user.id
   );
 
+  const canSubmit = (conference) =>
+    session?.user.role === "USER" &&
+    conference.status === "APPROVED" &&
+    new Date() < new Date(conference.submissionDeadline) &&
+    !conference.conferenceRoles.some(
+      (role) => role.userId === session?.user.id
+    );
+
   // Debug logging for session and main chair comparison
   console.log("Session user:", session?.user);
   console.log("Conference roles:", conference?.conferenceRoles);
@@ -304,21 +312,14 @@ export default function ConferencePage() {
               )}
             </div>
           </div>
-
-          {session?.user.role === "USER" &&
-            conference.status === "APPROVED" &&
-            !conference.conferenceRoles.some(
-              (role) => role.userId === session?.user.id
-            ) && (
-              <Link
-                href={`/dashboard/conference/${conferenceId}/new-submission`}
-              >
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Make a Submission
-                </Button>
-              </Link>
-            )}
+          {canSubmit(conference) && (
+            <Link href={`/dashboard/conference/${conferenceId}/new-submission`}>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                <FileText className="h-4 w-4 mr-2" />
+                Make a Submission
+              </Button>
+            </Link>
+          )}
         </div>
 
         {editable && isEditing ? (

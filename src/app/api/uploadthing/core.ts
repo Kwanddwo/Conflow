@@ -5,12 +5,11 @@ const f = createUploadthing();
 
 export const uploadRouter = {
   mediaUploader: f({
-    image: { maxFileSize: "4MB" },
+    // image: { maxFileSize: "4MB" },
     pdf: { maxFileSize: "16MB" },
-  })
-    .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Upload complete:", file);
-    }),
+  }).onUploadComplete(async ({ metadata, file }) => {
+    console.log("Upload complete:", file);
+  }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof uploadRouter;

@@ -2,6 +2,19 @@ import { TRPCError } from "@trpc/server";
 import { userProcedure, router } from "../trpc";
 import { z } from "zod";
 export const userRouter = router({
+  getAll: userProcedure.query(async ({ ctx }) => {
+    const users = await ctx.prisma.user.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        country: true,
+        affiliation: true,
+      },
+    });
+    return users;
+  }),
   getProfile: userProcedure.query(async ({ ctx }) => {
     const user = await ctx.prisma.user.findUnique({
       where: { id: ctx.session.user.id },

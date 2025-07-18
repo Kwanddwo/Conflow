@@ -218,7 +218,7 @@ function PaperSubmission() {
             )}
             <p className="text-muted-foreground text-sm">
               Type a list of keywords for your paper, each keyword should be in
-              its own line!!
+              its own line.
             </p>
           </div>
 
