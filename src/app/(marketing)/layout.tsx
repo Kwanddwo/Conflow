@@ -11,7 +11,7 @@ export default function MarketingLayout({
 }: {
   children: React.ReactNode;
   }) {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   return (
     <>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">

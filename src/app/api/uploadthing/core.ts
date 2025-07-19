@@ -7,7 +7,7 @@ export const uploadRouter = {
   mediaUploader: f({
     // image: { maxFileSize: "4MB" },
     pdf: { maxFileSize: "16MB" },
-  }).onUploadComplete(async ({ metadata, file }) => {
+  }).onUploadComplete(async ({ file }) => {
     console.log("Upload complete:", file);
   }),
 } satisfies FileRouter;

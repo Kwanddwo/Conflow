@@ -10,7 +10,6 @@ import {
   TableCell,
 } from "./ui/table";
 import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
 
 export default function ConferenceList({
   conferences,
