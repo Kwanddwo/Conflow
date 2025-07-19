@@ -260,12 +260,25 @@ export const conferenceRouter = router({
     .mutation(async ({ input, ctx }) => {
       input.callForPapers = DOMPurify.sanitize(input.callForPapers);
 
+      if (
+        !(
+          input.startDate < input.abstractDeadline &&
+          input.abstractDeadline < input.submissionDeadline &&
+          input.submissionDeadline < input.cameraReadyDeadline &&
+          input.cameraReadyDeadline < input.endDate
+        )
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Dates are not in the correct order: startDate, abstractDeadline, submissionDeadline, cameraReadyDeadline must be in ascending order.",
+        });
+      }
+
       // Create the conference first
       const conferenceRequest = await ctx.prisma.conference.create({
         data: {
           ...input,
-          // Remove mainChairId since we're using the role system
-          // mainChairId: ctx.session.user.id
         },
       });
 
