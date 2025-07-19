@@ -26,10 +26,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
-import { NewParticipantDialog } from "./NewParticipantDialog";
+import { useEffect, useState } from "react";
+import NewParticipant from "./NewParticipantDialog";
 import Link from "next/link";
-
+import { useParams } from "next/navigation";
+import { trpc } from "@/server/client";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { getName } from "country-list";
 interface Submission {
   id: string;
   title: string;
@@ -46,52 +49,23 @@ interface Assignment {
   submissions: Submission[];
 }
 
+interface Participant {
+  role: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  country: string;
+  affiliation: string;
+  isCorresponding: boolean;
+}
 export default function ConferenceDashboard() {
-  const [open, setOpen] = useState(false);
-
-  const participants = [
-    {
-      firstName: "Mohammed",
-      lastName: "Su",
-      email: "Medsu@gmail.com",
-      country: "Morocco",
-      affiliation: "Laboratory of Whatever, National School of Something, NSS",
-      role: "Main Chair",
-    },
-    {
-      firstName: "Mohammed",
-      lastName: "Su",
-      email: "Medsu@gmail.com",
-      country: "Morocco",
-      affiliation: "Laboratory of Whatever, National School of Something, NSS",
-      role: "Chair",
-    },
-    {
-      firstName: "Achraf",
-      lastName: "Tahiri",
-      email: "chraffi@gmail.com",
-      country: "Morocco",
-      affiliation: "Laboratory of Whatever, National School of Something, NSS",
-      role: "Author",
-    },
-    {
-      firstName: "Mohammed",
-      lastName: "Alami",
-      email: "m.alami@nss.ma",
-      country: "Morocco",
-      affiliation: "Laboratory of Whatever, National School of Something, NSS",
-      role: "Reviewer",
-    },
-    {
-      firstName: "Mohammed",
-      lastName: "Su",
-      email: "Medsu@gmail.com",
-      country: "Morocco",
-      affiliation: "Laboratory of Whatever, National School of Something, NSS",
-      role: "Author",
-    },
-  ];
-
+  const { conferenceId } = useParams<{ conferenceId: string }>();
+  const { data: submissions, isLoading } =
+    trpc.submission.getSubmissionsByConferenceId.useQuery({
+      conferenceId: conferenceId || "",
+    });
+  const [allAuthors,setAllAuthors]=useState<Participant[]>();
   const [chairAssignments, setChairAssignments] = useState<Assignment[]>([
     {
       reviewer: "Mohammed Su",
@@ -108,19 +82,6 @@ export default function ConferenceDashboard() {
             "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
           submitted: "Sep 17, 13:42",
           status: "Reviewed",
-        },
-        {
-          id: "100",
-          title:
-            "Something Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-          paper: "MyPaper.pdf",
-          area: "Artificial Intelligence and Cognitive Systems",
-          keywords:
-            "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-          abstract:
-            "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-          submitted: "Sep 17, 13:42",
-          status: null,
         },
       ],
     },
@@ -139,19 +100,6 @@ export default function ConferenceDashboard() {
             "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
           submitted: "Sep 17, 13:42",
           status: null,
-        },
-        {
-          id: "100",
-          title:
-            "Something Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-          paper: "MyPaper.pdf",
-          area: "Artificial Intelligence and Cognitive Systems",
-          keywords:
-            "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-          abstract:
-            "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-          submitted: "Sep 17, 13:42",
-          status: "Reviewed",
         },
       ],
     },
@@ -174,19 +122,6 @@ export default function ConferenceDashboard() {
           submitted: "Sep 17, 13:42",
           status: "Reviewed",
         },
-        {
-          id: "100",
-          title:
-            "Something Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-          paper: "MyPaper.pdf",
-          area: "Artificial Intelligence and Cognitive Systems",
-          keywords:
-            "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-          abstract:
-            "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-          submitted: "Sep 17, 13:42",
-          status: null,
-        },
       ],
     },
     {
@@ -205,67 +140,25 @@ export default function ConferenceDashboard() {
           submitted: "Sep 17, 13:42",
           status: null,
         },
-        {
-          id: "100",
-          title:
-            "Something Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-          paper: "MyPaper.pdf",
-          area: "Artificial Intelligence and Cognitive Systems",
-          keywords:
-            "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-          abstract:
-            "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-          submitted: "Sep 17, 13:42",
-          status: "Reviewed",
-        },
       ],
     },
   ]);
+  useEffect(() =>{
+    if(submissions){
+      setAllAuthors(
+        submissions.flatMap((submission) =>
+          submission.submissionAuthors.map((author) => ({
+            ...author,
+            role: "Author",
+          }))
+        )
+      );
+    }
+    },[submissions]);
 
-  const submissions = [
-    {
-      id: "95",
-      title:
-        "Neuro-Symbolic Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-      paper: "MyPaper.pdf",
-      area: "Artificial Intelligence and Cognitive Systems",
-      keywords:
-        "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-      abstract:
-        "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-      submitted: "Sep 17, 13:42",
-    },
-    {
-      id: "100",
-      title:
-        "Something Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-      paper: "MyPaper.pdf",
-      area: "Artificial Intelligence and Cognitive Systems",
-      keywords:
-        "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-      abstract:
-        "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-      submitted: "Sep 17, 13:42",
-    },
-    {
-      id: "54",
-      title:
-        "Advanced Machine Learning Techniques for Natural Language Processing",
-      paper: "MLPaper.pdf",
-      area: "Machine Learning",
-      keywords: "machine learning, natural language processing, deep learning",
-      abstract:
-        "This research explores advanced machine learning techniques for natural language processing applications.",
-      submitted: "Sep 15, 10:30",
-    },
-  ];
-
-  // Available submissions for assignment
-  const availableSubmissions = submissions.map((sub) => ({
-    id: sub.id,
-    title: sub.title,
-  }));
-
+  if (isLoading || !submissions) {
+      return <LoadingSpinner />;
+  }
   // Remove submission from chair assignments
   const removeChairSubmission = (
     reviewerName: string,
@@ -311,7 +204,6 @@ export default function ConferenceDashboard() {
     );
   };
 
-  // Remove submission from reviewer assignments
   const removeReviewerSubmission = (
     reviewerName: string,
     submissionId: string
@@ -330,7 +222,6 @@ export default function ConferenceDashboard() {
     );
   };
 
-  // Add submission to reviewer assignments
   const addReviewerSubmission = (
     reviewerName: string,
     submissionId: string
@@ -359,7 +250,6 @@ export default function ConferenceDashboard() {
     );
   };
 
-  // Get available submissions for a specific reviewer (not already assigned)
   const getAvailableSubmissionsForChair = (reviewerName: string) => {
     const assignedIds =
       chairAssignments
@@ -376,40 +266,28 @@ export default function ConferenceDashboard() {
     return availableSubmissions.filter((sub) => !assignedIds.includes(sub.id));
   };
 
+ 
+  const availableSubmissions = submissions.map((sub) => ({
+    id: sub.id,
+    title: sub.title,
+  }));
+  console.log("Available Submissions:", submissions);
   return (
     <div className="min-h-screen bg-[#ffffff]">
-
       <main className="px-6 py-6">
         {/* Conference Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#000000] mb-4">
             CONF2024 (Conference 2024)
           </h1>
-          <div className="flex space-x-3">
-            <Button size="sm" className="cursor-pointer">
-              Edit Conference
-            </Button>
-            <Button size="sm" className="cursor-pointer">
-              Edit CFP
-            </Button>
-          </div>
         </div>
-
-        {/* Conference Participants */}
         <Card className="mb-8">
-          <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-semibold text-[#000000]">
               Conference Participants
             </CardTitle>
-            <Button
-              size="sm"
-              className="bg-[#0f172a] text-[#ffffff] hover:bg-[#1d1b20] cursor-pointer"
-              onClick={() => setOpen(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add a new participant
-            </Button>
-          </CardHeader>
+            <NewParticipant/>
+            </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
@@ -423,7 +301,7 @@ export default function ConferenceDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {participants.map((participant, index) => (
+                {allAuthors?.map((participant, index) => (
                   <TableRow key={index}>
                     <TableCell className="text-[#000000]">
                       {participant.firstName}
@@ -435,7 +313,7 @@ export default function ConferenceDashboard() {
                       {participant.email}
                     </TableCell>
                     <TableCell className="text-[#000000]">
-                      {participant.country}
+                      {getName(participant.country)}
                     </TableCell>
                     <TableCell className="text-[#000000]">
                       {participant.affiliation}
@@ -678,14 +556,13 @@ export default function ConferenceDashboard() {
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
                       <Link
-                        href="#"
-                        className="text-blue-600 hover:text-blue-800 underline"
+                        href={submission.paperFilePath}
+                        className="text-blue-600 hover:text-blue-800 no-underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        {submission.paper}
+                        {submission.paperFileName}
                       </Link>
-                      <span className="text-[#64748b] ml-2">
-                        [{submission.submitted}]
-                      </span>
                     </div>
                   </div>
                   <div className="grid grid-cols-4 min-h-[60px] border-t border-[#e2e8f0]">
@@ -695,7 +572,9 @@ export default function ConferenceDashboard() {
                       </span>
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-[#000000]">{submission.area}</span>
+                      <span className="text-[#000000]">
+                        {submission.secondaryArea}
+                      </span>
                     </div>
                   </div>
                   <div className="grid grid-cols-4 min-h-[60px] border-t border-[#e2e8f0]">
@@ -730,7 +609,14 @@ export default function ConferenceDashboard() {
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
                       <span className="text-[#000000]">
-                        {submission.submitted}
+                        {new Date(submission.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
                       </span>
                     </div>
                   </div>
@@ -740,7 +626,6 @@ export default function ConferenceDashboard() {
           ))}
         </Card>
       </main>
-      <NewParticipantDialog open={open} setOpen={setOpen} />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   verifiedNoConferenceRoleProcedure,
 } from "../trpc";
 import { sendNotificationToChairs } from "@/lib/notification";
+
 const authorSchema = z.object({
   firstName: z.string().min(1, "First Name is Required"),
   lastName: z.string().min(1, "Last Name is Required"),
@@ -15,6 +16,27 @@ const authorSchema = z.object({
   affiliation: z.string().min(1, "Affilliation is required"),
   isCorresponding: z.boolean(),
 });
+
+export interface SubmissionWithAuthors {
+  id: string;
+  title: string;
+  abstract: string;
+  primaryArea: string;
+  secondaryArea: string;
+  keywords: string[];
+  paperFilePath: string;
+  paperFileName: string;
+  createdAt: Date;
+  submissionAuthors: {
+    id:string,
+    firstName: string;
+    lastName: string;
+    email: string;
+    country: string;
+    affiliation: string;
+    isCorresponding: boolean;
+  }[];
+}
 export const submissionRouter = router({
   getConferenceSubmissions: chairProcedure
     .input(
@@ -219,5 +241,38 @@ export const submissionRouter = router({
           message: "Failed to create submission. Please try again.",
         });
       }
+    }),
+  getSubmissionsByConferenceId: chairProcedure
+    .input(z.object({ conferenceId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { conferenceId } = input;
+
+      const submissions = await ctx.prisma.submission.findMany({
+        where: { conferenceId },
+        select: {
+          id: true,
+          title: true,
+          abstract: true,
+          primaryArea: true,
+          secondaryArea: true,
+          keywords: true,
+          paperFilePath: true,
+          paperFileName: true,
+          createdAt: true,
+          submissionAuthors: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              country: true,
+              affiliation: true,
+              isCorresponding: true,
+            },
+          },
+        },
+      });
+
+      return submissions as SubmissionWithAuthors[];
     }),
 });

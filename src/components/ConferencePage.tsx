@@ -317,14 +317,31 @@ export default function ConferencePage() {
               )}
             </div>
           </div>
-          {canSubmit(conference) && (
-            <Link href={`/dashboard/conference/${conferenceId}/new-submission`}>
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                <FileText className="h-4 w-4 mr-2" />
-                Make a Submission
-              </Button>
-            </Link>
-          )}
+          <div className="flex gap-2">
+            {canSubmit(conference) && (
+              <Link
+                href={`/dashboard/conference/${conferenceId}/new-submission`}
+              >
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Make a Submission
+                </Button>
+              </Link>
+            )}
+            {editable && (
+              <Link
+                href={`/dashboard/conference/${conferenceId}/chair-dashboard`}
+              >
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary/10"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Chair Dashboard
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
 
         {editable && isEditing ? (
