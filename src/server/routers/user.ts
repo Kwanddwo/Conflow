@@ -66,4 +66,53 @@ export const userRouter = router({
 
       return updatedUser;
     }),
+  getParticipantUsers: userProcedure.input(
+    z.object({
+      conferenceId: z.string(),
+    })
+  ).query(async ({ input, ctx }) => {
+    const { conferenceId } = input;
+    const usersWithRoles = await ctx.prisma.conferenceRoleEntries.findMany({
+      where: { conferenceId },
+      select: { userId: true },
+    });
+
+    const submissionAuthors = await ctx.prisma.submissonAuthor.findMany({
+      where: {
+        submission: {
+          conferenceId,
+        },
+        userId: { not: null },
+      },
+      select: { userId: true },
+    });
+
+    const excludedUserIds = [
+      ...new Set([
+        ...usersWithRoles.map((entry) => entry.userId),
+        ...submissionAuthors.map((author) => author.userId!),
+      ]),
+    ];
+
+    const availableUsers = await ctx.prisma.user.findMany({
+      where: {
+        id: {
+          notIn: excludedUserIds,
+        },
+        role : {not: "ADMIN"}, 
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        affiliation: true,
+        country: true,
+        isVerified: true,
+        role: true,
+      },
+    });
+
+    return availableUsers;
+  }),
 });

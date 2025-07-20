@@ -24,6 +24,8 @@ import {
 import { Search, Plus, X, Send } from "lucide-react";
 import { trpc } from "@/server/client";
 import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
 
 type ChosenUser = Pick<
   User,
@@ -32,14 +34,28 @@ type ChosenUser = Pick<
 
 type UserRole = "author" | "reviewer" | "chair";
 
-
 export default function NewParticipant() {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<ChosenUser | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
-  const { data: users } = trpc.user.getAll.useQuery();
+  const { conferenceId } = useParams<{ conferenceId: string }>();
+  const { data: users } = trpc.user.getParticipantUsers.useQuery({
+    conferenceId,
+  });
   const { data: session } = useSession();
+
+  const {
+    mutateAsync: sendInviteNotificationMutation,
+    isPending: isSendingNotification,
+  } = trpc.notification.sendInviteNotification.useMutation({
+    onSuccess: () => {
+      toast.success("Invitation sent successfully!");
+    },
+    onError: (error) => {
+      toast.error(`Failed to send invitation: ${error.message}`);
+    },
+  });
 
   const filteredUsers = users?.filter((user) => {
     const isCurrentUser = user.id !== session?.user.id;
@@ -61,18 +77,30 @@ export default function NewParticipant() {
     setSelectedRole(null);
   };
 
-  const handleInvite = () => {
-    if (selectedUser && selectedRole) {
-      setSelectedUser(null);
-      setSelectedRole(null);
-      setOpen(false);
+  const handleInvite = async () => {
+    if (selectedUser && selectedRole && conferenceId) {
+      try {
+        await sendInviteNotificationMutation({
+          userId: selectedUser.id,
+          title: `Conference Invitation - ${
+            selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+          } Role`,
+          message: `You have been invited to participate as a ${selectedRole} in our conference. Please review the invitation and respond accordingly.`,
+          conferenceId: conferenceId,
+          role: selectedRole,
+        });
+
+        setSelectedUser(null);
+        setSelectedRole(null);
+        setOpen(false);
+      } catch (error) {
+        console.error("Failed to send invitation:", error);
+      }
     }
   };
 
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {
-      case "author":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-200";
       case "reviewer":
         return "bg-green-100 text-green-800 hover:bg-green-200";
       case "chair":
@@ -191,12 +219,6 @@ export default function NewParticipant() {
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="author">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    Author
-                  </div>
-                </SelectItem>
                 <SelectItem value="reviewer">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -227,11 +249,13 @@ export default function NewParticipant() {
         <DialogFooter>
           <Button
             onClick={handleInvite}
-            disabled={!selectedUser || !selectedRole}
+            disabled={!selectedUser || !selectedRole || isSendingNotification}
             className="w-full"
           >
             <Send className="mr-2 h-4 w-4" />
-            Invite as {selectedRole || "..."}
+            {isSendingNotification
+              ? "Sending Invitation..."
+              : `Invite as ${selectedRole || "..."}`}
           </Button>
         </DialogFooter>
       </DialogContent>
