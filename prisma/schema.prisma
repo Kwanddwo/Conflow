@@ -27,7 +27,7 @@ model User {
 
   conferenceRoles ConferenceRoleEntries[]
   directSubmissions Submission[]
-  authorEntries     SubmissonAuthor[] @relation("AuthorUser")
+  authorEntries     SubmissionAuthor[] @relation("AuthorUser")
 }
 
 model Notification {
@@ -103,10 +103,10 @@ model Submission {
   submittedById       String
   submittedBy         User             @relation(fields: [submittedById], references: [id])
 
-  submissionAuthors SubmissonAuthor[]
+  submissionAuthors SubmissionAuthor[]
 }
 
-model SubmissonAuthor {
+model SubmissionAuthor {
   id              String     @id @default(cuid())
   firstName       String
   lastName        String

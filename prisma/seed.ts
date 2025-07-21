@@ -25,7 +25,7 @@ async function main() {
   // Clear existing data (optional - remove if you want to keep existing data)
   console.log("🗑️  Clearing existing data...");
   await prisma.notification.deleteMany();
-  await prisma.submissonAuthor.deleteMany();
+  await prisma.submissionAuthor.deleteMany();
   await prisma.submission.deleteMany();
   await prisma.conferenceRoleEntries.deleteMany();
   await prisma.conference.deleteMany();
@@ -754,7 +754,7 @@ async function main() {
   });
 
   // Authors for submission 1 - mix of linked and non-linked users
-  await prisma.submissonAuthor.createMany({
+  await prisma.SubmissionAuthor.createMany({
     data: [
       {
         firstName: "John",
@@ -814,7 +814,7 @@ async function main() {
     },
   });
 
-  await prisma.submissonAuthor.createMany({
+  await prisma.SubmissionAuthor.createMany({
     data: [
       {
         firstName: "Jane",
@@ -864,7 +864,7 @@ async function main() {
     },
   });
 
-  await prisma.submissonAuthor.createMany({
+  await prisma.SubmissionAuthor.createMany({
     data: [
       {
         firstName: "Alice",
@@ -924,7 +924,7 @@ async function main() {
     },
   });
 
-  await prisma.submissonAuthor.createMany({
+  await prisma.SubmissionAuthor.createMany({
     data: [
       {
         firstName: "Test",
@@ -974,7 +974,7 @@ async function main() {
     },
   });
 
-  await prisma.submissonAuthor.createMany({
+  await prisma.SubmissionAuthor.createMany({
     data: [
       {
         firstName: "Charlie",
@@ -1034,7 +1034,7 @@ async function main() {
     },
   });
 
-  await prisma.submissonAuthor.createMany({
+  await prisma.SubmissionAuthor.createMany({
     data: [
       {
         firstName: "Bob",
@@ -1269,7 +1269,7 @@ async function main() {
   const userCount = await prisma.user.count();
   const conferenceCount = await prisma.conference.count();
   const submissionCount = await prisma.submission.count();
-  const authorCount = await prisma.submissonAuthor.count();
+  const authorCount = await prisma.SubmissionAuthor.count();
   const roleEntriesCount = await prisma.conferenceRoleEntries.count();
   const notificationCount = await prisma.notification.count();
   const unreadCount = await prisma.notification.count({

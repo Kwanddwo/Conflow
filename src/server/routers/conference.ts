@@ -1,4 +1,3 @@
-// import { TRPCError } from "@trpc/server};
 import { sendNotification } from "@/lib/notification";
 import {
   userProcedure,
@@ -440,7 +439,115 @@ export const conferenceRouter = router({
 
     return conference.researchAreas as ResearchAreas;
   }),
+  getConferenceRoles: userProcedure.query(async ({ ctx }) => {
+    const roles = await ctx.prisma.conferenceRoleEntries.findMany({
+      where: { userId: ctx.session.user.id },
+      select: {
+        role: true,
+        conference: {
+          select: {
+            id: true,
+            title: true,
+            acronym: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
+    const authorEntries = await ctx.prisma.submissionAuthor.findMany({
+      where: { userId: ctx.session.user.id },
+      select: {
+        submission: {
+          select: {
+            conference: {
+              select: {
+                id: true,
+                title: true,
+                acronym: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    console.log("Author Entries:", authorEntries.length);
+
+    const authorRoles = authorEntries.map((entry) => ({
+      role: "AUTHOR",
+      conferenceId: entry.submission.conference.id,
+      conferenceTitle: entry.submission.conference.title,
+      conferenceAcronym: entry.submission.conference.acronym,
+    }));
+
+    const conferenceRoles = roles.map((role) => ({
+      role: role.role,
+      conferenceId: role.conference.id,
+      conferenceTitle: role.conference.title,
+      conferenceAcronym: role.conference.acronym,
+    }));
+
+    return [...conferenceRoles, ...authorRoles];
+  }),
+  getRecentConferenceRoles: userProcedure.query(async ({ ctx }) => {
+    const roles = await ctx.prisma.conferenceRoleEntries.findMany({
+      where: { userId: ctx.session.user.id },
+      select: {
+        role: true,
+        conference: {
+          select: {
+            id: true,
+            title: true,
+            acronym: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5, // Limit to the most recent 5 roles
+    });
+
+    const authorEntries = await ctx.prisma.submissionAuthor.findMany({
+      where: { userId: ctx.session.user.id },
+      select: {
+        submission: {
+          select: {
+            conference: {
+              select: {
+                id: true,
+                title: true,
+                acronym: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5, // Limit to the most recent 5 author roles
+    });
+
+    const authorRoles = authorEntries.map((entry) => ({
+      role: "AUTHOR",
+      conferenceId: entry.submission.conference.id,
+      conferenceTitle: entry.submission.conference.title,
+      conferenceAcronym: entry.submission.conference.acronym,
+    }));
+
+    const conferenceRoles = roles.map((role) => ({
+      role: role.role,
+      conferenceId: role.conference.id,
+      conferenceTitle: role.conference.title,
+      conferenceAcronym: role.conference.acronym,
+    }));
+
+    return [...conferenceRoles, ...authorRoles];
+  }),
   addConferenceRole: userProcedure
     .input(
       z.object({

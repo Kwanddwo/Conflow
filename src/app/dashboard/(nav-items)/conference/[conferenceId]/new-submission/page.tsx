@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadButton } from "@/lib/uploadthing";
 import { trpc } from "@/server/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -38,6 +39,7 @@ function PaperSubmission() {
   const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -46,11 +48,13 @@ function PaperSubmission() {
   } = useForm<PaperSubmissionValues>({
     resolver: zodResolver(paperSubmissionSchema),
   });
+
   const {
     data: areas,
     isLoading,
     error,
   } = trpc.conference.getAreas.useQuery(conferenceId);
+
   const normalizedAreas = areas
     ? Object.entries(areas).map(([key, values]) => {
         return {
@@ -59,8 +63,30 @@ function PaperSubmission() {
         };
       })
     : [];
+
   const { mutateAsync, isPending } =
     trpc.submission.addPaperSubmission.useMutation();
+
+  const { data: session } = useSession();
+
+  const canSubmit = (conference) =>
+    session?.user.role === "USER" &&
+    conference?.status === "APPROVED" &&
+    new Date() < new Date(conference?.submissionDeadline) &&
+    !conference?.conferenceRoles.some(
+      (role) => role.userId === session?.user.id
+    );
+
+  const { data: conference } =
+    trpc.conference.getConference.useQuery(conferenceId);
+
+  if (!canSubmit(conference)) {
+    toast.error(
+      "You cannot submit to this conference. Please check the conference status and deadlines."
+    );
+    router.push(`/dashboard/conference/${conferenceId}`);
+  }
+
   const onSubmit = async (data: PaperSubmissionValues) => {
     try {
       const jsonKeywords = data.keywords

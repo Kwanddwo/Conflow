@@ -712,48 +712,49 @@ export default function ConferencePage() {
                   </div>
                 </CardContent>
               </Card>
-              {conference.status === "PENDING" && (
-                <div className="flex justify-center gap-2">
-                  <Button
-                    className="bg-success-action hover:bg-success-action/90 text-success-action-foreground"
-                    disabled={isApproveLoading}
-                    onClick={async () => {
-                      try {
-                        await approveMutateAsync(conference.id);
-                        toast.success("Conference approved successfully!");
-                      } catch (error) {
-                        if (error instanceof TRPCError) {
-                          toast.error(error.message);
-                        } else {
-                          toast.error("An unexpected error occurred.");
+              {conference.status === "PENDING" &&
+                session?.user.role === "ADMIN" && (
+                  <div className="flex justify-center gap-2">
+                    <Button
+                      className="bg-success-action hover:bg-success-action/90 text-success-action-foreground"
+                      disabled={isApproveLoading}
+                      onClick={async () => {
+                        try {
+                          await approveMutateAsync(conference.id);
+                          toast.success("Conference approved successfully!");
+                        } catch (error) {
+                          if (error instanceof TRPCError) {
+                            toast.error(error.message);
+                          } else {
+                            toast.error("An unexpected error occurred.");
+                          }
                         }
-                      }
-                    }}
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    {isApproveLoading ? "Approving..." : "Approve Conference"}
-                  </Button>
-                  <Button
-                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                    disabled={isRejectLoading}
-                    onClick={async () => {
-                      try {
-                        await rejectMutateAsync(conference.id);
-                        toast.success("Conference rejected successfully!");
-                      } catch (error) {
-                        if (error instanceof TRPCError) {
-                          toast.error(error.message);
-                        } else {
-                          toast.error("An unexpected error occurred.");
+                      }}
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      {isApproveLoading ? "Approving..." : "Approve Conference"}
+                    </Button>
+                    <Button
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      disabled={isRejectLoading}
+                      onClick={async () => {
+                        try {
+                          await rejectMutateAsync(conference.id);
+                          toast.success("Conference rejected successfully!");
+                        } catch (error) {
+                          if (error instanceof TRPCError) {
+                            toast.error(error.message);
+                          } else {
+                            toast.error("An unexpected error occurred.");
+                          }
                         }
-                      }
-                    }}
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    {isRejectLoading ? "Rejecting..." : "Reject Conference"}
-                  </Button>
-                </div>
-              )}
+                      }}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      {isRejectLoading ? "Rejecting..." : "Reject Conference"}
+                    </Button>
+                  </div>
+                )}
             </>
           )}
         </div>
