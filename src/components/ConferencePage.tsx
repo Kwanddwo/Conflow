@@ -42,9 +42,16 @@ export default function ConferencePage() {
     data: conference,
     isLoading,
     refetch,
+    error,
   } = trpc.conference.getConference.useQuery(conferenceId, {
     enabled: !!conferenceId,
   });
+
+  useEffect(() => {
+    if (error?.data?.code === "NOT_FOUND") {
+      nextRouter.push("/dashboard/not-found");
+    }
+  }, [error, nextRouter]);
 
   // Check if user is main chair using the role system
   const editable = conference?.conferenceRoles?.some(

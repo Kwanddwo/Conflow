@@ -106,7 +106,19 @@ export const submissionRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { authors, submissionId } = input;
+      const submission = await ctx.prisma.submission.findUnique({
+        where: { id: submissionId },
+        select: {
+          id: true,
+        },
+      });
 
+      if (!submission) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Submission not found",
+        });
+      }
       // Map authors to users if possible here
       await ctx.prisma.submissionAuthor.createMany({
         data: authors.map((author) => ({
@@ -378,11 +390,12 @@ export const submissionRouter = router({
           }
         }
 
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update submission. Please try again.",
-        });
-      },
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update submission. Please try again.",
+          });
+        }
+      }),
   getSubmissionsByConferenceId: chairProcedure
     .input(z.object({ conferenceId: z.string() }))
     .query(async ({ ctx, input }) => {
