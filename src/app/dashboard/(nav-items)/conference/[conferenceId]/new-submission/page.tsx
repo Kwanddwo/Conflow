@@ -104,7 +104,7 @@ function PaperSubmission() {
       console.log("Submission response:", response);
       toast.success("Paper submitted successfully!");
       router.push(
-        `/dashboard/conference/${conferenceId}/submission/${response.submissionId}/authors`
+        `/dashboard/conference/${conferenceId}/your-submissions/${response.submissionId}/authors`
       );
     } catch (err) {
       console.error(err);

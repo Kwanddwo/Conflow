@@ -42,6 +42,7 @@ const formSchema = z.object({
 type AuthorFormValues = z.infer<typeof formSchema>;
 
 export default function AuthorForm() {
+  const { conferenceId } = useParams<{ conferenceId: string }>();
   const router = useRouter();
   const { submissionId } = useParams<{ submissionId: string }>();
   const { data: session } = useSession();
@@ -86,7 +87,7 @@ export default function AuthorForm() {
     try {
       await mutateAsync(payload);
       toast.success("Authors submitted successfully!");
-      router.push("/dashboard/my-roles");
+      router.push(`/conference/${conferenceId}/your-submissions/`);
     } catch (error) {
       console.error("Error submitting authors:", error);
       toast.error("Failed to submit authors.");
