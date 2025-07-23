@@ -13,6 +13,7 @@ import {
   Link,
   Unlink,
   UserPlus,
+  Loader2,
 } from "lucide-react";
 import { z } from "zod";
 import { useParams } from "next/navigation";
@@ -24,8 +25,10 @@ import UserChooser from "@/components/UserChooser";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useEffect } from "react";
 
 const authorSchema = z.object({
+  id: z.string().optional(), // Add id for existing authors
   firstName: z.string().min(1, "First Name is Required"),
   lastName: z.string().min(1, "Last Name is Required"),
   email: z.string().email("Invalid email"),
@@ -46,28 +49,61 @@ export default function AuthorForm() {
   const router = useRouter();
   const { submissionId } = useParams<{ submissionId: string }>();
   const { data: session } = useSession();
+
+  // Fetch existing authors
+  const { data: existingAuthors, isLoading: isLoadingAuthors } =
+    trpc.submission.getSubmissionAuthors.useQuery({ submissionId });
+
   const {
     control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
+    reset,
   } = useForm<AuthorFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      authors: [
-        {
-          firstName: session?.user.firstName,
-          lastName: session?.user.lastName,
-          email: session?.user.email,
-          country: session?.user.country,
-          affiliation: session?.user.affiliation,
-          isCorresponding: true,
-          userId: session?.user.id,
-        },
-      ],
+      authors: [],
     },
   });
+
+  // Update form when data is loaded
+  useEffect(() => {
+    if (existingAuthors && existingAuthors.length > 0) {
+      reset({
+        authors: existingAuthors.map((author) => ({
+          id: author.id,
+          firstName: author.firstName,
+          lastName: author.lastName,
+          email: author.email,
+          country: author.country,
+          affiliation: author.affiliation,
+          isCorresponding: author.isCorresponding,
+          userId: author.userId || undefined,
+        })),
+      });
+    } else if (
+      existingAuthors &&
+      existingAuthors.length === 0 &&
+      session?.user
+    ) {
+      // If no existing authors, set current user as first author (for backward compatibility)
+      reset({
+        authors: [
+          {
+            firstName: session.user.firstName,
+            lastName: session.user.lastName,
+            email: session.user.email,
+            country: session.user.country,
+            affiliation: session.user.affiliation,
+            isCorresponding: true,
+            userId: session.user.id,
+          },
+        ],
+      });
+    }
+  }, [existingAuthors, session, reset]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -76,21 +112,21 @@ export default function AuthorForm() {
 
   const watchedAuthors = watch("authors");
 
-  const { mutateAsync, isPending } =
-    trpc.submission.addSubmissionAuthors.useMutation();
+  const { mutateAsync: updateAuthors, isPending: isUpdating } =
+    trpc.submission.updateSubmissionAuthors.useMutation();
 
   const onSubmit = async (data: AuthorFormValues) => {
     const payload = {
-      ...data,
       submissionId,
+      authors: data.authors,
     };
     try {
-      await mutateAsync(payload);
-      toast.success("Authors submitted successfully!");
-      router.push(`/conference/${conferenceId}/your-submissions/`);
+      await updateAuthors(payload);
+      toast.success("Authors updated successfully!");
+      router.push(`/dashboard/conference/${conferenceId}/your-submissions/`);
     } catch (error) {
-      console.error("Error submitting authors:", error);
-      toast.error("Failed to submit authors.");
+      console.error("Error updating authors:", error);
+      toast.error("Failed to update authors.");
     }
   };
 
@@ -149,12 +185,26 @@ export default function AuthorForm() {
     });
   };
 
+  // Show loading state
+  if (isLoadingAuthors) {
+    return (
+      <div className="main-content-height flex items-center justify-center p-6">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Loading authors...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="main-content-height flex items-center justify-center p-6">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Add Authors
+            {existingAuthors && existingAuthors.length > 0
+              ? "Edit Authors"
+              : "Add Authors"}
           </h1>
           <p className="text-muted-foreground">
             Please provide information for all authors of this submission
@@ -173,6 +223,9 @@ export default function AuthorForm() {
                   isLinked ? "border-primary/30 bg-primary/5" : "border-border"
                 }`}
               >
+                {/* Hidden field for id */}
+                <input type="hidden" {...register(`authors.${index}.id`)} />
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <h2 className="text-lg font-semibold">
@@ -345,8 +398,7 @@ export default function AuthorForm() {
                       <CountrySelect
                         field={field}
                         isSubmitting={isSubmitting}
-                        isPending={isPending}
-                        disabled={isLinked}
+                        isPending={isUpdating}
                       />
                     )}
                   />
@@ -429,9 +481,9 @@ export default function AuthorForm() {
           <Button
             type="submit"
             className="w-full max-w-md mx-auto block mt-6 cursor-pointer"
-            disabled={isSubmitting || isPending}
+            disabled={isSubmitting || isUpdating}
           >
-            {isSubmitting || isPending ? "Submitting..." : "Submit Authors"}
+            {isSubmitting || isUpdating ? "Updating..." : "Update Authors"}
           </Button>
         </form>
       </div>

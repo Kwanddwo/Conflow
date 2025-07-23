@@ -9,6 +9,7 @@ import {
 import { sendNotificationToChairs } from "@/lib/notification";
 
 const authorSchema = z.object({
+  id: z.string().optional(), // For existing authors
   firstName: z.string().min(1, "First Name is Required"),
   lastName: z.string().min(1, "Last Name is Required"),
   email: z.string().email("Invalid email"),
@@ -29,7 +30,7 @@ export interface SubmissionWithAuthors {
   paperFileName: string;
   createdAt: Date;
   submissionAuthors: {
-    id:string,
+    id: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -96,6 +97,132 @@ export const submissionRouter = router({
       });
 
       return submissions || [];
+    }),
+  getSubmissionAuthors: userProcedure
+    .input(
+      z.object({
+        submissionId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { submissionId } = input;
+
+      // Check if user has access to this submission
+      const submission = await ctx.prisma.submission.findUnique({
+        where: { id: submissionId },
+        select: {
+          id: true,
+          submittedById: true,
+          submissionAuthors: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+
+      if (!submission) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Submission not found",
+        });
+      }
+
+      // Check if user is the submitter or one of the authors
+      const isSubmitter = submission.submittedById === ctx.session.user.id;
+      const isAuthor = submission.submissionAuthors.some(
+        (author) => author.userId === ctx.session.user.id
+      );
+
+      if (!isSubmitter && !isAuthor) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have access to this submission",
+        });
+      }
+
+      const authors = await ctx.prisma.submissionAuthor.findMany({
+        where: { submissionId },
+        orderBy: { createdAt: "asc" },
+      });
+
+      return authors;
+    }),
+  updateSubmissionAuthors: userProcedure
+    .input(
+      z.object({
+        submissionId: z.string(),
+        authors: z.array(authorSchema).min(1),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { submissionId, authors } = input;
+
+      // Check if user has access to this submission
+      const submission = await ctx.prisma.submission.findUnique({
+        where: { id: submissionId },
+        select: {
+          id: true,
+          submittedById: true,
+          submissionAuthors: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+
+      if (!submission) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Submission not found",
+        });
+      }
+
+      // Check if user is the submitter or one of the authors
+      const isSubmitter = submission.submittedById === ctx.session.user.id;
+      const isAuthor = submission.submissionAuthors.some(
+        (author) => author.userId === ctx.session.user.id
+      );
+
+      if (!isSubmitter && !isAuthor) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have access to this submission",
+        });
+      }
+
+      try {
+        // Use transaction to ensure data consistency
+        await ctx.prisma.$transaction(async (prisma) => {
+          // Delete all existing authors for this submission
+          await prisma.submissionAuthor.deleteMany({
+            where: { submissionId },
+          });
+
+          // Create new authors
+          await prisma.submissionAuthor.createMany({
+            data: authors.map((author) => ({
+              firstName: author.firstName,
+              lastName: author.lastName,
+              email: author.email,
+              country: author.country,
+              affiliation: author.affiliation,
+              isCorresponding: author.isCorresponding,
+              userId: author.userId,
+              submissionId,
+            })),
+          });
+        });
+
+        return { success: true };
+      } catch (error) {
+        console.error("Error updating submission authors:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update authors. Please try again.",
+        });
+      }
     }),
   addSubmissionAuthors: userProcedure
     .input(
@@ -390,12 +517,12 @@ export const submissionRouter = router({
           }
         }
 
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to update submission. Please try again.",
-          });
-        }
-      }),
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update submission. Please try again.",
+        });
+      }
+    }),
   getSubmissionsByConferenceId: chairProcedure
     .input(z.object({ conferenceId: z.string() }))
     .query(async ({ ctx, input }) => {

@@ -14,6 +14,9 @@ export default function YourSubmissionsPage() {
   return isLoading ? (
     <LoadingSpinner />
   ) : (
-    <SubmissionsTable submissions={submissions} />
+    <SubmissionsTable
+      submissions={submissions}
+      conferenceId={params.conferenceId}
+    />
   );
 }

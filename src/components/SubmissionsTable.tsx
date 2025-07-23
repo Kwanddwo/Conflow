@@ -15,14 +15,16 @@ import {
 import { Submission } from "@prisma/client";
 import { trpc } from "@/server/client";
 import { toast } from "sonner";
-import { Pencil, Check, X, Upload } from "lucide-react";
+import { Pencil, Check, X, Upload, User } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import React from "react";
 
 export default function SubmissionsTable({
   submissions,
+  conferenceId,
 }: {
   submissions: Array<Submission> | undefined;
+  conferenceId: string;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Submission>>({});
@@ -31,9 +33,7 @@ export default function SubmissionsTable({
     name: string;
   } | null>(null);
 
-  const { data: areas } = trpc.conference.getAreas.useQuery(
-    submissions?.[0]?.conference?.id
-  );
+  const { data: areas } = trpc.conference.getAreas.useQuery(conferenceId);
 
   const normalizedAreas = areas
     ? Object.entries(areas).map(([key, values]) => {
@@ -96,7 +96,7 @@ export default function SubmissionsTable({
         : [];
 
     updateSubmission.mutate({
-      conferenceId: submissions?.[0]?.conference?.id,
+      conferenceId: conferenceId,
       submissionId,
       title: editData.title,
       abstract: editData.abstract,
@@ -133,7 +133,7 @@ export default function SubmissionsTable({
     <Card>
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-foreground">
-          Submissions for {submissions?.[0]?.conference?.title}
+          Submissions
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -169,14 +169,24 @@ export default function SubmissionsTable({
                           </Button>
                         </>
                       ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(submission)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                          Edit
-                        </Button>
+                        <>
+                          <Link
+                            href={`/dashboard/conference/${conferenceId}/your-submissions/${submission.id}/authors`}
+                          >
+                            <Button size="sm" variant="outline">
+                              <User className="h-4 w-4" />
+                              Edit Authors
+                            </Button>
+                          </Link>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(submission)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            Edit
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
