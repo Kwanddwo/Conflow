@@ -399,6 +399,7 @@ export default function AuthorForm() {
                         field={field}
                         isSubmitting={isSubmitting}
                         isPending={isUpdating}
+                        disabled={isLinked}
                       />
                     )}
                   />

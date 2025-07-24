@@ -11,12 +11,14 @@ type Props = {
   field: ControllerRenderProps<any, any>;
   isSubmitting?: boolean;
   isPending?: boolean;
+  disabled?: boolean;
 };
 
 export default function CountrySelect({
   field,
   isSubmitting = false,
   isPending = false,
+  disabled = false,
 }: Props) {
   const countries = getData();
   return (
@@ -24,7 +26,7 @@ export default function CountrySelect({
       onValueChange={field.onChange}
       value={field.value}
       defaultValue={field.value}
-      disabled={isSubmitting || isPending}
+      disabled={isSubmitting || isPending || disabled}
     >
       <SelectTrigger
         ref={field.ref}
