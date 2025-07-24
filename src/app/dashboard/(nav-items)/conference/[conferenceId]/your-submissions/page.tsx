@@ -14,9 +14,11 @@ export default function YourSubmissionsPage() {
   return isLoading ? (
     <LoadingSpinner />
   ) : (
-    <SubmissionsTable
-      submissions={submissions}
-      conferenceId={params.conferenceId}
-    />
+    <div className="main-content-height flex items-center justify-center p-4 bg-muted/50">
+      <SubmissionsTable
+        submissions={submissions}
+        conferenceId={params.conferenceId}
+      />
+    </div>
   );
 }
