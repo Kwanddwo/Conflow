@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -57,7 +56,7 @@ interface Participant {
   email: string;
   country: string;
   affiliation: string;
-  isCorresponding: boolean;
+  isCorresponding?: boolean;
 }
 export default function ConferenceDashboard() {
   const { conferenceId } = useParams<{ conferenceId: string }>();
@@ -65,7 +64,10 @@ export default function ConferenceDashboard() {
     trpc.submission.getSubmissionsByConferenceId.useQuery({
       conferenceId: conferenceId || "",
     });
-  const [allAuthors, setAllAuthors] = useState<Participant[]>();
+  const { data : invitees, isLoading: isLoadingInvitees } = trpc.conference.getConferenceInvitees.useQuery({
+      conferenceId: conferenceId || "",
+    });
+  const [allParticipants, setAllParticipants] = useState<Participant[]>();
   const [chairAssignments, setChairAssignments] = useState<Assignment[]>([
     {
       reviewer: "Mohammed Su",
@@ -144,22 +146,39 @@ export default function ConferenceDashboard() {
     },
   ]);
   useEffect(() => {
-    if (submissions) {
-      setAllAuthors(
-        submissions.flatMap((submission) =>
-          submission.submissionAuthors.map((author) => ({
-            ...author,
-            role: "Author",
-          }))
-        )
+    if (submissions && invitees) {
+      const authorParticipants = submissions.flatMap((submission) =>
+        submission.submissionAuthors.map((author) => ({
+          ...author,
+          role: "Author",
+        }))
       );
-    }
-  }, [submissions]);
 
-  if (isLoading || !submissions) {
+      const inviteeParticipants: Participant[] = invitees.map((entry) => ({
+        id: entry.user.id,
+        firstName: entry.user.firstName,
+        lastName: entry.user.lastName,
+        email: entry.user.email,
+        country: entry.user.country,
+        affiliation: entry.user.affiliation,
+        role: entry.role,
+      }));
+      const mergedParticipants: Participant[] = [
+        ...authorParticipants,
+        ...inviteeParticipants.filter(
+          (invitee) =>
+            !authorParticipants.some((author) => author.email === invitee.email)
+        ),
+      ];
+
+      setAllParticipants(mergedParticipants);
+
+    }
+  }, [submissions,invitees]);
+
+  if (isLoading || !submissions || isLoadingInvitees) {
     return <LoadingSpinner />;
   }
-  // Remove submission from chair assignments
   const removeChairSubmission = (
     reviewerName: string,
     submissionId: string
@@ -308,7 +327,7 @@ export default function ConferenceDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {allAuthors?.map((participant, index) => (
+                {allParticipants?.map((participant, index) => (
                   <TableRow key={index}>
                     <TableCell className="text-foreground">
                       {participant.firstName}
