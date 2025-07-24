@@ -77,7 +77,7 @@ export const userRouter = router({
       select: { userId: true },
     });
 
-    const submissionAuthors = await ctx.prisma.submissonAuthor.findMany({
+    const submissionAuthors = await ctx.prisma.submissionAuthor.findMany({
       where: {
         submission: {
           conferenceId,

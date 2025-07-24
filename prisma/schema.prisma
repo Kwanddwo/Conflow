@@ -25,9 +25,12 @@ model User {
   createdAt   DateTime       @default(now())
   inbox       Notification[]
 
-  conferenceRoles ConferenceRoleEntries[]
+  conferenceRoles   ConferenceRoleEntries[]
   directSubmissions Submission[]
-  authorEntries     SubmissionAuthor[] @relation("AuthorUser")
+  authorEntries     SubmissionAuthor[]      @relation("AuthorUser")
+  reviewAssignments ReviewAssignment[]      @relation("Reviewer")
+
+  ReviewAssignment ReviewAssignment[]
 }
 
 model Notification {
@@ -104,6 +107,8 @@ model Submission {
   submittedBy         User             @relation(fields: [submittedById], references: [id])
 
   submissionAuthors SubmissionAuthor[]
+
+  ReviewAssignment ReviewAssignment[]
 }
 
 model SubmissionAuthor {
@@ -120,6 +125,7 @@ model SubmissionAuthor {
 
   userId String?
   user   User?   @relation("AuthorUser", fields: [userId], references: [id])
+
   @@unique([submissionId, email]) // Ensure unique authors per submission by email
 }
 
@@ -130,16 +136,32 @@ enum ConferenceRole {
 }
 
 model ConferenceRoleEntries {
-  id           String        @id @default(cuid())
+  id           String         @id @default(cuid())
   userId       String
   conferenceId String
   role         ConferenceRole
-  createdAt    DateTime      @default(now())
+  createdAt    DateTime       @default(now())
 
   user       User       @relation(fields: [userId], references: [id])
   conference Conference @relation(fields: [conferenceId], references: [id])
 
-  // Enforce unique role per user per conference
+
   @@unique([userId, conferenceId])
   @@index([conferenceId, role]) // For efficient role-based queries
+  ReviewAssignment ReviewAssignment[]
+}
+
+model ReviewAssignment {
+  id               String     @id @default(cuid())
+  submissionId     String
+  reviewerId       String
+  assignedById     String
+  createdAt        DateTime   @default(now())
+  dueDate          DateTime
+  conferenceRoleId String
+  submission       Submission @relation(fields: [submissionId], references: [id])
+  reviewer         User       @relation("Reviewer", fields: [reviewerId], references: [id])
+  assignedBy       User       @relation(fields: [assignedById], references: [id])
+  conferenceRole  ConferenceRoleEntries  @relation(fields: [conferenceRoleId], references: [id])
+  @@unique([submissionId, reviewerId])
 }
