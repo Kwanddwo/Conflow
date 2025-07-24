@@ -4,6 +4,7 @@ import {
   router,
   protectedProcedure,
   adminProcedure,
+  chairProcedure,
 } from "../trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -642,5 +643,33 @@ export const conferenceRouter = router({
           role: input.role,
         },
       });
+    }),
+  getConferenceInvitees: chairProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { conferenceId } = input;
+
+      const invitees = await ctx.prisma.conferenceRoleEntries.findMany({
+        where: { conferenceId },
+        select: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              country : true,
+              affiliation: true,
+            }
+          },
+          role: true,
+        }
+      });
+
+      return invitees || [];
     }),
 });
