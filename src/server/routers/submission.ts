@@ -85,6 +85,20 @@ export const submissionRouter = router({
           paperFileName: true,
           updatedAt: true,
           status: true,
+          submissionAuthors: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              country: true,
+              affiliation: true,
+              isCorresponding: true,
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+          },
           conference: {
             select: {
               id: true,

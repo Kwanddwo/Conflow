@@ -12,18 +12,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
 import { Submission } from "@prisma/client";
 import { trpc } from "@/server/client";
 import { toast } from "sonner";
 import { Pencil, Check, X, Upload, User } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import React from "react";
+import { getName } from "country-list";
+
+// Define the type for submission with authors
+type SubmissionWithAuthors = Submission & {
+  submissionAuthors: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    country: string;
+    affiliation: string;
+    isCorresponding: boolean;
+  }[];
+};
 
 export default function SubmissionsTable({
   submissions,
   conferenceId,
 }: {
-  submissions: Array<Submission> | undefined;
+  submissions: Array<SubmissionWithAuthors> | undefined;
   conferenceId: string;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -102,13 +124,16 @@ export default function SubmissionsTable({
       abstract: editData.abstract,
       primaryArea: editData.primaryArea,
       secondaryArea: editData.secondaryArea,
-      keywords: processedKeywords,
+      keywords: processedKeywords as string[],
       paperFilePath: uploadedFile?.url || "", // Use uploaded file or keep existing
       paperFileName: uploadedFile?.name || "", // Use uploaded file or keep existing
     });
   };
 
-  const handleInputChange = (field: keyof Submission, value: any) => {
+  const handleInputChange = (
+    field: keyof Submission,
+    value: string | string[]
+  ) => {
     setEditData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -170,14 +195,6 @@ export default function SubmissionsTable({
                         </>
                       ) : (
                         <>
-                          <Link
-                            href={`/dashboard/conference/${conferenceId}/your-submissions/${submission.id}/authors`}
-                          >
-                            <Button size="sm" variant="outline">
-                              <User className="h-4 w-4" />
-                              Edit Authors
-                            </Button>
-                          </Link>
                           <Button
                             size="sm"
                             variant="outline"
@@ -366,6 +383,7 @@ export default function SubmissionsTable({
                           </Select>
                         ) : (
                           <span className="text-foreground">
+                            {submission.primaryArea} /{" "}
                             {submission.secondaryArea}
                           </span>
                         )}
@@ -398,7 +416,11 @@ export default function SubmissionsTable({
                           />
                         ) : (
                           <span className="text-foreground">
-                            {submission.keywords?.join(", ")}
+                            {Array.isArray(submission.keywords)
+                              ? submission.keywords.join(", ")
+                              : typeof submission.keywords === "string"
+                              ? submission.keywords
+                              : ""}
                           </span>
                         )}
                       </div>
@@ -428,6 +450,74 @@ export default function SubmissionsTable({
                         )}
                       </div>
                     </div>
+                  </div>
+
+                  {/* Authors Table */}
+                  <div className="mt-6">
+                    <Card>
+                      <CardHeader className="flex justify-between">
+                        <CardTitle className="text-lg font-semibold text-foreground">
+                          Authors
+                        </CardTitle>
+                        <Link
+                          href={`/dashboard/conference/${conferenceId}/your-submissions/${submission.id}/authors`}
+                        >
+                          <Button size="sm" variant="outline">
+                            <User className="h-4 w-4" />
+                            Edit Authors
+                          </Button>
+                        </Link>
+                      </CardHeader>
+                      <CardContent>
+                        {submission.submissionAuthors &&
+                        submission.submissionAuthors.length > 0 ? (
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>First Name</TableHead>
+                                <TableHead>Last Name</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead>Country</TableHead>
+                                <TableHead>Affiliation</TableHead>
+                                <TableHead className="text-center">
+                                  Corresponding?
+                                </TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {submission.submissionAuthors.map((author) => (
+                                <TableRow key={author.id}>
+                                  <TableCell className="font-medium">
+                                    {author.firstName}
+                                  </TableCell>
+                                  <TableCell>{author.lastName}</TableCell>
+                                  <TableCell>{author.email}</TableCell>
+                                  <TableCell>
+                                    {getName(author.country)}
+                                  </TableCell>
+                                  <TableCell>{author.affiliation}</TableCell>
+                                  <TableCell className="text-center">
+                                    {author.isCorresponding ? (
+                                      <span className="text-primary font-medium">
+                                        Yes
+                                      </span>
+                                    ) : (
+                                      <span className="text-muted-foreground">
+                                        No
+                                      </span>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        ) : (
+                          <div className="text-center text-muted-foreground py-4">
+                            No authors found.
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               );
