@@ -65,7 +65,7 @@ export default function ConferenceDashboard() {
     trpc.submission.getSubmissionsByConferenceId.useQuery({
       conferenceId: conferenceId || "",
     });
-  const [allAuthors,setAllAuthors]=useState<Participant[]>();
+  const [allAuthors, setAllAuthors] = useState<Participant[]>();
   const [chairAssignments, setChairAssignments] = useState<Assignment[]>([
     {
       reviewer: "Mohammed Su",
@@ -143,8 +143,8 @@ export default function ConferenceDashboard() {
       ],
     },
   ]);
-  useEffect(() =>{
-    if(submissions){
+  useEffect(() => {
+    if (submissions) {
       setAllAuthors(
         submissions.flatMap((submission) =>
           submission.submissionAuthors.map((author) => ({
@@ -154,10 +154,10 @@ export default function ConferenceDashboard() {
         )
       );
     }
-    },[submissions]);
+  }, [submissions]);
 
   if (isLoading || !submissions) {
-      return <LoadingSpinner />;
+    return <LoadingSpinner />;
   }
   // Remove submission from chair assignments
   const removeChairSubmission = (
@@ -266,59 +266,66 @@ export default function ConferenceDashboard() {
     return availableSubmissions.filter((sub) => !assignedIds.includes(sub.id));
   };
 
- 
   const availableSubmissions = submissions.map((sub) => ({
     id: sub.id,
     title: sub.title,
   }));
   console.log("Available Submissions:", submissions);
   return (
-    <div className="min-h-screen bg-[#ffffff]">
+    <div className="min-h-screen bg-background">
       <main className="px-6 py-6">
         {/* Conference Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#000000] mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
             CONF2024 (Conference 2024)
           </h1>
         </div>
         <Card className="mb-8">
-            <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-[#000000]">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-semibold text-foreground">
               Conference Participants
             </CardTitle>
-            <NewParticipant/>
-            </CardHeader>
+            <NewParticipant />
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[#64748b]">First Name</TableHead>
-                  <TableHead className="text-[#64748b]">Last Name</TableHead>
-                  <TableHead className="text-[#64748b]">Email</TableHead>
-                  <TableHead className="text-[#64748b]">Country</TableHead>
-                  <TableHead className="text-[#64748b]">Affiliation</TableHead>
-                  <TableHead className="text-[#64748b]">Role</TableHead>
+                  <TableHead className="text-muted-foreground">
+                    First Name
+                  </TableHead>
+                  <TableHead className="text-muted-foreground">
+                    Last Name
+                  </TableHead>
+                  <TableHead className="text-muted-foreground">Email</TableHead>
+                  <TableHead className="text-muted-foreground">
+                    Country
+                  </TableHead>
+                  <TableHead className="text-muted-foreground">
+                    Affiliation
+                  </TableHead>
+                  <TableHead className="text-muted-foreground">Role</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {allAuthors?.map((participant, index) => (
                   <TableRow key={index}>
-                    <TableCell className="text-[#000000]">
+                    <TableCell className="text-foreground">
                       {participant.firstName}
                     </TableCell>
-                    <TableCell className="text-[#000000]">
+                    <TableCell className="text-foreground">
                       {participant.lastName}
                     </TableCell>
-                    <TableCell className="text-[#000000]">
+                    <TableCell className="text-foreground">
                       {participant.email}
                     </TableCell>
-                    <TableCell className="text-[#000000]">
+                    <TableCell className="text-foreground">
                       {getName(participant.country)}
                     </TableCell>
-                    <TableCell className="text-[#000000]">
+                    <TableCell className="text-foreground">
                       {participant.affiliation}
                     </TableCell>
-                    <TableCell className="text-[#000000]">
+                    <TableCell className="text-foreground">
                       {participant.role}
                     </TableCell>
                   </TableRow>
@@ -331,7 +338,7 @@ export default function ConferenceDashboard() {
         {/* Chair-Submissions Assignments */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-[#000000]">
+            <CardTitle className="text-lg font-semibold text-foreground">
               Chair-Submissions Assignments
             </CardTitle>
           </CardHeader>
@@ -339,8 +346,10 @@ export default function ConferenceDashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[#64748b]">Reviewer</TableHead>
-                  <TableHead className="text-[#64748b]">
+                  <TableHead className="text-muted-foreground">
+                    Reviewer
+                  </TableHead>
+                  <TableHead className="text-muted-foreground">
                     Assigned Submissions
                   </TableHead>
                 </TableRow>
@@ -348,7 +357,7 @@ export default function ConferenceDashboard() {
               <TableBody>
                 {chairAssignments.map((assignment, index) => (
                   <TableRow key={index}>
-                    <TableCell className="text-[#000000] align-top">
+                    <TableCell className="text-foreground align-top">
                       {assignment.reviewer}
                     </TableCell>
                     <TableCell>
@@ -358,12 +367,12 @@ export default function ConferenceDashboard() {
                             key={subIndex}
                             className="flex items-center space-x-2"
                           >
-                            <span className="text-[#000000] text-sm">
+                            <span className="text-foreground text-sm">
                               Submission No. {submission.id} ({submission.title}
                               )
                             </span>
                             <X
-                              className="h-4 w-4 text-red-600 cursor-pointer hover:text-red-800"
+                              className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"
                               onClick={() =>
                                 removeChairSubmission(
                                   assignment.reviewer,
@@ -372,7 +381,7 @@ export default function ConferenceDashboard() {
                               }
                             />
                             {submission.status && (
-                              <Badge className="bg-[#22c55e] text-[#ffffff] hover:bg-[#22c55e]/80">
+                              <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/80">
                                 {submission.status}
                               </Badge>
                             )}
@@ -431,7 +440,7 @@ export default function ConferenceDashboard() {
         {/* Reviewer-Submissions Assignments */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-[#000000]">
+            <CardTitle className="text-lg font-semibold text-foreground">
               Reviewer-Submissions Assignments
             </CardTitle>
           </CardHeader>
@@ -439,8 +448,10 @@ export default function ConferenceDashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[#64748b]">Reviewer</TableHead>
-                  <TableHead className="text-[#64748b]">
+                  <TableHead className="text-muted-foreground">
+                    Reviewer
+                  </TableHead>
+                  <TableHead className="text-muted-foreground">
                     Assigned Submissions
                   </TableHead>
                 </TableRow>
@@ -448,7 +459,7 @@ export default function ConferenceDashboard() {
               <TableBody>
                 {reviewerAssignments.map((assignment, index) => (
                   <TableRow key={index}>
-                    <TableCell className="text-[#000000] align-top">
+                    <TableCell className="text-foreground align-top">
                       {assignment.reviewer}
                     </TableCell>
                     <TableCell>
@@ -458,12 +469,12 @@ export default function ConferenceDashboard() {
                             key={subIndex}
                             className="flex items-center space-x-2"
                           >
-                            <span className="text-[#000000] text-sm">
+                            <span className="text-foreground text-sm">
                               Submission No. {submission.id} ({submission.title}
                               )
                             </span>
                             <X
-                              className="h-4 w-4 text-red-600 cursor-pointer hover:text-red-800"
+                              className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"
                               onClick={() =>
                                 removeReviewerSubmission(
                                   assignment.reviewer,
@@ -472,7 +483,7 @@ export default function ConferenceDashboard() {
                               }
                             />
                             {submission.status && (
-                              <Badge className="bg-[#22c55e] text-[#ffffff] hover:bg-[#22c55e]/80">
+                              <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/80">
                                 {submission.status}
                               </Badge>
                             )}
@@ -482,7 +493,7 @@ export default function ConferenceDashboard() {
                         {/* Add submission dialog */}
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Plus className="text-green-600 cursor-pointer h-4 w-4 hover:text-green-800" />
+                            <Plus className="text-status-success cursor-pointer h-4 w-4 hover:text-status-success/80" />
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-md">
                             <DialogHeader>
@@ -531,33 +542,35 @@ export default function ConferenceDashboard() {
         {/* Submissions */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-[#000000]">
+            <CardTitle className="text-lg font-semibold text-foreground">
               Submissions
             </CardTitle>
           </CardHeader>
           {submissions.map((submission, index) => (
             <CardContent key={index}>
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[#000000]">
+                <h3 className="text-xl font-semibold text-foreground">
                   Submission ID {submission.id}
                 </h3>
-                <div className="grid grid-cols-1 gap-0 border border-[#e2e8f0] rounded-lg overflow-hidden">
+                <div className="grid grid-cols-1 gap-0 border border-border rounded-lg overflow-hidden">
                   <div className="grid grid-cols-4 min-h-[60px]">
-                    <div className="bg-[#f1f5f9] p-4 border-r border-[#e2e8f0] flex items-center">
-                      <span className="font-medium text-[#000000]">Title</span>
+                    <div className="bg-muted p-4 border-r border-border flex items-center">
+                      <span className="font-medium text-foreground">Title</span>
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-[#000000]">{submission.title}</span>
+                      <span className="text-foreground">
+                        {submission.title}
+                      </span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-[#e2e8f0]">
-                    <div className="bg-[#f1f5f9] p-4 border-r border-[#e2e8f0] flex items-center">
-                      <span className="font-medium text-[#000000]">Paper</span>
+                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
+                    <div className="bg-muted p-4 border-r border-border flex items-center">
+                      <span className="font-medium text-foreground">Paper</span>
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
                       <Link
                         href={submission.paperFilePath}
-                        className="text-blue-600 hover:text-blue-800 no-underline"
+                        className="text-primary hover:text-primary/80 no-underline"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -565,50 +578,50 @@ export default function ConferenceDashboard() {
                       </Link>
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-[#e2e8f0]">
-                    <div className="bg-[#f1f5f9] p-4 border-r border-[#e2e8f0] flex items-center">
-                      <span className="font-medium text-[#000000]">
+                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
+                    <div className="bg-muted p-4 border-r border-border flex items-center">
+                      <span className="font-medium text-foreground">
                         Area/Track
                       </span>
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-[#000000]">
+                      <span className="text-foreground">
                         {submission.secondaryArea}
                       </span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-[#e2e8f0]">
-                    <div className="bg-[#f1f5f9] p-4 border-r border-[#e2e8f0] flex items-center">
-                      <span className="font-medium text-[#000000]">
+                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
+                    <div className="bg-muted p-4 border-r border-border flex items-center">
+                      <span className="font-medium text-foreground">
                         Keywords
                       </span>
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-[#000000]">
+                      <span className="text-foreground">
                         {submission.keywords}
                       </span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 border-t border-[#e2e8f0]">
-                    <div className="bg-[#f1f5f9] p-4 border-r border-[#e2e8f0] flex items-start pt-4">
-                      <span className="font-medium text-[#000000]">
+                  <div className="grid grid-cols-4 border-t border-border">
+                    <div className="bg-muted p-4 border-r border-border flex items-start pt-4">
+                      <span className="font-medium text-foreground">
                         Abstract
                       </span>
                     </div>
                     <div className="col-span-3 p-4">
-                      <p className="text-[#000000] leading-relaxed">
+                      <p className="text-foreground leading-relaxed">
                         {submission.abstract}
                       </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-[#e2e8f0]">
-                    <div className="bg-[#f1f5f9] p-4 border-r border-[#e2e8f0] flex items-center">
-                      <span className="font-medium text-[#000000]">
+                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
+                    <div className="bg-muted p-4 border-r border-border flex items-center">
+                      <span className="font-medium text-foreground">
                         Submitted
                       </span>
                     </div>
                     <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-[#000000]">
+                      <span className="text-foreground">
                         {new Date(submission.createdAt).toLocaleDateString(
                           "en-US",
                           {
