@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import {
   Table,
   TableBody,
@@ -8,6 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { BadgeCheck,ExternalLink, FileText, Hash } from "lucide-react";
+import { Button } from "./ui/button";
 
 export default function RoleList({
   conferences,
@@ -31,26 +33,41 @@ export default function RoleList({
     return `/dashboard/conference/${conferenceId}`;
   };
   return (
-    <div className="main-content-height bg-gradient-to-br from-background via-muted/20 to-muted/40 p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            {title || "Your Roles"}
-          </h1>
+    <div className="main-content-height bg-gradient-to-br from-background via-muted/20 to-muted/40 p-6">
+      <div className="max-w-4xl mx-auto space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <BadgeCheck className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              {title || "Your Roles"}
+            </h1>
+          </div>
         </div>
-        <Card className="border-0 shadow-2xl bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-2xl font-semibold">Roles</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card className="border-2 border-border/60 hover:border-border transition-colors duration-300 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 overflow-hidden">
+          <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="border-border/50 hover:bg-transparent">
-                  <TableHead className="text-base font-semibold">
-                    Acronym
+                <TableRow className="border-b hover:bg-transparent">
+                  <TableHead className="text-sm font-semibold h-12 px-4">
+                    <div className="flex items-center gap-2">
+                      <Hash className="w-4 h-4 text-muted-foreground" />
+                      <span>Acronym</span>
+                    </div>
                   </TableHead>
-                  <TableHead className="text-base font-semibold">
-                    Role
+                  <TableHead className="text-sm font-semibold h-12 px-4">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-muted-foreground" />
+                      <span>Name</span>
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-sm font-semibold h-12 px-4">
+                    <div className="flex items-center gap-2">
+                      <BadgeCheck className="w-4 h-4 text-muted-foreground" />
+                      <span>Role</span>
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-sm font-semibold h-12 px-4 w-[50px]">
+                    <span className="sr-only">Actions</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -69,28 +86,50 @@ export default function RoleList({
                     .map((item, index) => (
                       <TableRow
                         key={index}
-                        className="group border-border/30 hover:bg-muted/50 transition-all duration-300 ease-in-out"
+                        className="group border-b last:border-b-0 hover:bg-muted/50 transition-all duration-200 ease-in-out"
                       >
-                        <TableCell className="py-6">
+                        <TableCell className="h-12 px-4">
                           {/* The route should change based on role!! */}
                           <Link href={getLink(item.role, item.id)}>
-                            <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
+                            <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                               {item.acronym}
                             </p>
                           </Link>
                         </TableCell>
-                        <TableCell className="py-6">
+                        <TableCell className="h-12 px-4">
                           <Link href={getLink(item.role, item.id)}>
-                            <p className="text-lg font-medium group-hover:text-foreground/90 transition-colors">
+                            <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                              {item.title}
+                            </p>
+                          </Link>
+                        </TableCell>
+                        <TableCell className="h-12 px-4">
+                          <Link href={getLink(item.role, item.id)}>
+                            <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                               {item.role}
                             </p>
+                          </Link>
+                        </TableCell>
+                        <TableCell className="h-12 px-4">
+                          <Link href={getLink(item.role, item.id)}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              <span className="sr-only">View conference</span>
+                            </Button>
                           </Link>
                         </TableCell>
                       </TableRow>
                     ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={2} className="text-center py-6">
+                    <TableCell
+                      colSpan={4}
+                      className="h-24 px-4 text-center text-sm text-muted-foreground"
+                    >
                       You currently have no roles in any conferences.
                     </TableCell>
                   </TableRow>

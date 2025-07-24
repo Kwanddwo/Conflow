@@ -27,6 +27,8 @@ export const conferenceRouter = router({
         locationCountry: true,
         startDate: true,
         endDate: true,
+        status: true,
+        locationCity: true,
       },
       orderBy: {
         startDate: "asc",
