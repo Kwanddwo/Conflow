@@ -14,5 +14,5 @@ export default function MyRoles() {
     role: role.role,
   }));
 
-  return <RoleList conferences={conferences || []} />;
+  return <RoleList conferences={conferences || []} title={undefined} />;
 }

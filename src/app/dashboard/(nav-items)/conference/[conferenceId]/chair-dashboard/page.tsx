@@ -214,6 +214,11 @@ export default function ConferenceDashboard() {
                 {
                   id: selectedSubmission.id,
                   title: selectedSubmission.title,
+                  paper: "",
+                  area: "",
+                  keywords: "",
+                  abstract: "",
+                  submitted: "",
                   status: null,
                 },
               ],
@@ -260,6 +265,11 @@ export default function ConferenceDashboard() {
                 {
                   id: selectedSubmission.id,
                   title: selectedSubmission.title,
+                  paper: "",
+                  area: "",
+                  keywords: "",
+                  abstract: "",
+                  submitted: "",
                   status: null,
                 },
               ],
