@@ -28,9 +28,6 @@ model User {
   conferenceRoles   ConferenceRoleEntries[]
   directSubmissions Submission[]
   authorEntries     SubmissionAuthor[]      @relation("AuthorUser")
-  reviewAssignments ReviewAssignment[]      @relation("Reviewer")
-
-  ReviewAssignment ReviewAssignment[]
 }
 
 model Notification {
@@ -107,8 +104,7 @@ model Submission {
   submittedBy         User             @relation(fields: [submittedById], references: [id])
 
   submissionAuthors SubmissionAuthor[]
-
-  ReviewAssignment ReviewAssignment[]
+  reviewAssignments ReviewAssignment[]
 }
 
 model SubmissionAuthor {
@@ -144,24 +140,25 @@ model ConferenceRoleEntries {
 
   user       User       @relation(fields: [userId], references: [id])
   conference Conference @relation(fields: [conferenceId], references: [id])
-
-
+  reviewAssignments ReviewAssignment[] @relation("Reviewer")
+  assignedByReviews ReviewAssignment[] @relation("AssignedBy")
   @@unique([userId, conferenceId])
   @@index([conferenceId, role]) // For efficient role-based queries
-  ReviewAssignment ReviewAssignment[]
+  @@index([role]) // For efficient role-based queries
+  @@index([userId]) // For efficient user-based queries
 }
 
 model ReviewAssignment {
   id               String     @id @default(cuid())
   submissionId     String
-  reviewerId       String
-  assignedById     String
   createdAt        DateTime   @default(now())
   dueDate          DateTime
-  conferenceRoleId String
+  reviewerRoleId   String
+  assignedByRoleId String
   submission       Submission @relation(fields: [submissionId], references: [id])
-  reviewer         User       @relation("Reviewer", fields: [reviewerId], references: [id])
-  assignedBy       User       @relation(fields: [assignedById], references: [id])
-  conferenceRole  ConferenceRoleEntries  @relation(fields: [conferenceRoleId], references: [id])
-  @@unique([submissionId, reviewerId])
+  reviewer         ConferenceRoleEntries  @relation("Reviewer", fields: [reviewerRoleId], references: [id])
+  assignedBy       ConferenceRoleEntries  @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
+  @@index([submissionId]) // For efficient submission-based queries
+  @@index([reviewerRoleId]) // For efficient reviewer-based queries
+  @@index([assignedByRoleId]) // For efficient assigned-by queries
 }

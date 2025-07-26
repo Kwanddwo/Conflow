@@ -148,6 +148,52 @@ export const chairProcedure = protectedProcedure
     return next({ ctx });
   });
 
+export const reviewerProcedure = protectedProcedure
+  .input(z.object({ conferenceId: z.string() }))
+  .use(async ({ ctx, input, next }) => {
+    const conferenceId = input.conferenceId;
+
+    if (!conferenceId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Conference ID is required",
+      });
+    }
+
+    const conference = await ctx.prisma.conference.findUnique({
+      where: { id: conferenceId },
+      select: {
+        id: true,
+        conferenceRoles: {
+          where: { role: "REVIEWER" },
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!conference) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Conference not found",
+      });
+    }
+
+    // Check if the current user is a reviewer for the conference
+    const isReviewer = conference.conferenceRoles.some(
+      (role) => role.userId === ctx.session.user.id
+    );
+
+    if (!isReviewer) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message:
+          "You must be a reviewer for this conference to access this submission",
+      });
+    }
+
+    return next({ ctx });
+  });
+
 export const adminOrMainChairProcedure = protectedProcedure
   .input(z.object({ conferenceId: z.string() }))
   .use(async ({ ctx, input, next }) => {

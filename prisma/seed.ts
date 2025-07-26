@@ -24,6 +24,7 @@ async function main() {
 
   // Clear existing data (optional - remove if you want to keep existing data)
   console.log("🗑️  Clearing existing data...");
+  await prisma.reviewAssignment.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.submissionAuthor.deleteMany();
   await prisma.submission.deleteMany();
@@ -754,7 +755,7 @@ async function main() {
   });
 
   // Authors for submission 1 - mix of linked and non-linked users
-  await prisma.SubmissionAuthor.createMany({
+  await prisma.submissionAuthor.createMany({
     data: [
       {
         firstName: "John",
@@ -814,7 +815,7 @@ async function main() {
     },
   });
 
-  await prisma.SubmissionAuthor.createMany({
+  await prisma.submissionAuthor.createMany({
     data: [
       {
         firstName: "Jane",
@@ -864,7 +865,7 @@ async function main() {
     },
   });
 
-  await prisma.SubmissionAuthor.createMany({
+  await prisma.submissionAuthor.createMany({
     data: [
       {
         firstName: "Alice",
@@ -924,7 +925,7 @@ async function main() {
     },
   });
 
-  await prisma.SubmissionAuthor.createMany({
+  await prisma.submissionAuthor.createMany({
     data: [
       {
         firstName: "Test",
@@ -974,7 +975,7 @@ async function main() {
     },
   });
 
-  await prisma.SubmissionAuthor.createMany({
+  await prisma.submissionAuthor.createMany({
     data: [
       {
         firstName: "Charlie",
@@ -1034,7 +1035,7 @@ async function main() {
     },
   });
 
-  await prisma.SubmissionAuthor.createMany({
+  await prisma.submissionAuthor.createMany({
     data: [
       {
         firstName: "Bob",
@@ -1080,6 +1081,126 @@ async function main() {
   });
 
   console.log(`✅ Created 6 submissions with multiple authors`);
+
+  // Create review assignments
+  console.log("📋 Creating review assignments...");
+
+  // First, get the role entries for reviewers that we'll use for assignments
+  const johnReviewerRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: johnUser.id,
+      conferenceId: conference3.id,
+      role: "REVIEWER",
+    },
+  });
+
+  const bobReviewerRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: bobUser.id,
+      conferenceId: conference3.id,
+      role: "REVIEWER",
+    },
+  });
+
+  const aliceChairRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: aliceUser.id,
+      conferenceId: conference3.id,
+      role: "MAIN_CHAIR",
+    },
+  });
+
+  const janeChairRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: janeUser.id,
+      conferenceId: conference2.id,
+      role: "MAIN_CHAIR",
+    },
+  });
+
+  const johnChairRole = await prisma.conferenceRoleEntries.findFirst({
+    where: { userId: johnUser.id, conferenceId: conference2.id, role: "CHAIR" },
+  });
+
+  const aliceReviewerRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: aliceUser.id,
+      conferenceId: conference2.id,
+      role: "REVIEWER",
+    },
+  });
+
+  const bobReviewerRole2 = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: bobUser.id,
+      conferenceId: conference2.id,
+      role: "REVIEWER",
+    },
+  });
+
+  // Create review assignments
+  const reviewAssignments: {
+    submissionId: string;
+    dueDate: Date;
+    reviewerRoleId: string;
+    assignedByRoleId: string;
+  }[] = [];
+
+  // Assignments for FHTC2025 (conference3) - submission3
+  if (johnReviewerRole && aliceChairRole) {
+    reviewAssignments.push({
+      submissionId: submission3.id,
+      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+      reviewerRoleId: johnReviewerRole.id,
+      assignedByRoleId: aliceChairRole.id,
+    });
+  }
+
+  if (bobReviewerRole && aliceChairRole) {
+    reviewAssignments.push({
+      submissionId: submission3.id,
+      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+      reviewerRoleId: bobReviewerRole.id,
+      assignedByRoleId: aliceChairRole.id,
+    });
+  }
+
+  // Assignments for CDPS2024 (conference2) - submission2 and submission6
+  if (aliceReviewerRole && janeChairRole) {
+    reviewAssignments.push({
+      submissionId: submission2.id,
+      dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+      reviewerRoleId: aliceReviewerRole.id,
+      assignedByRoleId: janeChairRole.id,
+    });
+  }
+
+  if (bobReviewerRole2 && janeChairRole) {
+    reviewAssignments.push({
+      submissionId: submission6.id,
+      dueDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000), // 12 days from now
+      reviewerRoleId: bobReviewerRole2.id,
+      assignedByRoleId: janeChairRole.id,
+    });
+  }
+
+  if (aliceReviewerRole && johnChairRole) {
+    reviewAssignments.push({
+      submissionId: submission6.id,
+      dueDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000), // 12 days from now
+      reviewerRoleId: aliceReviewerRole.id,
+      assignedByRoleId: johnChairRole.id,
+    });
+  }
+
+  // Create the review assignments
+  for (const assignment of reviewAssignments) {
+    await prisma.reviewAssignment.create({
+      data: assignment,
+    });
+  }
+
+  console.log(`✅ Created ${reviewAssignments.length} review assignments`);
 
   // Create notifications (existing + conference-related)
   console.log("🔔 Creating notifications...");
@@ -1269,7 +1390,7 @@ async function main() {
   const userCount = await prisma.user.count();
   const conferenceCount = await prisma.conference.count();
   const submissionCount = await prisma.submission.count();
-  const authorCount = await prisma.SubmissionAuthor.count();
+  const authorCount = await prisma.submissionAuthor.count();
   const roleEntriesCount = await prisma.conferenceRoleEntries.count();
   const notificationCount = await prisma.notification.count();
   const unreadCount = await prisma.notification.count({

@@ -25,13 +25,153 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import React from "react";
 import NewParticipant from "./NewParticipantDialog";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { trpc } from "@/server/client";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { getName } from "country-list";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+// New Review Assignment Form Component
+function NewReviewAssignmentForm({
+  conferenceId,
+  submissions,
+  onCreateAssignment,
+  isCreating,
+}: {
+  conferenceId: string;
+  submissions: {
+    id: string;
+    title: string;
+  }[];
+  onCreateAssignment: (data: {
+    submissionId: string;
+    reviewerId: string;
+    dueDate: Date;
+    conferenceId: string;
+  }) => void;
+  isCreating: boolean;
+}) {
+  const [selectedReviewer, setSelectedReviewer] = useState("");
+  const [selectedSubmission, setSelectedSubmission] = useState("");
+  // Set default due date to 30 days from now
+  const [dueDate, setDueDate] = useState(() => {
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 30);
+    return defaultDate.toISOString().split("T")[0];
+  });
+
+  const { data: invitees } = trpc.conference.getConferenceInvitees.useQuery({
+    conferenceId,
+  });
+
+  // Get reviewers (people with reviewer role)
+  const reviewers =
+    invitees?.filter((invite) => invite.role === "REVIEWER") || [];
+
+  const handleSubmit = () => {
+    if (!selectedReviewer || !selectedSubmission || !dueDate) {
+      toast.error("Please select a reviewer, submission, and due date");
+      return;
+    }
+
+    onCreateAssignment({
+      submissionId: selectedSubmission,
+      reviewerId: selectedReviewer,
+      dueDate: new Date(dueDate),
+      conferenceId,
+    });
+
+    // Reset form
+    setSelectedReviewer("");
+    setSelectedSubmission("");
+    // Reset to default date (30 days from now)
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 30);
+    setDueDate(defaultDate.toISOString().split("T")[0]);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-sm font-medium text-foreground mb-2 block">
+          Select Reviewer
+        </label>
+        <Select value={selectedReviewer} onValueChange={setSelectedReviewer}>
+          <SelectTrigger>
+            <SelectValue placeholder="Choose a reviewer..." />
+          </SelectTrigger>
+          <SelectContent>
+            {reviewers.map((reviewer) => (
+              <SelectItem key={reviewer.user.id} value={reviewer.user.id}>
+                {reviewer.user.firstName} {reviewer.user.lastName} (
+                {reviewer.user.email})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-foreground mb-2 block">
+          Select Submission
+        </label>
+        <Select
+          value={selectedSubmission}
+          onValueChange={setSelectedSubmission}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Choose a submission..." />
+          </SelectTrigger>
+          <SelectContent>
+            {submissions.map((submission) => (
+              <SelectItem key={submission.id} value={submission.id}>
+                {submission.id} -{" "}
+                {submission.title.length > 50
+                  ? `${submission.title.substring(0, 50)}...`
+                  : submission.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label
+          htmlFor="dueDate"
+          className="text-sm font-medium text-foreground mb-2 block"
+        >
+          Due Date
+        </Label>
+        <Input
+          id="dueDate"
+          type="date"
+          value={dueDate}
+          className="w-sm"
+          onChange={(e) => setDueDate(e.target.value)}
+          min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4">
+        <button
+          onClick={handleSubmit}
+          disabled={
+            isCreating || !selectedReviewer || !selectedSubmission || !dueDate
+          }
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isCreating ? "Creating..." : "Create Assignment"}
+        </button>
+      </div>
+    </div>
+  );
+}
 interface Submission {
   id: string;
   title: string;
@@ -41,6 +181,8 @@ interface Submission {
   abstract: string;
   submitted: string;
   status?: "Reviewed" | null;
+  assignmentId?: string; // For reviewer assignments
+  dueDate?: string; // Add due date field
 }
 
 interface Assignment {
@@ -64,9 +206,39 @@ export default function ConferenceDashboard() {
     trpc.submission.getSubmissionsByConferenceId.useQuery({
       conferenceId: conferenceId || "",
     });
-  const { data : invitees, isLoading: isLoadingInvitees } = trpc.conference.getConferenceInvitees.useQuery({
+  const { data: invitees, isLoading: isLoadingInvitees } =
+    trpc.conference.getConferenceInvitees.useQuery({
       conferenceId: conferenceId || "",
     });
+
+  // Review assignments data and mutations
+  const { data: reviewAssignmentsData, refetch: refetchReviewAssignments } =
+    trpc.submission.getReviewAssignments.useQuery({
+      conferenceId: conferenceId || "",
+    });
+
+  const createReviewAssignmentMutation =
+    trpc.submission.createReviewAssignment.useMutation({
+      onSuccess: () => {
+        toast.success("Review assignment created successfully");
+        refetchReviewAssignments();
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to create review assignment");
+      },
+    });
+
+  const deleteReviewAssignmentMutation =
+    trpc.submission.deleteReviewAssignment.useMutation({
+      onSuccess: () => {
+        toast.success("Review assignment deleted successfully");
+        refetchReviewAssignments();
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to delete review assignment");
+      },
+    });
+
   const [allParticipants, setAllParticipants] = useState<Participant[]>();
   const [chairAssignments, setChairAssignments] = useState<Assignment[]>([
     {
@@ -107,44 +279,43 @@ export default function ConferenceDashboard() {
     },
   ]);
 
-  const [reviewerAssignments, setReviewerAssignments] = useState<Assignment[]>([
-    {
-      reviewer: "Mohammed Su",
-      submissions: [
-        {
-          id: "95",
-          title:
-            "Neuro-Symbolic Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-          paper: "MyPaper.pdf",
-          area: "Artificial Intelligence and Cognitive Systems",
-          keywords:
-            "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-          abstract:
-            "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-          submitted: "Sep 17, 13:42",
-          status: "Reviewed",
-        },
-      ],
-    },
-    {
-      reviewer: "Mohammed Alami",
-      submissions: [
-        {
-          id: "95",
-          title:
-            "Neuro-Symbolic Integration for Zero-Shot Commonsense Reasoning in Multi-Agent Systems",
-          paper: "MyPaper.pdf",
-          area: "Artificial Intelligence and Cognitive Systems",
-          keywords:
-            "Neuro-symbolic AI, zero-shot learning, commonsense reasoning, multi-agent systems, cognitive architectures",
-          abstract:
-            "This paper introduces a novel neuro-symbolic framework for enabling zero-shot commonsense reasoning in multi-agent environments. While existing systems either rely on statistical learning or symbolic reasoning, our approach combines both by integrating a large language model with a structured knowledge base to facilitate efficient inference and generalization in unfamiliar scenarios. We evaluate the framework on a custom benchmark involving collaborative planning and navigation tasks across heterogeneous agents. Results show a significant improvement in both task completion rate and reasoning accuracy compared to baseline methods. The proposed method highlights the potential of hybrid cognitive architectures in achieving robust and adaptive behavior in complex, real-world domains.",
-          submitted: "Sep 17, 13:42",
-          status: null,
-        },
-      ],
-    },
-  ]);
+  // Transform review assignments data to match the existing UI structure
+  const reviewerAssignments = React.useMemo(() => {
+    if (!reviewAssignmentsData) return [];
+
+    const grouped = reviewAssignmentsData.reduce((acc, assignment) => {
+      const reviewerName = assignment.reviewerName;
+      if (!acc[reviewerName]) {
+        acc[reviewerName] = {
+          reviewer: reviewerName,
+          submissions: [],
+        };
+      }
+
+      // Convert assignment to submission format expected by UI
+      acc[reviewerName].submissions.push({
+        id: assignment.submissionId,
+        title: assignment.submissionTitle,
+        paper: "", // This will be handled differently
+        area: `${assignment.submissionPrimaryArea} → ${assignment.submissionSecondaryArea}`,
+        keywords: "", // This will be handled differently
+        abstract: "", // This will be handled differently
+        submitted: new Date(assignment.createdAt).toLocaleDateString(),
+        status: null, // This will be handled differently
+        assignmentId: assignment.id, // Add this for deletion
+        dueDate: new Date(assignment.dueDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+      });
+
+      return acc;
+    }, {} as Record<string, Assignment>);
+
+    return Object.values(grouped);
+  }, [reviewAssignmentsData]);
+
   useEffect(() => {
     if (submissions && invitees) {
       const authorParticipants = submissions.flatMap((submission) =>
@@ -172,9 +343,8 @@ export default function ConferenceDashboard() {
       ];
 
       setAllParticipants(mergedParticipants);
-
     }
-  }, [submissions,invitees]);
+  }, [submissions, invitees]);
 
   if (isLoading || !submissions || isLoadingInvitees) {
     return <LoadingSpinner />;
@@ -197,102 +367,18 @@ export default function ConferenceDashboard() {
     );
   };
 
-  // Add submission to chair assignments
-  const addChairSubmission = (reviewerName: string, submissionId: string) => {
-    const selectedSubmission = availableSubmissions.find(
-      (sub) => sub.id === submissionId
-    );
-    if (!selectedSubmission) return;
-
-    setChairAssignments((prev) =>
-      prev.map((assignment) =>
-        assignment.reviewer === reviewerName
-          ? {
-              ...assignment,
-              submissions: [
-                ...assignment.submissions,
-                {
-                  id: selectedSubmission.id,
-                  title: selectedSubmission.title,
-                  paper: "",
-                  area: "",
-                  keywords: "",
-                  abstract: "",
-                  submitted: "",
-                  status: null,
-                },
-              ],
-            }
-          : assignment
-      )
-    );
-  };
-
   const removeReviewerSubmission = (
     reviewerName: string,
-    submissionId: string
+    submissionId: string,
+    assignmentId?: string
   ) => {
-    setReviewerAssignments((prev) =>
-      prev.map((assignment) =>
-        assignment.reviewer === reviewerName
-          ? {
-              ...assignment,
-              submissions: assignment.submissions.filter(
-                (sub) => sub.id !== submissionId
-              ),
-            }
-          : assignment
-      )
-    );
-  };
-
-  const addReviewerSubmission = (
-    reviewerName: string,
-    submissionId: string
-  ) => {
-    const selectedSubmission = availableSubmissions.find(
-      (sub) => sub.id === submissionId
-    );
-    if (!selectedSubmission) return;
-
-    setReviewerAssignments((prev) =>
-      prev.map((assignment) =>
-        assignment.reviewer === reviewerName
-          ? {
-              ...assignment,
-              submissions: [
-                ...assignment.submissions,
-                {
-                  id: selectedSubmission.id,
-                  title: selectedSubmission.title,
-                  paper: "",
-                  area: "",
-                  keywords: "",
-                  abstract: "",
-                  submitted: "",
-                  status: null,
-                },
-              ],
-            }
-          : assignment
-      )
-    );
-  };
-
-  const getAvailableSubmissionsForChair = (reviewerName: string) => {
-    const assignedIds =
-      chairAssignments
-        .find((a) => a.reviewer === reviewerName)
-        ?.submissions.map((s) => s.id) || [];
-    return availableSubmissions.filter((sub) => !assignedIds.includes(sub.id));
-  };
-
-  const getAvailableSubmissionsForReviewer = (reviewerName: string) => {
-    const assignedIds =
-      reviewerAssignments
-        .find((a) => a.reviewer === reviewerName)
-        ?.submissions.map((s) => s.id) || [];
-    return availableSubmissions.filter((sub) => !assignedIds.includes(sub.id));
+    if (assignmentId) {
+      // Use API to delete the review assignment
+      deleteReviewAssignmentMutation.mutate({
+        assignmentId,
+        conferenceId: conferenceId || "",
+      });
+    }
   };
 
   const availableSubmissions = submissions.map((sub) => ({
@@ -306,7 +392,7 @@ export default function ConferenceDashboard() {
         {/* Conference Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground mb-4">
-            CONF2024 (Conference 2024)
+            conferenceAcronym - ConferenceTitle
           </h1>
         </div>
         <Card className="mb-8">
@@ -397,8 +483,7 @@ export default function ConferenceDashboard() {
                             className="flex items-center space-x-2"
                           >
                             <span className="text-foreground text-sm">
-                              Submission No. {submission.id} ({submission.title}
-                              )
+                              {submission.title} ({submission.id})
                             </span>
                             <X
                               className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"
@@ -416,47 +501,6 @@ export default function ConferenceDashboard() {
                             )}
                           </div>
                         ))}
-
-                        {/* Add submission dialog */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Plus className="text-green-600 cursor-pointer h-4 w-4 hover:text-green-800" />
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                              <DialogTitle>
-                                Add Submission to {assignment.reviewer}
-                              </DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <Select
-                                onValueChange={(value) => {
-                                  addChairSubmission(
-                                    assignment.reviewer,
-                                    value
-                                  );
-                                }}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a submission to assign" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getAvailableSubmissionsForChair(
-                                    assignment.reviewer
-                                  ).map((submission) => (
-                                    <SelectItem
-                                      key={submission.id}
-                                      value={submission.id}
-                                    >
-                                      Submission No. {submission.id} -{" "}
-                                      {submission.title.substring(0, 50)}...
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -468,10 +512,30 @@ export default function ConferenceDashboard() {
 
         {/* Reviewer-Submissions Assignments */}
         <Card className="mb-8">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-semibold text-foreground">
               Reviewer-Submissions Assignments
             </CardTitle>
+            {/* Add New Assignment Button */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="flex items-center gap-2 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90">
+                  <Plus className="h-4 w-4" />
+                  New Assignment
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>New Review Assignment</DialogTitle>
+                </DialogHeader>
+                <NewReviewAssignmentForm
+                  conferenceId={conferenceId || ""}
+                  submissions={availableSubmissions}
+                  onCreateAssignment={createReviewAssignmentMutation.mutate}
+                  isCreating={createReviewAssignmentMutation.isPending}
+                />
+              </DialogContent>
+            </Dialog>
           </CardHeader>
           <CardContent>
             <Table>
@@ -482,6 +546,9 @@ export default function ConferenceDashboard() {
                   </TableHead>
                   <TableHead className="text-muted-foreground">
                     Assigned Submissions
+                  </TableHead>
+                  <TableHead className="text-muted-foreground">
+                    Due Date
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -499,15 +566,15 @@ export default function ConferenceDashboard() {
                             className="flex items-center space-x-2"
                           >
                             <span className="text-foreground text-sm">
-                              Submission No. {submission.id} ({submission.title}
-                              )
+                              {submission.title} ({submission.id})
                             </span>
                             <X
                               className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"
                               onClick={() =>
                                 removeReviewerSubmission(
                                   assignment.reviewer,
-                                  submission.id
+                                  submission.id,
+                                  submission.assignmentId
                                 )
                               }
                             />
@@ -518,47 +585,54 @@ export default function ConferenceDashboard() {
                             )}
                           </div>
                         ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-2">
+                        {assignment.submissions.map((submission, subIndex) => {
+                          const dueDate = submission.dueDate;
+                          const isOverdue =
+                            dueDate && new Date(dueDate) < new Date();
+                          const isUrgent =
+                            dueDate &&
+                            new Date(dueDate) <=
+                              new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-                        {/* Add submission dialog */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Plus className="text-status-success cursor-pointer h-4 w-4 hover:text-status-success/80" />
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                              <DialogTitle>
-                                Add Submission to {assignment.reviewer}
-                              </DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <Select
-                                onValueChange={(value) => {
-                                  addReviewerSubmission(
-                                    assignment.reviewer,
-                                    value
-                                  );
-                                }}
+                          return (
+                            <div
+                              key={subIndex}
+                              className="flex items-center space-x-2"
+                            >
+                              <span
+                                className={`text-sm ${
+                                  isOverdue
+                                    ? "text-destructive font-medium"
+                                    : isUrgent
+                                    ? "text-orange-500 font-medium"
+                                    : "text-foreground"
+                                }`}
                               >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a submission to assign" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getAvailableSubmissionsForReviewer(
-                                    assignment.reviewer
-                                  ).map((submission) => (
-                                    <SelectItem
-                                      key={submission.id}
-                                      value={submission.id}
-                                    >
-                                      Submission No. {submission.id} -{" "}
-                                      {submission.title.substring(0, 50)}...
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                                {dueDate || "No due date set"}
+                              </span>
+                              {isOverdue && (
+                                <Badge
+                                  variant="destructive"
+                                  className="text-xs"
+                                >
+                                  Overdue
+                                </Badge>
+                              )}
+                              {isUrgent && !isOverdue && (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs bg-orange-100 text-orange-800"
+                                >
+                                  Due Soon
+                                </Badge>
+                              )}
                             </div>
-                          </DialogContent>
-                        </Dialog>
+                          );
+                        })}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -579,7 +653,7 @@ export default function ConferenceDashboard() {
             <CardContent key={index}>
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-foreground">
-                  Submission ID {submission.id}
+                  Submission {submission.id}
                 </h3>
                 <div className="grid grid-cols-1 gap-0 border border-border rounded-lg overflow-hidden">
                   <div className="grid grid-cols-4 min-h-[60px]">
