@@ -8,8 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { BadgeCheck,ExternalLink, FileText, Hash } from "lucide-react";
+import { BadgeCheck, ExternalLink, FileText, Hash } from "lucide-react";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 
 export default function RoleList({
   conferences,
@@ -106,7 +107,15 @@ export default function RoleList({
                         <TableCell className="h-12 px-4">
                           <Link href={getLink(item.role, item.id)}>
                             <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                              {item.role}
+                              <Badge variant="outline">
+                                {item.role === "MAIN_CHAIR"
+                                  ? "Main Chair"
+                                  : item.role === "CHAIR"
+                                  ? "Chair"
+                                  : item.role === "AUTHOR"
+                                  ? "Author"
+                                  : "Reviewer"}
+                              </Badge>
                             </p>
                           </Link>
                         </TableCell>

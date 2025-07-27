@@ -7,7 +7,8 @@ export default function ConflowReview() {
     <div className="min-h-screen bg-[#ffffff]">
       <main className="max-w-6xl mx-auto px-6 py-8">
         <h1 className="text-2xl font-semibold text-[#000000] mb-8">
-          Your Review for Submission 54 of CONF2024
+          Your Review for Submission{" "}
+          <span className="text-muted-foreground">54</span> of CONF2024
         </h1>
 
         {/* Paper Details */}
