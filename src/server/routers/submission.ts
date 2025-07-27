@@ -819,17 +819,28 @@ export const submissionRouter = router({
               },
             },
           },
+          reviews: {
+            select: {
+              id: true,
+              isReviewed: true,
+            },
+          },
         },
         orderBy: { dueDate: "asc" },
       });
 
-      return assignments.map((assignment) => ({
-        id: assignment.id,
-        submission: assignment.submission,
-        assignedByName: `${assignment.assignedBy.user.firstName} ${assignment.assignedBy.user.lastName}`,
-        dueDate: assignment.dueDate,
-        createdAt: assignment.createdAt,
-      }));
+      return assignments.map((assignment) => {
+        const review = assignment.reviews[0]; 
+        return {
+          id: assignment.id,
+          submission: assignment.submission,
+          assignedByName: `${assignment.assignedBy.user.firstName} ${assignment.assignedBy.user.lastName}`,
+          dueDate: assignment.dueDate,
+          createdAt: assignment.createdAt,
+          isReviewed: review?.isReviewed || false,
+          reviewId: review?.id || null,
+        };
+      });
     }),
 
   updateReviewAssignmentDueDate: chairProcedure
