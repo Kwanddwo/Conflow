@@ -171,7 +171,10 @@ export default function SubmissionsTable({
                 <div key={submission.id}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-semibold text-foreground">
-                      Submission ID {submission.id}
+                      Submission ID{" "}
+                      <span className="text-muted-foreground">
+                        {submission.id}
+                      </span>
                     </h3>
                     <div className="flex gap-2">
                       {isEditing ? (

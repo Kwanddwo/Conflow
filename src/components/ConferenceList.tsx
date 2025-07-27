@@ -96,10 +96,10 @@ export default function ConferenceList({
           </div>
         )}
       </div>
-      <Card className="border-2 border-border/60 hover:border-border transition-colors duration-300 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 overflow-hidden">
+      <Card className="py-2 border-2 border-border/60 hover:border-border transition-colors duration-300 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 overflow-hidden">
         <CardContent className="p-0">
           {conferences.length === 0 ? (
-            <div className="text-center py-12 space-y-4 px-6">
+            <div className="text-center space-y-4 px-6">
               <div className="text-6xl">📚</div>
               <h3 className="text-xl font-semibold text-muted-foreground">
                 No conferences found
@@ -129,18 +129,6 @@ export default function ConferenceList({
                     <div className="flex items-center gap-2">
                       <Activity className="w-4 h-4 text-muted-foreground" />
                       Status
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-base font-semibold h-10 px-4">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-muted-foreground" />
-                      Country
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-base font-semibold h-10 px-4">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      City
                     </div>
                   </TableHead>
                   <TableHead className="text-base font-semibold h-10 px-4 w-[50px]">
@@ -177,26 +165,6 @@ export default function ConferenceList({
                     <TableCell className="h-10 px-4">
                       <Link href={`${route}/${conf.id}`} className="block">
                         {getStatusBadge(conf.status)}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="h-10 px-4">
-                      <Link href={`${route}/${conf.id}`} className="block">
-                        <div className="flex items-center gap-2">
-                          <Globe className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                            {getName(conf.locationCountry)}
-                          </span>
-                        </div>
-                      </Link>
-                    </TableCell>
-                    <TableCell className="h-10 px-4">
-                      <Link href={`${route}/${conf.id}`} className="block">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                            {conf.locationCity}
-                          </span>
-                        </div>
                       </Link>
                     </TableCell>
                     <TableCell className="h-10 px-4">
