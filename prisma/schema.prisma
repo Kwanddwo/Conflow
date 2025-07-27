@@ -105,6 +105,8 @@ model Submission {
 
   submissionAuthors SubmissionAuthor[]
   reviewAssignments ReviewAssignment[]
+
+  reviews Reviews[]
 }
 
 model SubmissionAuthor {
@@ -138,10 +140,11 @@ model ConferenceRoleEntries {
   role         ConferenceRole
   createdAt    DateTime       @default(now())
 
-  user       User       @relation(fields: [userId], references: [id])
-  conference Conference @relation(fields: [conferenceId], references: [id])
+  user              User               @relation(fields: [userId], references: [id])
+  conference        Conference         @relation(fields: [conferenceId], references: [id])
   reviewAssignments ReviewAssignment[] @relation("Reviewer")
   assignedByReviews ReviewAssignment[] @relation("AssignedBy")
+
   @@unique([userId, conferenceId])
   @@index([conferenceId, role]) // For efficient role-based queries
   @@index([role]) // For efficient role-based queries
@@ -149,16 +152,40 @@ model ConferenceRoleEntries {
 }
 
 model ReviewAssignment {
-  id               String     @id @default(cuid())
+  id               String                @id @default(cuid())
   submissionId     String
-  createdAt        DateTime   @default(now())
+  createdAt        DateTime              @default(now())
   dueDate          DateTime
   reviewerRoleId   String
   assignedByRoleId String
-  submission       Submission @relation(fields: [submissionId], references: [id])
-  reviewer         ConferenceRoleEntries  @relation("Reviewer", fields: [reviewerRoleId], references: [id])
-  assignedBy       ConferenceRoleEntries  @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
+  submission       Submission            @relation(fields: [submissionId], references: [id])
+  reviewer         ConferenceRoleEntries @relation("Reviewer", fields: [reviewerRoleId], references: [id])
+  assignedBy       ConferenceRoleEntries @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
+  reviews          Reviews[]
+
   @@index([submissionId]) // For efficient submission-based queries
   @@index([reviewerRoleId]) // For efficient reviewer-based queries
   @@index([assignedByRoleId]) // For efficient assigned-by queries
+}
+
+enum RecStatus {
+  REVISION
+  ACCEPTED
+  REJECTED
+}
+
+model Reviews {
+  id                String           @id @default(cuid())
+  submissionId      String
+  createdAt         DateTime         @default(now())
+  assignmentId      String
+  recommendation    RecStatus
+  overallEvaluation String
+  overallScore      Int
+  isReviewed        Boolean          @default(false)
+  submission        Submission       @relation(fields: [submissionId], references: [id])
+  assignment        ReviewAssignment @relation(fields: [assignmentId], references: [id])
+
+  @@index([submissionId])
+  @@index([assignmentId])
 }
