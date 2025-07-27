@@ -106,7 +106,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="main-content-height bg-muted/50 flex items-center justify-center p-6">
+    <div className="main-content-height flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <form onSubmit={handleSubmit(onSubmit)}>
           <Card className="border-border shadow-sm">
