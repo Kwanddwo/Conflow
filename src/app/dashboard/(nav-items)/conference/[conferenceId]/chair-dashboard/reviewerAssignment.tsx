@@ -191,7 +191,10 @@ export default function ReviewerAssignments() {
                     >
                       <div className="flex items-center gap-2 flex-1">
                         <span className="text-[#000000] text-sm">
-                          Submission No. {submission.id} ({submission.title})
+                          <span className="text-muted-foreground">
+                            {submission.id}
+                          </span>{" "}
+                          ({submission.title})
                         </span>
                         {submission.status && (
                           <Badge className="bg-[#22c55e] text-[#ffffff] hover:bg-[#22c55e]/80 text-xs">
@@ -251,8 +254,11 @@ export default function ReviewerAssignments() {
                                 key={submission.id}
                                 value={submission.id}
                               >
-                                Submission No. {submission.id} -{" "}
-                                {submission.title.substring(0, 50)}...
+                                Submission No.{" "}
+                                <span className="text-muted-foreground">
+                                  {submission.id}
+                                </span>{" "}
+                                - {submission.title.substring(0, 50)}...
                               </SelectItem>
                             ))}
                           </SelectContent>

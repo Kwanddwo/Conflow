@@ -131,7 +131,7 @@ function NewReviewAssignmentForm({
           <SelectContent>
             {submissions.map((submission) => (
               <SelectItem key={submission.id} value={submission.id}>
-                {submission.id} -{" "}
+                <span className="text-muted-foreground">{submission.id}</span> -{" "}
                 {submission.title.length > 50
                   ? `${submission.title.substring(0, 50)}...`
                   : submission.title}
@@ -202,6 +202,10 @@ interface Participant {
 }
 export default function ConferenceDashboard() {
   const { conferenceId } = useParams<{ conferenceId: string }>();
+
+  const { data: conference } =
+    trpc.conference.getConference.useQuery(conferenceId);
+
   const { data: submissions, isLoading } =
     trpc.submission.getSubmissionsByConferenceId.useQuery({
       conferenceId: conferenceId || "",
@@ -321,7 +325,7 @@ export default function ConferenceDashboard() {
       const authorParticipants = submissions.flatMap((submission) =>
         submission.submissionAuthors.map((author) => ({
           ...author,
-          role: "Author",
+          role: "AUTHOR",
         }))
       );
 
@@ -392,7 +396,7 @@ export default function ConferenceDashboard() {
         {/* Conference Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground mb-4">
-            conferenceAcronym - ConferenceTitle
+            {conference?.acronym} - {conference?.title}
           </h1>
         </div>
         <Card className="mb-8">
@@ -441,7 +445,15 @@ export default function ConferenceDashboard() {
                       {participant.affiliation}
                     </TableCell>
                     <TableCell className="text-foreground">
-                      {participant.role}
+                      <Badge variant="outline">
+                        {participant.role === "MAIN_CHAIR"
+                          ? "Main Chair"
+                          : participant.role === "CHAIR"
+                          ? "Chair"
+                          : participant.role === "AUTHOR"
+                          ? "Author"
+                          : "Reviewer"}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -483,7 +495,7 @@ export default function ConferenceDashboard() {
                             className="flex items-center space-x-2"
                           >
                             <span className="text-foreground text-sm">
-                              {submission.title} ({submission.id})
+                              {submission.title} (<span className="text-muted-foreground">{submission.id}</span>)
                             </span>
                             <X
                               className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"
@@ -566,7 +578,7 @@ export default function ConferenceDashboard() {
                             className="flex items-center space-x-2"
                           >
                             <span className="text-foreground text-sm">
-                              {submission.title} ({submission.id})
+                              {submission.title} (<span className="text-muted-foreground">{submission.id}</span>)
                             </span>
                             <X
                               className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"
@@ -653,7 +665,7 @@ export default function ConferenceDashboard() {
             <CardContent key={index}>
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-foreground">
-                  Submission {submission.id}
+                  Submission <span className="text-muted-foreground">{submission.id}</span>
                 </h3>
                 <div className="grid grid-cols-1 gap-0 border border-border rounded-lg overflow-hidden">
                   <div className="grid grid-cols-4 min-h-[60px]">
