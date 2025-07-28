@@ -3,30 +3,31 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Home, ArrowLeft, Search } from "lucide-react";
+import { Home, ArrowLeft, ShieldX } from "lucide-react";
 
-export default function NotFound() {
+export default function Forbidden() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md mx-auto shadow-lg">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md mx-auto shadow-lg dark:border-red-800">
         <CardContent className="p-8 text-center space-y-6">
-          {/* 404 Illustration */}
+          {/* 403 Illustration */}
           <div className="relative">
-            <div className="text-8xl font-bold text-slate-200 dark:text-slate-700 select-none">
-              404
+            <div className="text-8xl font-bold text-red-200 dark:text-red-800 select-none">
+              403
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Search className="w-12 h-12 text-slate-400 dark:text-slate-500" />
+              <ShieldX className="w-12 h-12 text-red-500 dark:text-red-400" />
             </div>
           </div>
 
           {/* Error Message */}
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-              Page Not Found
+            <h1 className="text-2xl font-semibold text-red-900 dark:text-red-100">
+              Access Forbidden
             </h1>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Sorry, we couldn&apos;t find the Conference you&apos;re looking for. The URL might be incorrect.
+            <p className="text-red-700 dark:text-red-300 leading-relaxed">
+              Sorry, you don&apos;t have permission to access this resource.
+              Please contact an administrator if you believe this is an error.
             </p>
           </div>
 

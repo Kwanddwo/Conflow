@@ -49,7 +49,7 @@ export function AppSidebar() {
     <Sidebar>
         <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2">
-          <Logo width={100} height={100} />
+          <Logo width={100} height={100} link="/dashboard" />
         </div>
         </SidebarHeader>
       <SidebarContent>

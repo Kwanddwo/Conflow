@@ -1,4 +1,5 @@
 "use client";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import RoleList from "@/components/RoleList";
 import { trpc } from "@/server/client";
 
@@ -13,6 +14,9 @@ export default function MyRecentRoles() {
     title: role.conferenceTitle,
     role: role.role,
   }));
+  if (!conferenceRoles){
+    return <LoadingSpinner />;
+  }
 
   return <RoleList title="Your Recent Roles" conferences={conferences || []} />;
 }

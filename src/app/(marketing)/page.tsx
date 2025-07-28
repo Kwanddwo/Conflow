@@ -46,7 +46,7 @@ export default function LandingPage() {
       <footer className="flex flex-col justify-between gap-4 py-6 border-border border-t bg-card">
         <div className="flex flex-col lg:flex-row justify-between gap-6 lg:gap-4 px-4 sm:px-6">
           <div className="text-center lg:text-left">
-            <Logo height={32} width={110} />
+            <Logo height={32} width={110} link="/" />
             <p className="text-muted-foreground mt-2">
               A simplified conference manager.
             </p>

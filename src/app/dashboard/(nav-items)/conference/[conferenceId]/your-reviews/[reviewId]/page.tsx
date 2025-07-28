@@ -7,17 +7,18 @@ import { trpc } from "@/server/client";
 import { useParams } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Link from "next/link";
+import { useProtectedQuery } from "@/hooks/useProtectedQuery";
 
 export default function ConflowReview() {
   const { conferenceId, reviewId } = useParams<{
     conferenceId: string;
     reviewId: string;
   }>();
-  const { data: review, isPending } = trpc.review.getReviewerReview.useQuery({
+  const query = trpc.review.getReviewerReview.useQuery({
     conferenceId,
     reviewId,
   });
-
+  const { data: review, isPending } = useProtectedQuery(query);
   if (isPending || !review) {
     return <LoadingSpinner />;
   }

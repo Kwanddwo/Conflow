@@ -7,11 +7,12 @@ import React from "react";
 interface LogoProps {
   width?: number;
   height?: number;
+  link : string;
 }
 
-const Logo: React.FC<LogoProps> = ({ width, height }) => {
+const Logo: React.FC<LogoProps> = ({ width, height, link }) => {
   return (
-    <Link href="/dashboard">
+    <Link href={link}>
       <Image
         src={`/conflow.png`}
         className="dark:hidden"
