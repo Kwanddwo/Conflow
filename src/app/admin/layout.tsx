@@ -10,10 +10,10 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminPage>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
-        <Link href="/admin" className="flex items-center gap-2">
-          <Logo height={120} width={110} />
+        <div className="flex items-center gap-2">
+          <Logo height={120} width={110} link="/admin" />
           <span className="text-xl text-foreground font-bold">Admin</span>
-        </Link>
+        </div>
         <nav className="flex items-center gap-8">
           <Link
             href="/admin/conference-requests"
