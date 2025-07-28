@@ -28,6 +28,9 @@ export default function RoleList({
     if (role === "AUTHOR") {
       return `/dashboard/conference/${conferenceId}/your-submissions`;
     }
+    if (role === "MAIN_CHAIR" || role === "CHAIR") {
+      return `/dashboard/conference/${conferenceId}/chair-dashboard`;
+    }
     if (role === "REVIEWER") {
       return `/dashboard/conference/${conferenceId}/your-reviews`;
     }

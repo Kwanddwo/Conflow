@@ -25,11 +25,23 @@ export default function ConflowReview() {
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-semibold text-foreground mb-8">
-          Your Review for Submission{" "}
-          <span className="text-muted-foreground">{review.submission.id}</span>{" "}
-          of CONF2024
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-semibold text-foreground">
+            Your Review for Submission{" "}
+            <span className="text-muted-foreground">
+              {review.submission.id}
+            </span>{" "}
+            of CONF2024
+          </h1>
+          <Button
+            asChild
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <Link href={`/dashboard/conference/${conferenceId}`}>
+              Go to Conference
+            </Link>
+          </Button>
+        </div>
 
         {/* Paper Details */}
         <Card className="mb-8 border-2 border-border/60">
@@ -85,11 +97,13 @@ export default function ConflowReview() {
               <div className="grid grid-cols-[120px_1fr] gap-4">
                 <span className="font-medium text-foreground">Submitted</span>
                 <span className="text-foreground">
-                    {new Date(review.submission.createdAt).toLocaleDateString('en-US', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                    }).replace(',', ',')}
+                  {new Date(review.submission.createdAt)
+                    .toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                    .replace(",", ",")}
                 </span>
               </div>
             </div>

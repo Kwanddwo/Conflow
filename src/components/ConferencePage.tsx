@@ -67,6 +67,11 @@ export default function ConferencePage() {
     !conference.conferenceRoles.some(
       (role) => role.userId === session?.user.id
     );
+  const isReviewer = conference?.conferenceRoles?.some(
+  (role) =>
+    role.role === "REVIEWER" &&
+    role.user.id === session?.user.id
+);
 
   // Debug logging for session and main chair comparison
   console.log("Session user:", session?.user);
@@ -345,6 +350,17 @@ export default function ConferencePage() {
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Chair Dashboard
+                </Button>
+              </Link>
+            )}
+            {isReviewer && (
+              <Link href={`/dashboard/conference/${conferenceId}/your-reviews`}>
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary/10"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Your Reviews
                 </Button>
               </Link>
             )}
