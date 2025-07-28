@@ -36,6 +36,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { getName } from "country-list";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useProtectedQuery } from "@/hooks/useProtectedQuery";
 
 // New Review Assignment Form Component
 function NewReviewAssignmentForm({
@@ -206,7 +207,7 @@ export default function ConferenceDashboard() {
   const { data: conference } =
     trpc.conference.getConference.useQuery(conferenceId);
 
-  const { data: submissions, isLoading } =
+  const query =
     trpc.submission.getSubmissionsByConferenceId.useQuery({
       conferenceId: conferenceId || "",
     });
@@ -215,12 +216,11 @@ export default function ConferenceDashboard() {
       conferenceId: conferenceId || "",
     });
 
-  // Review assignments data and mutations
   const { data: reviewAssignmentsData, refetch: refetchReviewAssignments } =
     trpc.submission.getReviewAssignments.useQuery({
       conferenceId: conferenceId || "",
     });
-
+  const { data: submissions, isLoading }= useProtectedQuery(query);
   const createReviewAssignmentMutation =
     trpc.submission.createReviewAssignment.useMutation({
       onSuccess: () => {

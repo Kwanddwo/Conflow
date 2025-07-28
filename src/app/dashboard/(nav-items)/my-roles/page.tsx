@@ -1,9 +1,9 @@
 "use client";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import RoleList from "@/components/RoleList";
 import { trpc } from "@/server/client";
 
 export default function MyRoles() {
-  // Get data for conferenceRoles
   const { data: conferenceRoles } =
     trpc.conference.getConferenceRoles.useQuery();
 
@@ -13,6 +13,8 @@ export default function MyRoles() {
     acronym: role.conferenceAcronym,
     role: role.role,
   }));
-
+  if(!conferences) {
+    return <LoadingSpinner />;
+  }
   return <RoleList conferences={conferences || []} title={undefined} />;
 }

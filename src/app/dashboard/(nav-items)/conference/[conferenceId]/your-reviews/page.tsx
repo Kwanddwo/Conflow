@@ -17,6 +17,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Activity, AlertCircle, ExternalLink, FileText } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useProtectedQuery } from "@/hooks/useProtectedQuery";
 
 interface ReviewAssignment {
   id: string;
@@ -33,16 +34,11 @@ interface ReviewAssignment {
 export default function YourReviewsPage() {
   const { conferenceId } = useParams<{ conferenceId: string }>();
   const { data: session } = useSession();
-
-  const {
-    data: reviews,
-    isLoading,
-    error,
-  } = trpc.submission.getMyReviewAssignments.useQuery(
+  const query = trpc.submission.getMyReviewAssignments.useQuery(
     { conferenceId },
     { enabled: !!conferenceId && !!session?.user?.id }
   );
-
+  const { data: reviews, isLoading, error } = useProtectedQuery(query);
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -64,7 +60,9 @@ export default function YourReviewsPage() {
               Error Loading Reviews
             </h3>
             <p className="text-muted-foreground">
-              {error.message || "Failed to load your review assignments."}
+              {error instanceof Error 
+                ? error.message 
+                : "Failed to load your review assignments."}
             </p>
           </CardContent>
         </Card>
