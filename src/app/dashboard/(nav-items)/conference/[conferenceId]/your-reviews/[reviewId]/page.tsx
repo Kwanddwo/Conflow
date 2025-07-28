@@ -1,76 +1,95 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { trpc } from "@/server/client";
+import { useParams } from "next/navigation";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import Link from "next/link";
 
 export default function ConflowReview() {
+  const { conferenceId, reviewId } = useParams<{
+    conferenceId: string;
+    reviewId: string;
+  }>();
+  const { data: review, isPending } = trpc.review.getReviewerReview.useQuery({
+    conferenceId,
+    reviewId,
+  });
+
+  if (isPending || !review) {
+    return <LoadingSpinner />;
+  }
   return (
-    <div className="min-h-screen bg-[#ffffff]">
+    <div className="min-h-screen bg-background">
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-semibold text-[#000000] mb-8">
+        <h1 className="text-2xl font-semibold text-foreground mb-8">
           Your Review for Submission{" "}
-          <span className="text-muted-foreground">54</span> of CONF2024
+          <span className="text-muted-foreground">{review.submission.id}</span>{" "}
+          of CONF2024
         </h1>
 
         {/* Paper Details */}
-        <Card className="mb-8">
+        <Card className="mb-8 border-2 border-border/60">
           <CardContent className="p-6">
             <div className="space-y-4">
               <div className="grid grid-cols-[120px_1fr] gap-4">
-                <span className="font-medium text-[#000000]">Title</span>
-                <span className="text-[#000000]">
-                  Neuro-Symbolic Integration for Zero-Shot Commonsense Reasoning
-                  in Multi-Agent Systems
+                <span className="font-medium text-foreground">Title</span>
+                <span className="text-foreground">
+                  {review.submission.title}
                 </span>
               </div>
 
               <div className="grid grid-cols-[120px_1fr] gap-4">
-                <span className="font-medium text-[#000000]">Paper</span>
+                <span className="font-medium text-foreground">Paper</span>
                 <div>
-                  <a href="#" className="text-blue-600 hover:underline">
-                    MyPaper.pdf
-                  </a>
-                  <span className="text-[#64748b] ml-2">[Sep 17, 21:54]</span>
+                  <Link
+                    href={review.submission.paperFilePath || ""}
+                    className="text-primary hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {review.submission.paperFileName}
+                  </Link>
                 </div>
               </div>
 
               <div className="grid grid-cols-[120px_1fr] gap-4">
-                <span className="font-medium text-[#000000]">Area/Track</span>
-                <span className="text-[#000000]">
-                  Artificial Intelligence and Cognitive Systems
+                <span className="font-medium text-foreground">Area/Track</span>
+                <span className="text-foreground">
+                  {review.submission.primaryArea} /{" "}
+                  {review.submission.secondaryArea}
                 </span>
               </div>
 
               <div className="grid grid-cols-[120px_1fr] gap-4">
-                <span className="font-medium text-[#000000]">Keywords</span>
-                <span className="text-[#000000]">
-                  Neuro-symbolic AI, zero-shot learning, commonsense reasoning,
-                  multi-agent systems, cognitive architectures
+                <span className="font-medium text-foreground">Keywords</span>
+                <span className="text-foreground">
+                  {Array.isArray(review.submission.keywords)
+                    ? review.submission.keywords.join(", ")
+                    : typeof review.submission.keywords === "string"
+                    ? review.submission.keywords
+                    : ""}
                 </span>
               </div>
 
               <div className="grid grid-cols-[120px_1fr] gap-4">
-                <span className="font-medium text-[#000000]">Abstract</span>
-                <p className="text-[#000000] leading-relaxed">
-                  This paper introduces a novel neuro-symbolic framework for
-                  enabling zero-shot commonsense reasoning in multi-agent
-                  environments. While existing systems either rely on
-                  statistical learning or symbolic reasoning, our approach
-                  combines both by integrating a large language model with a
-                  structured knowledge base to facilitate efficient inference
-                  and generalization in unfamiliar scenarios. We evaluate the
-                  framework on a custom benchmark involving collaborative
-                  planning and navigation tasks across heterogeneous agents.
-                  Results show a significant improvement in both task completion
-                  rate and reasoning accuracy compared to baseline methods. The
-                  proposed method highlights the potential of hybrid cognitive
-                  architectures in achieving robust and adaptive behavior in
-                  complex, real-world domains.
+                <span className="font-medium text-foreground">Abstract</span>
+                <p className="text-foreground leading-relaxed">
+                  {review.submission.abstract}
                 </p>
               </div>
 
               <div className="grid grid-cols-[120px_1fr] gap-4">
-                <span className="font-medium text-[#000000]">Submitted</span>
-                <span className="text-[#000000]">Sep 17, 13:42</span>
+                <span className="font-medium text-foreground">Submitted</span>
+                <span className="text-foreground">
+                    {new Date(review.submission.createdAt).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                    }).replace(',', ',')}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -78,67 +97,74 @@ export default function ConflowReview() {
 
         {/* Authors Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-[#000000] mb-4">Authors</h2>
-          <Card>
+          <h2 className="text-xl font-semibold text-foreground mb-4">
+            Authors
+          </h2>
+          <Card className="py-0 border-2 border-border/60">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-[#f1f5f9]">
+                  <thead className="bg-muted/30">
                     <tr>
-                      <th className="text-left p-4 font-medium text-[#000000]">
+                      <th className="text-left p-4 font-medium text-foreground">
                         First Name
                       </th>
-                      <th className="text-left p-4 font-medium text-[#000000]">
+                      <th className="text-left p-4 font-medium text-foreground">
                         Last Name
                       </th>
-                      <th className="text-left p-4 font-medium text-[#000000]">
+                      <th className="text-left p-4 font-medium text-foreground">
                         Email
                       </th>
-                      <th className="text-left p-4 font-medium text-[#000000]">
+                      <th className="text-left p-4 font-medium text-foreground">
                         Country
                       </th>
-                      <th className="text-left p-4 font-medium text-[#000000]">
+                      <th className="text-left p-4 font-medium text-foreground">
                         Affiliation
                       </th>
-                      <th className="text-left p-4 font-medium text-[#000000]">
+                      <th className="text-left p-4 font-medium text-foreground">
                         Corresponding?
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-[#e2e8f0]">
-                      <td className="p-4 text-[#000000]">Mohammed</td>
-                      <td className="p-4 text-[#000000]">Su</td>
-                      <td className="p-4 text-[#000000]">Medsu@gmail.com</td>
-                      <td className="p-4 text-[#000000]">Morocco</td>
-                      <td className="p-4 text-[#000000]">
-                        Laboratory of Whatever, National School of Something,
-                        NSS
-                      </td>
-                      <td className="p-4 text-[#000000]">Yes</td>
-                    </tr>
-                    <tr className="border-b border-[#e2e8f0]">
-                      <td className="p-4 text-[#000000]">Achraf</td>
-                      <td className="p-4 text-[#000000]">Tahiri</td>
-                      <td className="p-4 text-[#000000]">chrafiri@gmail.com</td>
-                      <td className="p-4 text-[#000000]">Morocco</td>
-                      <td className="p-4 text-[#000000]">
-                        Laboratory of Whatever, National School of Something,
-                        NSS
-                      </td>
-                      <td className="p-4 text-[#000000]">Yes</td>
-                    </tr>
-                    <tr>
-                      <td className="p-4 text-[#000000]">Mohammed</td>
-                      <td className="p-4 text-[#000000]">Alami</td>
-                      <td className="p-4 text-[#000000]">m.alami@nss.ma</td>
-                      <td className="p-4 text-[#000000]">Morocco</td>
-                      <td className="p-4 text-[#000000]">
-                        Laboratory of Whatever, National School of Something,
-                        NSS
-                      </td>
-                      <td className="p-4 text-[#000000]">No</td>
-                    </tr>
+                    {review.submission.submissionAuthors.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={6}
+                          className="p-8 text-center text-muted-foreground"
+                        >
+                          No authors found
+                        </td>
+                      </tr>
+                    ) : (
+                      review.submission.submissionAuthors.map(
+                        (author, index) => (
+                          <tr
+                            key={index}
+                            className="border-b border-border hover:bg-muted/30 transition-colors"
+                          >
+                            <td className="p-4 text-foreground">
+                              {author.firstName}
+                            </td>
+                            <td className="p-4 text-foreground">
+                              {author.lastName}
+                            </td>
+                            <td className="p-4 text-foreground">
+                              {author.email}
+                            </td>
+                            <td className="p-4 text-foreground">
+                              {author.country}
+                            </td>
+                            <td className="p-4 text-foreground">
+                              {author.affiliation}
+                            </td>
+                            <td className="p-4 text-foreground">
+                              {author.isCorresponding ? "Yes" : "No"}
+                            </td>
+                          </tr>
+                        )
+                      )
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -146,45 +172,57 @@ export default function ConflowReview() {
           </Card>
         </div>
 
-        {/* Your Review Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-[#000000] mb-4">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
             Your Review
           </h2>
-          <Card>
+          <Card className="py-2 border-2 border-border/60">
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="grid grid-cols-[160px_1fr] gap-4">
-                  <span className="font-medium text-[#000000]">
-                    Acceptance Status
+                  <span className="font-medium text-foreground">
+                    Recommendation
                   </span>
                   <Badge
-                    variant="secondary"
-                    className="w-fit bg-[#f1f5f9] text-[#64748b]"
+                    variant="outline"
+                    className={`w-fit ${
+                      review.recommendation === "ACCEPTED"
+                        ? "bg-green-100 text-green-800 border-green-300"
+                        : review.recommendation === "REJECTED"
+                        ? "bg-red-100 text-red-800 border-red-300"
+                        : "bg-yellow-100 text-yellow-800 border-yellow-300"
+                    }`}
                   >
-                    Weak Accept
+                    {review.recommendation}
                   </Badge>
                 </div>
 
                 <div className="grid grid-cols-[160px_1fr] gap-4">
-                  <span className="font-medium text-[#000000]">
+                  <span className="font-medium text-foreground">
+                    Overall Score
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className={`w-fit ${
+                      review.overallScore >= 8
+                        ? "bg-green-100 text-green-800 border-green-300"
+                        : review.overallScore >= 6
+                        ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+                        : review.overallScore >= 4
+                        ? "bg-orange-100 text-orange-800 border-orange-300"
+                        : "bg-red-100 text-red-800 border-red-300"
+                    }`}
+                  >
+                    {review.overallScore}/10
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-[160px_1fr] gap-4">
+                  <span className="font-medium text-foreground">
                     Overall Evaluation
                   </span>
-                  <p className="text-[#000000] leading-relaxed">
-                    This paper introduces a novel neuro-symbolic framework for
-                    enabling zero-shot commonsense reasoning in multi-agent
-                    environments. While existing systems either rely on
-                    statistical learning or symbolic reasoning, our approach
-                    combines both by integrating a large language model with a
-                    structured knowledge base to facilitate efficient inference
-                    and generalization in unfamiliar scenarios. We evaluate the
-                    framework on a custom benchmark involving collaborative
-                    planning and navigation tasks across heterogeneous agents.
-                    Results show a significant improvement in both task
-                    completion rate and reasoning accuracy compared to baseline
-                    methods. The proposed method highlights the potential of
-                    hybrid cognitive architectures in achieving robust and
-                    adaptive behavior in complex, real-world domains.
+                  <p className="text-foreground leading-relaxed">
+                    {review.overallEvaluation}
                   </p>
                 </div>
               </div>
@@ -194,7 +232,7 @@ export default function ConflowReview() {
 
         {/* Edit Review Button */}
         <div className="flex justify-end">
-          <Button className="bg-[#0f172a] text-white hover:bg-[#0f172a]/90 px-8">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8">
             Edit Review
           </Button>
         </div>
