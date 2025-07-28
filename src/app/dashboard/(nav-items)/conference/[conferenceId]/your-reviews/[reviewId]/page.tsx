@@ -23,7 +23,7 @@ export default function ConflowReview() {
     return <LoadingSpinner />;
   }
   return (
-    <div className="min-h-screen bg-background">
+    <div className="main-content-height bg-background">
       <main className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-semibold text-foreground">

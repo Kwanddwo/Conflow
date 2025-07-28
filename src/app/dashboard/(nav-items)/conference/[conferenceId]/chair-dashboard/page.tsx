@@ -208,10 +208,9 @@ export default function ConferenceDashboard() {
   const { data: conference } =
     trpc.conference.getConference.useQuery(conferenceId);
 
-  const query =
-    trpc.submission.getSubmissionsByConferenceId.useQuery({
-      conferenceId: conferenceId || "",
-    });
+  const query = trpc.submission.getSubmissionsByConferenceId.useQuery({
+    conferenceId: conferenceId || "",
+  });
   const { data: invitees, isLoading: isLoadingInvitees } =
     trpc.conference.getConferenceInvitees.useQuery({
       conferenceId: conferenceId || "",
@@ -221,7 +220,7 @@ export default function ConferenceDashboard() {
     trpc.submission.getReviewAssignments.useQuery({
       conferenceId: conferenceId || "",
     });
-  const { data: submissions, isLoading }= useProtectedQuery(query);
+  const { data: submissions, isLoading } = useProtectedQuery(query);
   const createReviewAssignmentMutation =
     trpc.submission.createReviewAssignment.useMutation({
       onSuccess: () => {
@@ -392,7 +391,7 @@ export default function ConferenceDashboard() {
   }));
   console.log("Available Submissions:", submissions);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="main-content-height bg-background">
       <main className="px-6 py-6">
         {/* Conference Header */}
         <div className="mb-6 flex items-center justify-between">

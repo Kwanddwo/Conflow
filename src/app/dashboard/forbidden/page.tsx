@@ -7,7 +7,7 @@ import { Home, ArrowLeft, ShieldX } from "lucide-react";
 
 export default function Forbidden() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="main-content-height flex items-center justify-center p-4">
       <Card className="w-full max-w-md mx-auto shadow-lg dark:border-red-800">
         <CardContent className="p-8 text-center space-y-6">
           {/* 403 Illustration */}

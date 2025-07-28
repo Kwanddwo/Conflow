@@ -7,7 +7,7 @@ import { Home, ArrowLeft, Search } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
+    <div className="main-content-height bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
       <Card className="w-full max-w-md mx-auto shadow-lg">
         <CardContent className="p-8 text-center space-y-6">
           {/* 404 Illustration */}
@@ -26,7 +26,8 @@ export default function NotFound() {
               Page Not Found
             </h1>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Sorry, we couldn&apos;t find the Conference you&apos;re looking for. The URL might be incorrect.
+              Sorry, we couldn&apos;t find the Conference you&apos;re looking
+              for. The URL might be incorrect.
             </p>
           </div>
 
