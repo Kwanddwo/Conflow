@@ -15,9 +15,7 @@ export default function MarketingLayout({
   return (
     <>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
-        <Link href="/">
           <Logo height={120} width={110} link="/" />
-        </Link>
         <div className="flex gap-4">
           <Link href="/sign-up">
             <Button variant="outline" className="cursor-pointer">
