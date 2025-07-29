@@ -50,7 +50,7 @@ interface SubmissionAssignmentProps {
 function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmissions }: SubmissionAssignmentProps) {
   const [assignments, setAssignments] = React.useState<Assignment[]>([]);
   const { data: reviewAssignmentsData, refetch: refetchReviewAssignments } =
-    trpc.submission.getReviewAssignments.useQuery({
+    trpc.review.getReviewAssignments.useQuery({
       conferenceId: conferenceId || "",
     });
   const { data: decisionAssignmentsData, refetch: refetchDecisionAssignments } =
@@ -58,7 +58,7 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
       conferenceId: conferenceId || "",
     });
   const createReviewAssignmentMutation =
-    trpc.submission.createReviewAssignment.useMutation({
+    trpc.review.createReviewAssignment.useMutation({
       onSuccess: () => {
         toast.success("Review assignment created successfully");
         refetchReviewAssignments();
@@ -88,7 +88,7 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
       },
     });
   const deleteReviewAssignmentMutation =
-    trpc.submission.deleteReviewAssignment.useMutation({
+    trpc.review.deleteReviewAssignment.useMutation({
       onSuccess: () => {
         toast.success("Review assignment deleted successfully");
         refetchReviewAssignments();
