@@ -107,6 +107,8 @@ model Submission {
   reviewAssignments ReviewAssignment[]
 
   reviews Review[]
+
+  DecisionAssignment DecisionAssignment[]
 }
 
 model SubmissionAuthor {
@@ -140,10 +142,12 @@ model ConferenceRoleEntries {
   role         ConferenceRole
   createdAt    DateTime       @default(now())
 
-  user              User               @relation(fields: [userId], references: [id])
-  conference        Conference         @relation(fields: [conferenceId], references: [id])
-  reviewAssignments ReviewAssignment[] @relation("Reviewer")
-  assignedByReviews ReviewAssignment[] @relation("AssignedBy")
+  user                User                 @relation(fields: [userId], references: [id])
+  conference          Conference           @relation(fields: [conferenceId], references: [id])
+  reviewAssignments   ReviewAssignment[]   @relation("Reviewer")
+  assignedByReviews   ReviewAssignment[]   @relation("AssignedBy")
+  DecisionAssignment  DecisionAssignment[] @relation("ChairReviewer")
+  assignedByDecisions DecisionAssignment[] @relation("AssignedBy")
 
   @@unique([userId, conferenceId])
   @@index([conferenceId, role]) // For efficient role-based queries
@@ -190,4 +194,36 @@ model Review {
   assignment        ReviewAssignment @relation("AssignmentReview", fields: [assignmentId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
+}
+
+model DecisionAssignment {
+  id               String                @id @default(cuid())
+  submissionId     String
+  createdAt        DateTime              @default(now())
+  dueDate          DateTime
+  chairRoleId      String
+  assignedByRoleId String
+  submission       Submission            @relation(fields: [submissionId], references: [id])
+  chairReviewer    ConferenceRoleEntries @relation("ChairReviewer", fields: [chairRoleId], references: [id])
+  assignedBy       ConferenceRoleEntries @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
+
+  @@index([submissionId]) 
+  @@index([chairRoleId]) 
+  @@index([assignedByRoleId]) 
+}
+
+model DecisionAssignment {
+  id               String                @id @default(cuid())
+  submissionId     String
+  createdAt        DateTime              @default(now())
+  dueDate          DateTime
+  chairRoleId      String
+  assignedByRoleId String
+  submission       Submission            @relation(fields: [submissionId], references: [id])
+  chairReviewer    ConferenceRoleEntries @relation("ChairReviewer", fields: [chairRoleId], references: [id])
+  assignedBy       ConferenceRoleEntries @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
+
+  @@index([submissionId]) 
+  @@index([chairRoleId]) 
+  @@index([assignedByRoleId]) 
 }
