@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { mainChairProcedure, router } from "../trpc";
+import { mainChairProcedure, chairProcedure, router } from "../trpc";
 import z from "zod";
 
 export const decisionRouter = router({
@@ -371,7 +371,7 @@ export const decisionRouter = router({
         createdAt: assignment.createdAt,
       }));
     }),
-  getMyDecisionAssignments: mainChairProcedure
+  getMyDecisionAssignments: chairProcedure
     .input(
       z.object({
         conferenceId: z.string(),
@@ -441,7 +441,7 @@ export const decisionRouter = router({
         };
       });
     }),
-  submitDecision: mainChairProcedure
+  submitDecision: chairProcedure
     .input(
       z.object({
         assignmentId: z.string(),
@@ -509,7 +509,7 @@ export const decisionRouter = router({
       };
     }),
 
-  updateDecision: mainChairProcedure
+  updateDecision: chairProcedure
     .input(
       z.object({
         decisionId: z.string(),
@@ -569,132 +569,162 @@ export const decisionRouter = router({
         message: "Decision updated successfully",
       };
     }),
-    getChairDecision: mainChairProcedure
-        .input(z.object({ decisionId: z.string() }))
-        .query(async ({ input, ctx }) => {
-          const { decisionId } = input;
-          const decision = await ctx.prisma.decision.findUnique({
-            where: { id: decisionId },
-            include: {
-              submission: {
+  getChairDecision: chairProcedure
+    .input(z.object({ decisionId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { decisionId } = input;
+      const decision = await ctx.prisma.decision.findUnique({
+        where: { id: decisionId },
+        include: {
+          submission: {
+            select: {
+              id: true,
+              title: true,
+              abstract: true,
+              keywords: true,
+              paperFilePath: true,
+              paperFileName: true,
+              primaryArea: true,
+              secondaryArea: true,
+              status: true,
+              createdAt: true,
+              updatedAt: true,
+              submissionAuthors: {
                 select: {
                   id: true,
-                  title: true,
-                  abstract: true,
-                  keywords: true,
-                  paperFilePath: true,
-                  paperFileName: true,
-                  primaryArea: true,
-                  secondaryArea: true,
-                  status: true,
-                  createdAt: true,
-                  updatedAt: true,
-                  submissionAuthors: {
-                    select: {
-                      id: true,
-                      firstName: true,
-                      lastName: true,
-                      email: true,
-                      affiliation: true,
-                      country: true,
-                      isCorresponding: true,
-                    },
-                    orderBy: {
-                      createdAt: "asc",
-                    },
-                  },
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  affiliation: true,
+                  country: true,
+                  isCorresponding: true,
                 },
-              },
-              assignment: {
-                select: {
-                  id: true,
-                  dueDate: true,
-                  createdAt: true,
-                },
-              },
-            },
-          });
-          return decision;
-        }),
-   getDecisionAssignment: mainChairProcedure
-      .input(
-        z.object({
-          conferenceId: z.string(),
-          assignmentId: z.string(),
-        })
-      )
-      .query(async ({ ctx, input }) => {
-        const { assignmentId } = input;
-        const assignment = await ctx.prisma.decisionAssignment.findUnique({
-          where: { id: assignmentId },
-          include: {
-            submission: {
-              select: {
-                id: true,
-                title: true,
-                abstract: true,
-                primaryArea: true,
-                secondaryArea: true,
-                keywords: true,
-                paperFilePath: true,
-                paperFileName: true,
-                createdAt: true,
-                submissionAuthors: {
-                  select: {
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    affiliation: true,
-                    country: true,
-                  },
-                },
-              },
-            },
-            chairReviewer: {
-              select: {
-                user: {
-                  select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                  },
-                },
-              },
-            },
-            assignedBy: {
-              select: {
-                user: {
-                  select: {
-                    firstName: true,
-                    lastName: true,
-                  },
+                orderBy: {
+                  createdAt: "asc",
                 },
               },
             },
           },
+          assignment: {
+            select: {
+              id: true,
+              dueDate: true,
+              createdAt: true,
+            },
+          },
+        },
+      });
+      return decision;
+    }),
+  getDecisionAssignment: chairProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+        assignmentId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { assignmentId, conferenceId } = input;
+
+      // Get the user's role in the conference
+      const userRole = await ctx.prisma.conferenceRoleEntries.findFirst({
+        where: {
+          userId: ctx.session.user.id,
+          conferenceId,
+          role: { in: ["CHAIR", "MAIN_CHAIR"] },
+        },
+      });
+
+      if (!userRole) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You must be a chair to access decision assignments",
         });
-  
-        if (!assignment) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Decision assignment not found",
-          });
-        }
-  
-        return {
-          id: assignment.id,
-          submission: assignment.submission,
+      }
+
+      const assignment = await ctx.prisma.decisionAssignment.findUnique({
+        where: { id: assignmentId },
+        include: {
+          submission: {
+            select: {
+              id: true,
+              title: true,
+              abstract: true,
+              primaryArea: true,
+              secondaryArea: true,
+              keywords: true,
+              paperFilePath: true,
+              paperFileName: true,
+              createdAt: true,
+              submissionAuthors: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  affiliation: true,
+                  country: true,
+                },
+              },
+            },
+          },
           chairReviewer: {
-            id: assignment.chairReviewer.user.id,
-            name: `${assignment.chairReviewer.user.firstName} ${assignment.chairReviewer.user.lastName}`,
-            email: assignment.chairReviewer.user.email,
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
           },
           assignedBy: {
-            name: `${assignment.assignedBy.user.firstName} ${assignment.assignedBy.user.lastName}`,
+            select: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
           },
-          dueDate: assignment.dueDate,
-          createdAt: assignment.createdAt,
-        };
-      }),
+        },
+      });
+
+      if (!assignment) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Decision assignment not found",
+        });
+      }
+
+      // Additional authorization: check if the user is either the assigned chair or a main chair
+      const isAssignedChair =
+        assignment.chairReviewer.user.id === ctx.session.user.id;
+      const isMainChair = userRole.role === "MAIN_CHAIR";
+
+      if (!isAssignedChair && !isMainChair) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "You can only access decision assignments that are assigned to you or if you are the main chair",
+        });
+      }
+
+      return {
+        id: assignment.id,
+        submission: assignment.submission,
+        chairReviewer: {
+          id: assignment.chairReviewer.user.id,
+          name: `${assignment.chairReviewer.user.firstName} ${assignment.chairReviewer.user.lastName}`,
+          email: assignment.chairReviewer.user.email,
+        },
+        assignedBy: {
+          name: `${assignment.assignedBy.user.firstName} ${assignment.assignedBy.user.lastName}`,
+        },
+        dueDate: assignment.dueDate,
+        createdAt: assignment.createdAt,
+      };
+    }),
 });
