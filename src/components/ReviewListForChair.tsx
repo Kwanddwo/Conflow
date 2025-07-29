@@ -201,7 +201,7 @@ export default function ReviewListForChair({
                   <TableCell className="max-w-xs">
                     <div className="text-sm text-foreground">
                       {review.overallEvaluation ? (
-                        <div className="line-clamp-3">
+                        <div className="whitespace-pre-wrap break-words max-w-prose-3">
                           {review.overallEvaluation}
                         </div>
                       ) : (
