@@ -570,4 +570,69 @@ export const submissionRouter = router({
 
       return submissions as SubmissionWithAuthors[];
     }),
+  getSubmissionReviews: chairProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+        submissionId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { conferenceId, submissionId } = input;
+
+      // Verify the submission belongs to this conference
+      const submission = await ctx.prisma.submission.findUnique({
+        where: { id: submissionId },
+        select: { conferenceId: true },
+      });
+
+      if (!submission || submission.conferenceId !== conferenceId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Submission not found or does not belong to this conference",
+        });
+      }
+
+      // Get all reviews for this submission with reviewer information
+      const reviews = await ctx.prisma.review.findMany({
+        where: {
+          submissionId,
+        },
+        select: {
+          id: true,
+          overallScore: true,
+          recommendation: true,
+          overallEvaluation: true,
+          createdAt: true,
+          assignment: {
+            select: {
+              reviewer: {
+                select: {
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                      email: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      return reviews.map((review) => ({
+        id: review.id,
+        overallScore: review.overallScore,
+        recommendation: review.recommendation,
+        overallEvaluation: review.overallEvaluation,
+        createdAt: review.createdAt,
+        reviewerName: `${review.assignment.reviewer.user.firstName} ${review.assignment.reviewer.user.lastName}`,
+        reviewerEmail: review.assignment.reviewer.user.email,
+      }));
+    }),
 });
