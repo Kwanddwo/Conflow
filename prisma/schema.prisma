@@ -212,18 +212,3 @@ model DecisionAssignment {
   @@index([assignedByRoleId]) 
 }
 
-model DecisionAssignment {
-  id               String                @id @default(cuid())
-  submissionId     String
-  createdAt        DateTime              @default(now())
-  dueDate          DateTime
-  chairRoleId      String
-  assignedByRoleId String
-  submission       Submission            @relation(fields: [submissionId], references: [id])
-  chairReviewer    ConferenceRoleEntries @relation("ChairReviewer", fields: [chairRoleId], references: [id])
-  assignedBy       ConferenceRoleEntries @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
-
-  @@index([submissionId]) 
-  @@index([chairRoleId]) 
-  @@index([assignedByRoleId]) 
-}
