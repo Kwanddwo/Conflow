@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, ArrowLeft} from "lucide-react";
+import { AlertCircle, ArrowLeft } from "lucide-react";
 import { trpc } from "@/server/client";
 import { useParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,26 +10,28 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { SubmissionOverview } from "@/components/SubmissionOverview";
 import React from "react";
 import NewDecisionModal from "./NewDecisionModal";
+import ReviewListForChair from "@/components/ReviewListForChair";
+
 
 export default function DecisionModal() {
   const { conferenceId, assignmentId } = useParams<{
-      conferenceId: string;
-      assignmentId: string;
-    }>();
- const [open, setOpen] = React.useState(false);
-    
+    conferenceId: string;
+    assignmentId: string;
+  }>();
+  const [open, setOpen] = React.useState(false);
   const assignmentQuery = trpc.decision.getDecisionAssignment.useQuery({
-      conferenceId,
-      assignmentId,
-    });
-    const { data: assignment, isPending } = useProtectedQuery(assignmentQuery);
+    conferenceId,
+    assignmentId,
+  });
+  const { data: assignment, isPending } = useProtectedQuery(assignmentQuery);
+
   if (isPending) {
-        return (
-          <div className="w-full max-w-4xl mx-auto p-4 md:p-8">
-            <LoadingSpinner />
-          </div>
-        );
-      }
+    return (
+      <div className="w-full max-w-4xl mx-auto p-4 md:p-8">
+        <LoadingSpinner />
+      </div>
+    );
+  }
   if (!assignment) {
     return (
       <div className="w-full max-w-4xl mx-auto p-4 md:p-8">
@@ -42,7 +44,9 @@ export default function DecisionModal() {
               permission to access it.
             </p>
             <Button asChild>
-              <Link href={`/dashboard/conference/${conferenceId}/your-decisions`}>
+              <Link
+                href={`/dashboard/conference/${conferenceId}/your-decisions`}
+              >
                 Back to Decisions
               </Link>
             </Button>
@@ -70,6 +74,15 @@ export default function DecisionModal() {
         </h2>
         <SubmissionOverview submission={assignment?.submission as never} />
       </div>
+
+      {/* Other Reviews - Only show for chairs */}
+        <div className="space-y-4">
+          <ReviewListForChair
+            conferenceId={conferenceId}
+            submissionId={assignment.submission.id}
+          />
+        </div>
+
 
       {/* Make Decision Button */}
       <div className="flex justify-center pt-6">
