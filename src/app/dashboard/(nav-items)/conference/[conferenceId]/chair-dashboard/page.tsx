@@ -217,12 +217,12 @@ export default function ConferenceDashboard() {
     });
 
   const { data: reviewAssignmentsData, refetch: refetchReviewAssignments } =
-    trpc.submission.getReviewAssignments.useQuery({
+    trpc.review.getReviewAssignments.useQuery({
       conferenceId: conferenceId || "",
     });
   const { data: submissions, isLoading } = useProtectedQuery(query);
   const createReviewAssignmentMutation =
-    trpc.submission.createReviewAssignment.useMutation({
+    trpc.review.createReviewAssignment.useMutation({
       onSuccess: () => {
         toast.success("Review assignment created successfully");
         refetchReviewAssignments();
@@ -233,7 +233,7 @@ export default function ConferenceDashboard() {
     });
 
   const deleteReviewAssignmentMutation =
-    trpc.submission.deleteReviewAssignment.useMutation({
+    trpc.review.deleteReviewAssignment.useMutation({
       onSuccess: () => {
         toast.success("Review assignment deleted successfully");
         refetchReviewAssignments();

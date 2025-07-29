@@ -153,7 +153,7 @@ export default function ReviewerAssignments() {
       <CardContent>
         <div className="grid grid-cols-2 gap-0 border border-[#e2e8f0] rounded-lg overflow-hidden">
           {/* Header */}
-          <div className="bg-[#f8f9fa] p-4 border-r border-[#e2e8f0] border-b border-[#e2e8f0]">
+          <div className="bg-[#f8f9fa] p-4 border-r border-[#e2e8f0] border-b">
             <h3 className="font-semibold text-[#000000]">Reviewer</h3>
           </div>
           <div className="bg-[#f8f9fa] p-4 border-b border-[#e2e8f0]">

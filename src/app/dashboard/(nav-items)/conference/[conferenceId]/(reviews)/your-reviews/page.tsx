@@ -34,7 +34,7 @@ interface ReviewAssignment {
 export default function YourReviewsPage() {
   const { conferenceId } = useParams<{ conferenceId: string }>();
   const { data: session } = useSession();
-  const query = trpc.submission.getMyReviewAssignments.useQuery(
+  const query = trpc.review.getMyReviewAssignments.useQuery(
     { conferenceId },
     { enabled: !!conferenceId && !!session?.user?.id }
   );
@@ -43,11 +43,15 @@ export default function YourReviewsPage() {
     return <LoadingSpinner />;
   }
 
-  const getLink = (isReviewed: boolean, reviewId: string) => {
+  const getLink = (
+    isReviewed: boolean,
+    reviewId: string,
+    assignmentId: string
+  ) => {
     if (isReviewed) {
       return `/dashboard/conference/${conferenceId}/your-reviews/${reviewId}`;
     }
-    return `/dashboard/conference/${conferenceId}/your-reviews/new-review`;
+    return `/dashboard/conference/${conferenceId}/new-review/${assignmentId}`;
   };
 
   if (error) {
@@ -60,8 +64,8 @@ export default function YourReviewsPage() {
               Error Loading Reviews
             </h3>
             <p className="text-muted-foreground">
-              {error instanceof Error 
-                ? error.message 
+              {error instanceof Error
+                ? error.message
                 : "Failed to load your review assignments."}
             </p>
           </CardContent>
@@ -98,25 +102,13 @@ export default function YourReviewsPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table className="w-full min-w-[900px]">
+                <Table className="w-full">
                   <TableHeader>
                     <TableRow className="border-b hover:bg-transparent">
                       <TableHead className="text-sm font-semibold h-12 px-4 w-[40%]">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-muted-foreground" />
                           <span>Title</span>
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-sm font-semibold h-12 px-4 w-[20%]">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-muted-foreground" />
-                          <span>Area</span>
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-sm font-semibold h-12 px-4 w-[20%]">
-                        <div className="flex items-center gap-2">
-                          <Activity className="w-4 h-4 text-muted-foreground" />
-                          <span>Assigned By</span>
                         </div>
                       </TableHead>
                       <TableHead className="text-sm font-semibold h-12 px-4 w-[15%]">
@@ -140,12 +132,19 @@ export default function YourReviewsPage() {
                           <Link
                             href={getLink(
                               review.isReviewed,
-                              review.reviewId || ""
+                              review.reviewId || "",
+                              review.id
                             )}
                             className="block"
                           >
                             <p className="font-medium text-foreground mb-1 leading-relaxed break-words overflow-wrap-anywhere">
-                              {review.submission.title}
+                              {review.submission.title.length > 70 ? (
+                                <span title={review.submission.title}>
+                                  {review.submission.title.slice(0, 50)}...
+                                </span>
+                              ) : (
+                                review.submission.title
+                              )}
                             </p>
                           </Link>
                         </TableCell>
@@ -153,36 +152,8 @@ export default function YourReviewsPage() {
                           <Link
                             href={getLink(
                               review.isReviewed,
-                              review.reviewId || ""
-                            )}
-                          >
-                            <Badge
-                              variant="outline"
-                              className="text-sm text-muted-foreground group-hover:text-foreground transition-colors"
-                            >
-                              <span className="truncate max-w-[150px] block">
-                                {review.submission.primaryArea}
-                              </span>
-                            </Badge>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="px-4 py-4 align-top">
-                          <Link
-                            href={getLink(
-                              review.isReviewed,
-                              review.reviewId || ""
-                            )}
-                          >
-                            <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[150px]">
-                              {review.assignedByName}
-                            </p>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="px-4 py-4 align-top">
-                          <Link
-                            href={getLink(
-                              review.isReviewed,
-                              review.reviewId || ""
+                              review.reviewId || "",
+                              review.id
                             )}
                           >
                             <Badge
@@ -201,7 +172,8 @@ export default function YourReviewsPage() {
                           <Link
                             href={getLink(
                               review.isReviewed,
-                              review.reviewId || ""
+                              review.reviewId || "",
+                              review.id
                             )}
                           >
                             <Button

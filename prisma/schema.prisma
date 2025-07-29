@@ -106,7 +106,7 @@ model Submission {
   submissionAuthors SubmissionAuthor[]
   reviewAssignments ReviewAssignment[]
 
-  reviews Reviews[]
+  reviews Review[]
 }
 
 model SubmissionAuthor {
@@ -161,8 +161,11 @@ model ReviewAssignment {
   submission       Submission            @relation(fields: [submissionId], references: [id])
   reviewer         ConferenceRoleEntries @relation("Reviewer", fields: [reviewerRoleId], references: [id])
   assignedBy       ConferenceRoleEntries @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
-  reviews          Reviews[]
-
+  
+  // One-to-one relationship with Review (optional until review is submitted)
+  review           Review?               @relation("AssignmentReview")
+  
+  @@unique([submissionId, reviewerRoleId]) // Ensure one reviewer per submission
   @@index([submissionId]) // For efficient submission-based queries
   @@index([reviewerRoleId]) // For efficient reviewer-based queries
   @@index([assignedByRoleId]) // For efficient assigned-by queries
@@ -174,18 +177,17 @@ enum RecStatus {
   REJECTED
 }
 
-model Reviews {
+model Review {
   id                String           @id @default(cuid())
   submissionId      String
   createdAt         DateTime         @default(now())
-  assignmentId      String
+  assignmentId      String           @unique // Make this unique for one-to-one relationship
   recommendation    RecStatus
   overallEvaluation String
   overallScore      Int
-  isReviewed        Boolean          @default(false)
+
   submission        Submission       @relation(fields: [submissionId], references: [id])
-  assignment        ReviewAssignment @relation(fields: [assignmentId], references: [id])
+  assignment        ReviewAssignment @relation("AssignmentReview", fields: [assignmentId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
-  @@index([assignmentId])
 }

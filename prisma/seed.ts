@@ -1,4 +1,9 @@
-import { PrismaClient, UserRole, ConferenceStatus } from "@prisma/client";
+import {
+  PrismaClient,
+  UserRole,
+  ConferenceStatus,
+  RecStatus,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -24,6 +29,7 @@ async function main() {
 
   // Clear existing data (optional - remove if you want to keep existing data)
   console.log("🗑️  Clearing existing data...");
+  await prisma.review.deleteMany();
   await prisma.reviewAssignment.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.submissionAuthor.deleteMany();
@@ -1202,6 +1208,82 @@ async function main() {
 
   console.log(`✅ Created ${reviewAssignments.length} review assignments`);
 
+  // Create reviews for some assignments
+  console.log("📝 Creating reviews...");
+
+  // Get created review assignments to add reviews to them
+  const createdAssignments = await prisma.reviewAssignment.findMany({
+    include: {
+      submission: true,
+      reviewer: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+
+  const reviews: {
+    submissionId: string;
+    assignmentId: string;
+    recommendation: RecStatus;
+    overallEvaluation: string;
+    overallScore: number;
+  }[] = [];
+
+  // Create some completed reviews
+  // Skip creating a review for John's second assignment (the new one we added) for testing
+  const assignmentsToReview = createdAssignments.slice(0, 3);
+
+  for (let i = 0; i < assignmentsToReview.length; i++) {
+    const assignment = assignmentsToReview[i];
+
+    // Skip creating review for John's assignment to submission3 (for testing)
+    if (
+      assignment.reviewer.user.id === johnUser.id &&
+      assignment.submissionId === submission3.id
+    ) {
+      console.log(
+        `⏭️  Skipping review creation for John's assignment to test review submission`
+      );
+      continue;
+    }
+
+    const recommendations: RecStatus[] = ["ACCEPTED", "REVISION", "REJECTED"];
+    const randomRecommendation = recommendations[Math.floor(Math.random() * 3)];
+
+    reviews.push({
+      submissionId: assignment.submissionId,
+      assignmentId: assignment.id,
+      recommendation: randomRecommendation,
+      overallEvaluation: `This paper presents ${
+        ["excellent", "good", "fair"][Math.floor(Math.random() * 3)]
+      } research on ${assignment.submission.title.toLowerCase()}. The methodology is ${
+        ["strong", "adequate", "weak"][Math.floor(Math.random() * 3)]
+      } and the results are ${
+        ["convincing", "promising", "questionable"][
+          Math.floor(Math.random() * 3)
+        ]
+      }. ${
+        [
+          "I recommend acceptance with minor revisions.",
+          "The paper needs major revisions before acceptance.",
+          "The contribution is not sufficient for publication.",
+        ][Math.floor(Math.random() * 3)]
+      }`,
+      overallScore: Math.floor(Math.random() * 10), // 1-10 score
+    });
+  }
+
+  // Create the reviews
+  for (const review of reviews) {
+    await prisma.review.create({
+      data: review,
+    });
+  }
+
+  console.log(`✅ Created ${reviews.length} reviews`);
+
   // Create notifications (existing + conference-related)
   console.log("🔔 Creating notifications...");
 
@@ -1392,6 +1474,8 @@ async function main() {
   const submissionCount = await prisma.submission.count();
   const authorCount = await prisma.submissionAuthor.count();
   const roleEntriesCount = await prisma.conferenceRoleEntries.count();
+  const reviewAssignmentCount = await prisma.reviewAssignment.count();
+  const reviewCount = await prisma.review.count();
   const notificationCount = await prisma.notification.count();
   const unreadCount = await prisma.notification.count({
     where: { isRead: false, isDeleted: false },
@@ -1433,6 +1517,8 @@ async function main() {
   console.log(`  🏁 Completed: ${completedConferences}`);
   console.log(`📝 Total Submissions: ${submissionCount}`);
   console.log(`👥 Total Authors: ${authorCount}`);
+  console.log(`📋 Review Assignments: ${reviewAssignmentCount}`);
+  console.log(`📝 Reviews: ${reviewCount}`);
   console.log(`🎭 Conference Roles: ${roleEntriesCount}`);
   console.log(`  🎯 Main Chairs: ${mainChairRoles}`);
   console.log(`  🪑 Chairs: ${chairRoles}`);
@@ -1481,6 +1567,18 @@ async function main() {
   console.log("🚫 John CANNOT submit to CDPS2024 (he's Chair)");
   console.log("🚫 John CANNOT submit to FHTC2025 (he's Reviewer)");
   console.log("🚫 John CANNOT submit to QCPS2024 (he's Reviewer)");
+
+  console.log("\n📝 For Testing Review Submissions:");
+  console.log("===================================");
+  console.log(`🔍 ${userEmail} (John) has a review assignment for:`);
+  console.log(
+    '   - FHTC2025: "AI-Powered Diagnostic System for Early Disease Detection"'
+  );
+  console.log(
+    "   - This assignment has NO review created yet (perfect for testing!)"
+  );
+  console.log("   - Due in 21 days from now");
+  console.log("   - Assigned by Alice (Main Chair)");
 
   console.log("\n🎭 Role System Features:");
   console.log("========================");
