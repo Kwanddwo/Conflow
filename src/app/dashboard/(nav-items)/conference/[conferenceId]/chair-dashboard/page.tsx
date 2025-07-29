@@ -22,6 +22,7 @@ import { useProtectedQuery } from "@/hooks/useProtectedQuery";
 import { Button } from "@/components/ui/button";
 import SubmissionAssignment from "@/components/SubmissionAssignment";
 import { useSession } from "next-auth/react";
+import { FileCheck } from "lucide-react";
 interface Participant {
   role: string;
   id: string;
@@ -99,14 +100,30 @@ export default function ConferenceDashboard() {
           <h1 className="text-2xl font-bold text-foreground">
             {conference?.acronym} - {conference?.title}
           </h1>
-          <Button
-            asChild
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <Link href={`/dashboard/conference/${conferenceId}`}>
-              Go to Conference
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            {isMainChair && (
+              <Button
+                asChild
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary/10"
+              >
+                <Link
+                  href={`/dashboard/conference/${conferenceId}/your-decisions`}
+                >
+                  <FileCheck className="h-4 w-4 mr-2" />
+                  Your Decisions
+                </Link>
+              </Button>
+            )}
+            <Button
+              asChild
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Link href={`/dashboard/conference/${conferenceId}`}>
+                Go to Conference
+              </Link>
+            </Button>
+          </div>
         </div>
         <Card className="mb-8">
           <CardHeader className="flex flex-row items-center justify-between">
