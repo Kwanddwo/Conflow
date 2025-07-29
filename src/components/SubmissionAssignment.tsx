@@ -54,7 +54,7 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
       conferenceId: conferenceId || "",
     });
   const { data: decisionAssignmentsData, refetch: refetchDecisionAssignments } =
-    trpc.submission.getDecisionAssignments.useQuery({
+    trpc.decision.getDecisionAssignments.useQuery({
       conferenceId: conferenceId || "",
     });
   const createReviewAssignmentMutation =
@@ -68,7 +68,7 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
       },
     });
   const createDecisionAssignmentMutation =
-    trpc.submission.createDecisionAssignment.useMutation({
+    trpc.decision.createDecisionAssignment.useMutation({
       onSuccess: () => {
         toast.success("Decision assignment created successfully");
         refetchDecisionAssignments();
@@ -78,7 +78,7 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
       },
     });
   const deleteDecisionAssignmentMutation =
-    trpc.submission.deleteDecisionAssignment.useMutation({
+    trpc.decision.deleteDecisionAssignment.useMutation({
       onSuccess: () => {
         toast.success("Decision assignment deleted successfully");
         refetchDecisionAssignments();

@@ -109,6 +109,7 @@ model Submission {
   reviews Review[]
 
   DecisionAssignment DecisionAssignment[]
+  decisions          Decision[]
 }
 
 model SubmissionAuthor {
@@ -165,10 +166,10 @@ model ReviewAssignment {
   submission       Submission            @relation(fields: [submissionId], references: [id])
   reviewer         ConferenceRoleEntries @relation("Reviewer", fields: [reviewerRoleId], references: [id])
   assignedBy       ConferenceRoleEntries @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
-  
+
   // One-to-one relationship with Review (optional until review is submitted)
-  review           Review?               @relation("AssignmentReview")
-  
+  review Review? @relation("AssignmentReview")
+
   @@unique([submissionId, reviewerRoleId]) // Ensure one reviewer per submission
   @@index([submissionId]) // For efficient submission-based queries
   @@index([reviewerRoleId]) // For efficient reviewer-based queries
@@ -182,16 +183,16 @@ enum RecStatus {
 }
 
 model Review {
-  id                String           @id @default(cuid())
+  id                String    @id @default(cuid())
   submissionId      String
-  createdAt         DateTime         @default(now())
-  assignmentId      String           @unique // Make this unique for one-to-one relationship
+  createdAt         DateTime  @default(now())
+  assignmentId      String    @unique // Make this unique for one-to-one relationship
   recommendation    RecStatus
   overallEvaluation String
   overallScore      Int
 
-  submission        Submission       @relation(fields: [submissionId], references: [id])
-  assignment        ReviewAssignment @relation("AssignmentReview", fields: [assignmentId], references: [id], onDelete: Cascade)
+  submission Submission       @relation(fields: [submissionId], references: [id])
+  assignment ReviewAssignment @relation("AssignmentReview", fields: [assignmentId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
 }
@@ -207,8 +208,26 @@ model DecisionAssignment {
   chairReviewer    ConferenceRoleEntries @relation("ChairReviewer", fields: [chairRoleId], references: [id])
   assignedBy       ConferenceRoleEntries @relation("AssignedBy", fields: [assignedByRoleId], references: [id])
 
-  @@index([submissionId]) 
-  @@index([chairRoleId]) 
-  @@index([assignedByRoleId]) 
-}
+  decision Decision? @relation("AssignmentDecision")
 
+  @@index([submissionId])
+  @@index([chairRoleId])
+  @@index([assignedByRoleId])
+}
+enum DecStatus {
+  ACCEPT
+  MAJOR_REVISION
+  MINOR_REVISION
+  REJECT
+}
+model Decision {
+  id                String    @id @default(cuid())
+  submissionId      String
+  createdAt         DateTime  @default(now())
+  assignmentId      String    @unique 
+  reviewDecision    DecStatus
+  submission Submission         @relation(fields: [submissionId], references: [id])
+  assignment DecisionAssignment @relation("AssignmentDecision", fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+}
