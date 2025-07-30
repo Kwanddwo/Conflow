@@ -158,6 +158,7 @@ export const reviewRouter = router({
               secondaryArea: true,
             },
           },
+          review: true,
           reviewer: {
             select: {
               user: {
@@ -194,6 +195,7 @@ export const reviewRouter = router({
         reviewerId: assignment.reviewer.user.id,
         reviewerName: `${assignment.reviewer.user.firstName} ${assignment.reviewer.user.lastName}`,
         reviewerEmail: assignment.reviewer.user.email,
+        isReviewed: !!assignment.review,
         assignedById: assignment.assignedBy.user.id,
         assignedByName: `${assignment.assignedBy.user.firstName} ${assignment.assignedBy.user.lastName}`,
         dueDate: assignment.dueDate,
