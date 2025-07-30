@@ -30,7 +30,7 @@ interface Submission {
   keywords: string;
   abstract: string;
   submitted: string;
-  status?: "Reviewed" | null;
+  isReviewed: boolean;
   assignmentId?: string; // For reviewer assignments
   dueDate?: string; // Add due date field
 }
@@ -47,7 +47,11 @@ interface SubmissionAssignmentProps {
     title: string;
   }[];
 }
-function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmissions }: SubmissionAssignmentProps) {
+function SubmissionAssignment({
+  isReviewAssignment,
+  conferenceId,
+  availableSubmissions,
+}: SubmissionAssignmentProps) {
   const [assignments, setAssignments] = React.useState<Assignment[]>([]);
   const { data: reviewAssignmentsData, refetch: refetchReviewAssignments } =
     trpc.review.getReviewAssignments.useQuery({
@@ -97,112 +101,112 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
         toast.error(error.message || "Failed to delete review assignment");
       },
     });
-    const reviewerAssignments = React.useMemo(() => {
-        if (!reviewAssignmentsData) return [];
-    
-        const grouped = reviewAssignmentsData.reduce((acc, assignment) => {
-          const reviewerName = assignment.reviewerName;
-          if (!acc[reviewerName]) {
-            acc[reviewerName] = {
-              reviewer: reviewerName,
-              submissions: [],
-            };
-          }
-    
-          // Convert assignment to submission format expected by UI
-          acc[reviewerName].submissions.push({
-            id: assignment.submissionId,
-            title: assignment.submissionTitle,
-            paper: "", // This will be handled differently
-            area: `${assignment.submissionPrimaryArea} → ${assignment.submissionSecondaryArea}`,
-            keywords: "", // This will be handled differently
-            abstract: "", // This will be handled differently
-            submitted: new Date(assignment.createdAt).toLocaleDateString(),
-            status: null, // This will be handled differently
-            assignmentId: assignment.id, // Add this for deletion
-            dueDate: new Date(assignment.dueDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            }),
-          });
-    
-          return acc;
-        }, {} as Record<string, Assignment>);
-    
-        return Object.values(grouped);
-      }, [reviewAssignmentsData]);
-    
-      const decisionAssignments = React.useMemo(() => {
-        if (!decisionAssignmentsData) return [];
-    
-        const grouped = decisionAssignmentsData.reduce((acc, assignment) => {
-          const reviewerName = assignment.chairName;
-          if (!acc[reviewerName]) {
-            acc[reviewerName] = {
-              reviewer: reviewerName,
-              submissions: [],
-            };
-          }
-    
-          acc[reviewerName].submissions.push({
-            id: assignment.submissionId,
-            title: assignment.submissionTitle,
-            paper: "", // This will be handled differently
-            area: `${assignment.submissionPrimaryArea} → ${assignment.submissionSecondaryArea}`,
-            keywords: "", // This will be handled differently
-            abstract: "", // This will be handled differently
-            submitted: new Date(assignment.createdAt).toLocaleDateString(),
-            status: null, // This will be handled differently
-            assignmentId: assignment.id, // Add this for deletion
-            dueDate: new Date(assignment.dueDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            }),
-          });
-    
-          return acc;
-        }, {} as Record<string, Assignment>);
-    
-        return Object.values(grouped);
-      }, [decisionAssignmentsData]);
-    const removeChairSubmission = (assignmentId: string) => {
-      if (assignmentId) {
-        deleteDecisionAssignmentMutation.mutate({
-          assignmentId,
-          conferenceId: conferenceId || "",
-        });
-      }
-    };
+  const reviewerAssignments = React.useMemo(() => {
+    if (!reviewAssignmentsData) return [];
 
-    const removeReviewerSubmission = (
-      reviewerName: string,
-      submissionId: string,
-      assignmentId?: string
-    ) => {
-      if (assignmentId) {
-        deleteReviewAssignmentMutation.mutate({
-          assignmentId,
-          conferenceId: conferenceId || "",
-        });
+    const grouped = reviewAssignmentsData.reduce((acc, assignment) => {
+      const reviewerName = assignment.reviewerName;
+      if (!acc[reviewerName]) {
+        acc[reviewerName] = {
+          reviewer: reviewerName,
+          submissions: [],
+        };
       }
-    };
-    useEffect(() => {
-      if (isReviewAssignment) {
-        setAssignments(reviewerAssignments);
-      } else {
-        setAssignments(decisionAssignments);
+
+      // Convert assignment to submission format expected by UI
+      acc[reviewerName].submissions.push({
+        id: assignment.submissionId,
+        title: assignment.submissionTitle,
+        paper: "", // This will be handled differently
+        area: `${assignment.submissionPrimaryArea} → ${assignment.submissionSecondaryArea}`,
+        keywords: "", // This will be handled differently
+        abstract: "", // This will be handled differently
+        submitted: new Date(assignment.createdAt).toLocaleDateString(),
+        isReviewed: assignment.isReviewed,
+        assignmentId: assignment.id, // Add this for deletion
+        dueDate: new Date(assignment.dueDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+      });
+
+      return acc;
+    }, {} as Record<string, Assignment>);
+
+    return Object.values(grouped);
+  }, [reviewAssignmentsData]);
+
+  const decisionAssignments = React.useMemo(() => {
+    if (!decisionAssignmentsData) return [];
+
+    const grouped = decisionAssignmentsData.reduce((acc, assignment) => {
+      const reviewerName = assignment.chairName;
+      if (!acc[reviewerName]) {
+        acc[reviewerName] = {
+          reviewer: reviewerName,
+          submissions: [],
+        };
       }
+
+      acc[reviewerName].submissions.push({
+        id: assignment.submissionId,
+        title: assignment.submissionTitle,
+        paper: "", // This will be handled differently
+        area: `${assignment.submissionPrimaryArea} → ${assignment.submissionSecondaryArea}`,
+        keywords: "", // This will be handled differently
+        abstract: "", // This will be handled differently
+        submitted: new Date(assignment.createdAt).toLocaleDateString(),
+        isReviewed: false, // Todo: get this from the backend
+        assignmentId: assignment.id, // Add this for deletion
+        dueDate: new Date(assignment.dueDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+      });
+
+      return acc;
+    }, {} as Record<string, Assignment>);
+
+    return Object.values(grouped);
+  }, [decisionAssignmentsData]);
+  const removeChairSubmission = (assignmentId: string) => {
+    if (assignmentId) {
+      deleteDecisionAssignmentMutation.mutate({
+        assignmentId,
+        conferenceId: conferenceId || "",
+      });
     }
-    , [decisionAssignments, isReviewAssignment, reviewerAssignments]);
+  };
+
+  const removeReviewerSubmission = (
+    reviewerName: string,
+    submissionId: string,
+    assignmentId?: string
+  ) => {
+    if (assignmentId) {
+      deleteReviewAssignmentMutation.mutate({
+        assignmentId,
+        conferenceId: conferenceId || "",
+      });
+    }
+  };
+  useEffect(() => {
+    if (isReviewAssignment) {
+      setAssignments(reviewerAssignments);
+    } else {
+      setAssignments(decisionAssignments);
+    }
+  }, [decisionAssignments, isReviewAssignment, reviewerAssignments]);
 
   return (
     <>
       <Card className="mb-8">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-semibold text-foreground">
-            {isReviewAssignment ? "Reviewer" : "Decision"} - Submissions Assignments
+            {isReviewAssignment ? "Reviewer" : "Decision"} - Submissions
+            Assignments
           </CardTitle>
           <Dialog>
             <DialogTrigger asChild>
@@ -213,7 +217,11 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
             </DialogTrigger>
             <DialogContent className="sm:max-w-2xl">
               <DialogHeader>
-                <DialogTitle>{isReviewAssignment ? "New Review Assignment" : "New Decision Assignment"}</DialogTitle>
+                <DialogTitle>
+                  {isReviewAssignment
+                    ? "New Review Assignment"
+                    : "New Decision Assignment"}
+                </DialogTitle>
               </DialogHeader>
               {isReviewAssignment ? (
                 <NewReviewAssignmentForm
@@ -268,25 +276,27 @@ function SubmissionAssignment({ isReviewAssignment,conferenceId, availableSubmis
                             </span>
                             )
                           </span>
+                          {submission.isReviewed && (
+                            <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/80">
+                              Reviewed
+                            </Badge>
+                          )}
                           <X
                             className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"
                             onClick={() =>
-                                isReviewAssignment
-                                    ? removeReviewerSubmission(
-                                        assignment.reviewer,
-                                        submission.id,
-                                        submission.assignmentId
-                                    )
-                                    : removeChairSubmission(
-                                        submission.assignmentId ? submission.assignmentId : ""
-                                    )
-                            }   
+                              isReviewAssignment
+                                ? removeReviewerSubmission(
+                                    assignment.reviewer,
+                                    submission.id,
+                                    submission.assignmentId
+                                  )
+                                : removeChairSubmission(
+                                    submission.assignmentId
+                                      ? submission.assignmentId
+                                      : ""
+                                  )
+                            }
                           />
-                          {submission.status && (
-                            <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/80">
-                              {submission.status}
-                            </Badge>
-                          )}
                         </div>
                       ))}
                     </div>
