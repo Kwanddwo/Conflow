@@ -213,6 +213,7 @@ model DecisionAssignment {
   @@index([submissionId])
   @@index([chairRoleId])
   @@index([assignedByRoleId])
+  @@unique([submissionId]) // Ensure one decision per submission
 }
 enum DecStatus {
   ACCEPT
@@ -222,7 +223,7 @@ enum DecStatus {
 }
 model Decision {
   id                String    @id @default(cuid())
-  submissionId      String
+  submissionId      String    @unique
   createdAt         DateTime  @default(now())
   assignmentId      String    @unique 
   reviewDecision    DecStatus

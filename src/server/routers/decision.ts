@@ -321,6 +321,11 @@ export const decisionRouter = router({
           ...(submissionId && { submissionId }),
         },
         include: {
+          decision: {
+            select: {
+              id: true,
+            },
+          },
           submission: {
             select: {
               id: true,
@@ -358,6 +363,7 @@ export const decisionRouter = router({
 
       return assignments.map((assignment) => ({
         id: assignment.id,
+        isReviewed: !!assignment.decision,
         submissionId: assignment.submissionId,
         submissionTitle: assignment.submission.title,
         submissionPrimaryArea: assignment.submission.primaryArea,
@@ -385,7 +391,7 @@ export const decisionRouter = router({
           chairReviewer: {
             userId: ctx.session.user.id,
             conferenceId,
-            role: "MAIN_CHAIR",
+            role: { in: ["MAIN_CHAIR", "CHAIR"] },
           },
           submission: { conferenceId },
         },
@@ -624,27 +630,16 @@ export const decisionRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const { assignmentId, conferenceId } = input;
-
-      // Get the user's role in the conference
-      const userRole = await ctx.prisma.conferenceRoleEntries.findFirst({
-        where: {
-          userId: ctx.session.user.id,
-          conferenceId,
-          role: { in: ["CHAIR", "MAIN_CHAIR"] },
-        },
-      });
-
-      if (!userRole) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You must be a chair to access decision assignments",
-        });
-      }
+      const { assignmentId } = input;
 
       const assignment = await ctx.prisma.decisionAssignment.findUnique({
         where: { id: assignmentId },
         include: {
+          decision: {
+            select: {
+              id: true,
+            },
+          },
           submission: {
             select: {
               id: true,
@@ -702,19 +697,19 @@ export const decisionRouter = router({
       // Additional authorization: check if the user is either the assigned chair or a main chair
       const isAssignedChair =
         assignment.chairReviewer.user.id === ctx.session.user.id;
-      const isMainChair = userRole.role === "MAIN_CHAIR";
 
-      if (!isAssignedChair && !isMainChair) {
+      if (!isAssignedChair) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message:
-            "You can only access decision assignments that are assigned to you or if you are the main chair",
+            "You can only access decision assignments that are assigned to you",
         });
       }
 
       return {
         id: assignment.id,
         submission: assignment.submission,
+        isReviewed: !!assignment.decision,
         chairReviewer: {
           id: assignment.chairReviewer.user.id,
           name: `${assignment.chairReviewer.user.firstName} ${assignment.chairReviewer.user.lastName}`,

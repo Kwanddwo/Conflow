@@ -96,7 +96,7 @@ async function main() {
       affiliation: "Tech Corp",
       country: "gb",
       role: UserRole.USER,
-      isVerified: false, // Unverified user
+      isVerified: true,
     },
   });
 

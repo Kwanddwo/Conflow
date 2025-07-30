@@ -22,13 +22,13 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
 
-  const { status } = useSession();
+  const { status, data: session } = useSession();
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "authenticated" && session && session.user.isVerified) {
       router.push("/dashboard");
     }
-  }, [status, router]);
+  }, [session, status, router]);
 
   const {
     register,

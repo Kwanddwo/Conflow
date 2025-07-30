@@ -12,7 +12,6 @@ import React from "react";
 import NewDecisionModal from "./NewDecisionModal";
 import ReviewListForChair from "@/components/ReviewListForChair";
 
-
 export default function DecisionModal() {
   const { conferenceId, assignmentId } = useParams<{
     conferenceId: string;
@@ -70,19 +69,21 @@ export default function DecisionModal() {
       {/* Submission Details */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-foreground">
-          Submission to Review
+          Submission{" "}
+          <span className="text-muted-foreground">
+            {assignment.submission.id}
+          </span>
         </h2>
         <SubmissionOverview submission={assignment?.submission as never} />
       </div>
 
       {/* Other Reviews - Only show for chairs */}
-        <div className="space-y-4">
-          <ReviewListForChair
-            conferenceId={conferenceId}
-            submissionId={assignment.submission.id}
-          />
-        </div>
-
+      <div className="space-y-4">
+        <ReviewListForChair
+          conferenceId={conferenceId}
+          submissionId={assignment.submission.id}
+        />
+      </div>
 
       {/* Make Decision Button */}
       <div className="flex justify-center pt-6">

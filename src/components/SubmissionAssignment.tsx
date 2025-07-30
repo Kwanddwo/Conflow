@@ -157,7 +157,7 @@ function SubmissionAssignment({
         keywords: "", // This will be handled differently
         abstract: "", // This will be handled differently
         submitted: new Date(assignment.createdAt).toLocaleDateString(),
-        isReviewed: false, // Todo: get this from the backend
+        isReviewed: assignment.isReviewed, // Todo: get this from the backend
         assignmentId: assignment.id, // Add this for deletion
         dueDate: new Date(assignment.dueDate).toLocaleDateString("en-US", {
           year: "numeric",
@@ -278,7 +278,7 @@ function SubmissionAssignment({
                           </span>
                           {submission.isReviewed && (
                             <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/80">
-                              Reviewed
+                              {isReviewAssignment ? "Reviewed" : "Made"}
                             </Badge>
                           )}
                           <X

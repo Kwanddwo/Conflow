@@ -49,6 +49,11 @@ export default function ConferenceDashboard() {
   const { data: submissions, isLoading } = useProtectedQuery(query);
   const [allParticipants, setAllParticipants] = useState<Participant[]>();
   const { data: session } = useSession();
+  const isChair = conference?.conferenceRoles?.some(
+    (role) =>
+      (role.role === "CHAIR" || role.role === "MAIN_CHAIR") &&
+      role.user.id === session?.user.id
+  );
   const isMainChair = conference?.conferenceRoles?.some(
     (role) => role.role === "MAIN_CHAIR" && role.user.id === session?.user.id
   );
@@ -85,7 +90,6 @@ export default function ConferenceDashboard() {
   if (isLoading || !submissions || isLoadingInvitees) {
     return <LoadingSpinner />;
   }
-  
 
   const availableSubmissions = submissions.map((sub) => ({
     id: sub.id,
@@ -101,7 +105,7 @@ export default function ConferenceDashboard() {
             {conference?.acronym} - {conference?.title}
           </h1>
           <div className="flex gap-2">
-            {isMainChair && (
+            {isChair && (
               <Button
                 asChild
                 variant="outline"

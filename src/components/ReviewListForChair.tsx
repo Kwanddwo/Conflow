@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/server/client";
-import { FileText, Star, ThumbsDown, ThumbsUp, User } from "lucide-react";
+import { FileText, ThumbsDown, ThumbsUp, User } from "lucide-react";
 
 interface ReviewListForChairProps {
   conferenceId: string;
@@ -53,17 +53,6 @@ const getRecommendationBadge = (recommendation: string) => {
   }
 };
 
-const getScoreStars = (score: number) => {
-  return Array.from({ length: 5 }, (_, i) => (
-    <Star
-      key={i}
-      className={`w-4 h-4 ${
-        i < score ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-      }`}
-    />
-  ));
-};
-
 const formatDate = (date: Date | string) => {
   const d = new Date(date);
   return d.toLocaleDateString("en-US", {
@@ -94,7 +83,7 @@ export default function ReviewListForChair({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <User className="w-5 h-5" />
-            Other Reviews
+            Reviews
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -112,7 +101,7 @@ export default function ReviewListForChair({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <User className="w-5 h-5" />
-            Other Reviews
+            Reviews
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -130,7 +119,7 @@ export default function ReviewListForChair({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <User className="w-5 h-5" />
-            Other Reviews
+            Reviews
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -147,14 +136,14 @@ export default function ReviewListForChair({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-foreground">
           <User className="w-5 h-5 text-primary" />
-          Other Reviews ({reviews.length})
+          Reviews ({reviews.length})
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           Reviews from other reviewers for this submission. This information
           helps you make informed decisions.
         </p>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="px-4">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -189,9 +178,8 @@ export default function ReviewListForChair({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      {getScoreStars(review.overallScore)}
                       <span className="text-sm text-muted-foreground ml-1">
-                        ({review.overallScore}/5)
+                        {review.overallScore} / 10
                       </span>
                     </div>
                   </TableCell>

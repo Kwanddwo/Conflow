@@ -14,7 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Activity, AlertCircle, ExternalLink, FileText, GitBranch } from "lucide-react";
+import {
+  Activity,
+  AlertCircle,
+  ExternalLink,
+  FileText,
+  GitBranch,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useProtectedQuery } from "@/hooks/useProtectedQuery";
@@ -27,7 +33,7 @@ interface DecisionAssignment {
     primaryArea: string;
   };
   isReviewed: boolean;
-  decisionId : string | null;
+  decisionId: string | null;
   assignedByName: string;
 }
 
@@ -164,7 +170,7 @@ export default function YourDecisionsPage() {
                                   : "bg-yellow-100 text-yellow-800 border-yellow-300"
                               }`}
                             >
-                              {decision.isReviewed ? "Reviewed" : "Not Reviewed"}
+                              {decision.isReviewed ? "Made" : "Not Made"}
                             </Badge>
                           </Link>
                         </TableCell>
