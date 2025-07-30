@@ -3,6 +3,7 @@ import {
   UserRole,
   ConferenceStatus,
   RecStatus,
+  DecStatus,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -29,6 +30,8 @@ async function main() {
 
   // Clear existing data (optional - remove if you want to keep existing data)
   console.log("🗑️  Clearing existing data...");
+  await prisma.decision.deleteMany();
+  await prisma.decisionAssignment.deleteMany();
   await prisma.review.deleteMany();
   await prisma.reviewAssignment.deleteMany();
   await prisma.notification.deleteMany();
@@ -1284,6 +1287,182 @@ async function main() {
 
   console.log(`✅ Created ${reviews.length} reviews`);
 
+  // Create decision assignments
+  console.log("⚖️ Creating decision assignments...");
+
+  // Get chair roles that can make decisions
+  const johnMainChairRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: johnUser.id,
+      conferenceId: conference1.id,
+      role: "MAIN_CHAIR",
+    },
+  });
+
+  const janeMainChairRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: janeUser.id,
+      conferenceId: conference2.id,
+      role: "MAIN_CHAIR",
+    },
+  });
+
+  const aliceMainChairRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: aliceUser.id,
+      conferenceId: conference3.id,
+      role: "MAIN_CHAIR",
+    },
+  });
+
+  const testMainChairRole = await prisma.conferenceRoleEntries.findFirst({
+    where: {
+      userId: testUser.id,
+      conferenceId: conference5.id,
+      role: "MAIN_CHAIR",
+    },
+  });
+
+  const decisionAssignments: {
+    submissionId: string;
+    dueDate: Date;
+    chairRoleId: string;
+    assignedByRoleId: string;
+  }[] = [];
+
+  // Create decision assignments for submissions that have been reviewed or are ready for decision
+  if (johnMainChairRole) {
+    // For submission1 (UNDER_REVIEW) - assign to Main Chair
+    decisionAssignments.push({
+      submissionId: submission1.id,
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      chairRoleId: johnMainChairRole.id,
+      assignedByRoleId: johnMainChairRole.id, // Self-assigned as Main Chair
+    });
+
+    // For submission5 (REFUSED) - historical decision assignment
+    decisionAssignments.push({
+      submissionId: submission5.id,
+      dueDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago (completed)
+      chairRoleId: johnMainChairRole.id,
+      assignedByRoleId: johnMainChairRole.id,
+    });
+  }
+
+  if (janeMainChairRole) {
+    // For submission2 (ACCEPTED) - historical decision assignment
+    decisionAssignments.push({
+      submissionId: submission2.id,
+      dueDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago (completed)
+      chairRoleId: janeMainChairRole.id,
+      assignedByRoleId: janeMainChairRole.id,
+    });
+
+    // For submission6 (ACCEPTED) - historical decision assignment
+    decisionAssignments.push({
+      submissionId: submission6.id,
+      dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago (completed)
+      chairRoleId: janeMainChairRole.id,
+      assignedByRoleId: janeMainChairRole.id,
+    });
+  }
+
+  if (aliceMainChairRole) {
+    // For submission3 (DRAFT) - future decision assignment (when ready)
+    decisionAssignments.push({
+      submissionId: submission3.id,
+      dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 21 days from now
+      chairRoleId: aliceMainChairRole.id,
+      assignedByRoleId: aliceMainChairRole.id,
+    });
+  }
+
+  if (testMainChairRole) {
+    // For submission4 (REVISION) - historical decision assignment
+    decisionAssignments.push({
+      submissionId: submission4.id,
+      dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago (completed)
+      chairRoleId: testMainChairRole.id,
+      assignedByRoleId: testMainChairRole.id,
+    });
+  }
+
+  // Create the decision assignments
+  type CreatedDecisionAssignment = {
+    id: string;
+    submissionId: string;
+    dueDate: Date;
+    chairRoleId: string;
+    assignedByRoleId: string;
+    createdAt: Date;
+  };
+
+  const createdDecisionAssignments: CreatedDecisionAssignment[] = [];
+  for (const assignment of decisionAssignments) {
+    const created = await prisma.decisionAssignment.create({
+      data: assignment,
+    });
+    createdDecisionAssignments.push(created);
+  }
+
+  console.log(
+    `✅ Created ${createdDecisionAssignments.length} decision assignments`
+  );
+
+  // Create decisions for completed assignments
+  console.log("📋 Creating decisions...");
+
+  const decisions: {
+    submissionId: string;
+    assignmentId: string;
+    reviewDecision: DecStatus;
+  }[] = [];
+
+  // Find decision assignments that should have decisions (historical ones)
+  const completedDecisionAssignments = createdDecisionAssignments.filter(
+    (assignment) => assignment.dueDate < new Date()
+  );
+
+  for (const assignment of completedDecisionAssignments) {
+    let decision: DecStatus;
+
+    // Match decisions to submission status
+    if (
+      assignment.submissionId === submission2.id ||
+      assignment.submissionId === submission6.id
+    ) {
+      decision = "ACCEPT"; // These are ACCEPTED submissions
+    } else if (assignment.submissionId === submission4.id) {
+      decision = "MAJOR_REVISION"; // This is REVISION submission
+    } else if (assignment.submissionId === submission5.id) {
+      decision = "REJECT"; // This is REFUSED submission
+    } else {
+      // Default random decision for others
+      const randomDecisions: DecStatus[] = [
+        "ACCEPT",
+        "MAJOR_REVISION",
+        "MINOR_REVISION",
+        "REJECT",
+      ];
+      decision = randomDecisions[Math.floor(Math.random() * 4)];
+    }
+
+    decisions.push({
+      submissionId: assignment.submissionId,
+      assignmentId: assignment.id,
+      reviewDecision: decision,
+    });
+  }
+
+  // Create the decisions
+  for (const decision of decisions) {
+    await prisma.decision.create({
+      data: decision,
+    });
+  }
+
+  console.log(`✅ Created ${decisions.length} decisions`);
+
   // Create notifications (existing + conference-related)
   console.log("🔔 Creating notifications...");
 
@@ -1476,6 +1655,8 @@ async function main() {
   const roleEntriesCount = await prisma.conferenceRoleEntries.count();
   const reviewAssignmentCount = await prisma.reviewAssignment.count();
   const reviewCount = await prisma.review.count();
+  const decisionAssignmentCount = await prisma.decisionAssignment.count();
+  const decisionCount = await prisma.decision.count();
   const notificationCount = await prisma.notification.count();
   const unreadCount = await prisma.notification.count({
     where: { isRead: false, isDeleted: false },
@@ -1519,6 +1700,8 @@ async function main() {
   console.log(`👥 Total Authors: ${authorCount}`);
   console.log(`📋 Review Assignments: ${reviewAssignmentCount}`);
   console.log(`📝 Reviews: ${reviewCount}`);
+  console.log(`⚖️ Decision Assignments: ${decisionAssignmentCount}`);
+  console.log(`📋 Decisions: ${decisionCount}`);
   console.log(`🎭 Conference Roles: ${roleEntriesCount}`);
   console.log(`  🎯 Main Chairs: ${mainChairRoles}`);
   console.log(`  🪑 Chairs: ${chairRoles}`);
