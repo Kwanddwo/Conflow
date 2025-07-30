@@ -43,7 +43,7 @@ export default function LandingPage() {
 
       <div className="mt-12 sm:mt-16 md:mt-20" />
 
-      <footer className="flex flex-col justify-between gap-4 py-6 border-border border-t bg-card">
+      <footer className="mt-auto flex flex-col justify-between gap-4 py-6 border-border border-t bg-card">
         <div className="flex flex-col lg:flex-row justify-between gap-6 lg:gap-4 px-4 sm:px-6">
           <div className="text-center lg:text-left">
             <Logo height={32} width={110} link="/" />
@@ -54,37 +54,8 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 lg:gap-3 text-center sm:text-left">
             <div className="min-w-36">
-              <p className="font-semibold text-foreground mb-3">Learn</p>
-              <ul className="flex flex-col gap-2">
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Guides
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Tutorials
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="min-w-36">
               <p className="font-semibold text-foreground mb-3">Resources</p>
               <ul className="flex flex-col gap-2">
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Documentation
-                  </Link>
-                </li>
                 <li>
                   <Link
                     href="#"
@@ -112,8 +83,7 @@ export default function LandingPage() {
         </div>
         <div className="flex justify-center items-center p-4 border-t border-border">
           <p className="text-muted-foreground text-center text-sm">
-            © 2025 chairio. Built with ❤️ by Marouane Lemghari & Aymane
-            Derrouich.
+            Built with ❤️ by Marouane Lemghari & Aymane Derrouich.
           </p>
         </div>
       </footer>
