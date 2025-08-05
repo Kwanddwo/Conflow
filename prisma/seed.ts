@@ -758,7 +758,6 @@ async function main() {
       primaryArea: "Natural Language Processing",
       secondaryArea: "Language Models",
       submittedById: johnUser.id,
-      status: "UNDER_REVIEW",
       conferenceId: conference1.id,
     },
   });
@@ -819,7 +818,6 @@ async function main() {
       primaryArea: "Cybersecurity",
       secondaryArea: "Threat Intelligence",
       submittedById: janeUser.id,
-      status: "ACCEPTED",
       conferenceId: conference2.id,
     },
   });
@@ -869,7 +867,6 @@ async function main() {
       primaryArea: "Medical AI",
       secondaryArea: "Diagnostic AI",
       submittedById: aliceUser.id,
-      status: "DRAFT",
       conferenceId: conference3.id,
     },
   });
@@ -929,7 +926,6 @@ async function main() {
       primaryArea: "Sustainable Computing",
       secondaryArea: "Energy-Efficient Algorithms",
       submittedById: testUser.id,
-      status: "REVISION",
       conferenceId: conference5.id,
     },
   });
@@ -979,7 +975,6 @@ async function main() {
       primaryArea: "Machine Learning",
       secondaryArea: "Deep Learning",
       submittedById: charlieUser.id,
-      status: "REFUSED",
       conferenceId: conference1.id,
     },
   });
@@ -1039,7 +1034,6 @@ async function main() {
       primaryArea: "Data Privacy",
       secondaryArea: "Privacy by Design",
       submittedById: bobUser.id,
-      status: "ACCEPTED",
       conferenceId: conference2.id,
     },
   });
