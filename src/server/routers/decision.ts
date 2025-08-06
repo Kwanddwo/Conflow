@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { mainChairProcedure, chairProcedure, router } from "../trpc";
 import z from "zod";
+import { sendNotification } from "@/lib/notification";
 
 export const decisionRouter = router({
   createDecisionAssignment: mainChairProcedure
@@ -465,15 +466,28 @@ export const decisionRouter = router({
       const assignment = await ctx.prisma.decisionAssignment.findUnique({
         where: { id: assignmentId },
         include: {
-          chairReviewer: {
-            select: {
-              userId: true,
-            },
-          },
           submission: {
             select: {
               id: true,
               title: true,
+              submissionAuthors: {
+                where: {
+                  isCorresponding: true,
+                },
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      email: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          chairReviewer: {
+            select: {
+              userId: true,
             },
           },
           decision: {
@@ -507,6 +521,19 @@ export const decisionRouter = router({
           reviewDecision,
         },
       });
+
+      const emailPromises: Promise<any>[] = [];
+      assignment.submission.submissionAuthors.forEach((author) => {
+        if (!author.user) return;
+        emailPromises.push(
+          sendNotification(
+            author.user,
+            "One of your submissions has been given a decision",
+            `Your submission titled "${assignment.submission.title}" (${assignment.submission.id}) has been given a final decision.`
+          )
+        );
+      });
+      await Promise.allSettled(emailPromises);
 
       return {
         success: true,
@@ -592,7 +619,6 @@ export const decisionRouter = router({
               paperFileName: true,
               primaryArea: true,
               secondaryArea: true,
-              status: true,
               createdAt: true,
               updatedAt: true,
               submissionAuthors: {
