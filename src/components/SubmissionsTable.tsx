@@ -27,9 +27,14 @@ import { Pencil, Check, X, Upload, User } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import React from "react";
 import { getName } from "country-list";
+import { Badge } from "./ui/badge";
 
 // Define the type for submission with authors
 type SubmissionWithAuthors = Submission & {
+  decision: {
+    reviewDecision: string;
+  };
+} & {
   submissionAuthors: {
     id: string;
     firstName: string;
@@ -175,6 +180,11 @@ export default function SubmissionsTable({
                       <span className="text-muted-foreground">
                         {submission.id}
                       </span>
+                      {submission.decision && (
+                        <Badge className="ml-2">
+                          {submission.decision.reviewDecision}
+                        </Badge>
+                      )}
                     </h3>
                     <div className="flex gap-2">
                       {isEditing ? (
