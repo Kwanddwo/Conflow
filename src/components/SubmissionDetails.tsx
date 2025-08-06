@@ -54,8 +54,8 @@ export function SubmissionDetails({
   };
 
   return (
-    <Card className={`border-2 border-border/60 ${className}`}>
-      <CardContent className="p-6">
+    <Card className={`border-2 border-border/60 py-0 ${className}`}>
+      <CardContent className="py-4 px-6">
         <Table>
           <TableBody>
             <TableRow>

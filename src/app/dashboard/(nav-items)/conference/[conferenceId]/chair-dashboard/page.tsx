@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import SubmissionAssignment from "@/components/SubmissionAssignment";
 import { useSession } from "next-auth/react";
 import { FileCheck } from "lucide-react";
+import { SubmissionOverview } from "@/components/SubmissionOverview";
 interface Participant {
   role: string;
   id: string;
@@ -216,94 +217,11 @@ export default function ConferenceDashboard() {
           </CardHeader>
           {submissions.map((submission, index) => (
             <CardContent key={index}>
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-foreground">
-                  Submission{" "}
-                  <span className="text-muted-foreground">{submission.id}</span>
-                </h3>
-                <div className="grid grid-cols-1 gap-0 border border-border rounded-lg overflow-hidden">
-                  <div className="grid grid-cols-4 min-h-[60px]">
-                    <div className="bg-muted p-4 border-r border-border flex items-center">
-                      <span className="font-medium text-foreground">Title</span>
-                    </div>
-                    <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-foreground">
-                        {submission.title}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
-                    <div className="bg-muted p-4 border-r border-border flex items-center">
-                      <span className="font-medium text-foreground">Paper</span>
-                    </div>
-                    <div className="col-span-3 p-4 flex items-center">
-                      <Link
-                        href={submission.paperFilePath}
-                        className="text-primary hover:text-primary/80 no-underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {submission.paperFileName}
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
-                    <div className="bg-muted p-4 border-r border-border flex items-center">
-                      <span className="font-medium text-foreground">
-                        Area/Track
-                      </span>
-                    </div>
-                    <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-foreground">
-                        {submission.secondaryArea}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
-                    <div className="bg-muted p-4 border-r border-border flex items-center">
-                      <span className="font-medium text-foreground">
-                        Keywords
-                      </span>
-                    </div>
-                    <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-foreground">
-                        {submission.keywords}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 border-t border-border">
-                    <div className="bg-muted p-4 border-r border-border flex items-start pt-4">
-                      <span className="font-medium text-foreground">
-                        Abstract
-                      </span>
-                    </div>
-                    <div className="col-span-3 p-4">
-                      <p className="text-foreground leading-relaxed">
-                        {submission.abstract}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
-                    <div className="bg-muted p-4 border-r border-border flex items-center">
-                      <span className="font-medium text-foreground">
-                        Submitted
-                      </span>
-                    </div>
-                    <div className="col-span-3 p-4 flex items-center">
-                      <span className="text-foreground">
-                        {new Date(submission.createdAt).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <SubmissionOverview
+                isTitle={true}
+                submission={submission}
+                authorsTitle={null}
+              />
             </CardContent>
           ))}
         </Card>

@@ -14,7 +14,7 @@ interface Author {
 
 interface SubmissionAuthorsListProps {
   authors: Author[];
-  title?: string;
+  title?: string | null;
   className?: string;
   showCorrespondingColumn?: boolean;
 }
@@ -27,7 +27,9 @@ export function SubmissionAuthorsList({
 }: SubmissionAuthorsListProps) {
   return (
     <div className={className}>
-      <h2 className="text-xl font-semibold text-foreground mb-4">{title}</h2>
+      {title && (
+        <h2 className="text-xl font-semibold text-foreground mb-4">{title}</h2>
+      )}
       <Card className="py-0 border-2 border-border/60">
         <CardContent className="p-0">
           <div className="overflow-x-auto">

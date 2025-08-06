@@ -84,7 +84,6 @@ export const submissionRouter = router({
           paperFilePath: true,
           paperFileName: true,
           updatedAt: true,
-          status: true,
           submissionAuthors: {
             select: {
               id: true,
@@ -99,6 +98,7 @@ export const submissionRouter = router({
               createdAt: "asc",
             },
           },
+          decision: true,
           conference: {
             select: {
               id: true,

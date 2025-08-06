@@ -28,9 +28,10 @@ interface Submission {
 interface SubmissionOverviewProps {
   submission: Submission;
   showPaperLink?: boolean;
-  authorsTitle?: string;
+  authorsTitle?: string | null;
   showCorrespondingColumn?: boolean;
   className?: string;
+  isTitle?: boolean;
 }
 
 export function SubmissionOverview({
@@ -39,10 +40,18 @@ export function SubmissionOverview({
   authorsTitle = "Authors",
   showCorrespondingColumn = true,
   className = "",
+  isTitle = false,
 }: SubmissionOverviewProps) {
   return (
     <div className={`space-y-8 ${className}`}>
       {/* Paper Details */}
+      {isTitle && (
+        <h3 className="text-md font-semibold mb-4">
+          Submission{" "}
+          <span className="text-muted-foreground">{submission.id}</span>
+        </h3>
+      )}
+
       <SubmissionDetails
         submission={submission}
         showPaperLink={showPaperLink}
