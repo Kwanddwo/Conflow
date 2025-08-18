@@ -231,6 +231,8 @@ export const reviewRouter = router({
               keywords: true,
               paperFilePath: true,
               paperFileName: true,
+              cameraReadyFilepath: true,
+              cameraReadyFilename: true,
               submissionAuthors: {
                 select: {
                   firstName: true,
@@ -294,6 +296,8 @@ export const reviewRouter = router({
               keywords: true,
               paperFilePath: true,
               paperFileName: true,
+              cameraReadyFilepath: true,
+              cameraReadyFilename: true,
               submissionAuthors: {
                 select: {
                   firstName: true,
@@ -554,9 +558,10 @@ export const reviewRouter = router({
               keywords: true,
               paperFilePath: true,
               paperFileName: true,
+              cameraReadyFilepath: true,
+              cameraReadyFilename: true,
               primaryArea: true,
               secondaryArea: true,
-              status: true,
               createdAt: true,
               updatedAt: true,
               submissionAuthors: {

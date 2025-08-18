@@ -27,10 +27,16 @@ import { Pencil, Check, X, Upload, User } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import React from "react";
 import { getName } from "country-list";
-import { Badge } from "./ui/badge";
+import RecommendationBadge from "./RecommendationBadge";
 
 // Define the type for submission with authors
 type SubmissionWithAuthors = Submission & {
+  conference: {
+    submissionDeadline: Date;
+    cameraReadyDeadline: Date;
+    id: string;
+  };
+} & {
   decision: {
     reviewDecision: string;
   };
@@ -82,6 +88,15 @@ export default function SubmissionsTable({
     },
     onError: (error) => {
       toast.error(`Failed to update submission: ${error.message}`);
+    },
+  });
+  const updateCameraReady = trpc.submission.updateCameraReady.useMutation({
+    onSuccess: () => {
+      toast.success("Camera Ready updated successfully");
+      utils.submission.getConferenceSubmissionsByAuthor.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to update Camera Ready: ${error.message}`);
     },
   });
 
@@ -181,9 +196,11 @@ export default function SubmissionsTable({
                         {submission.id}
                       </span>
                       {submission.decision && (
-                        <Badge className="ml-2">
-                          {submission.decision.reviewDecision}
-                        </Badge>
+                        <span className="ml-4">
+                          <RecommendationBadge
+                            recommendation={submission.decision.reviewDecision}
+                          />
+                        </span>
                       )}
                     </h3>
                     <div className="flex gap-2">
@@ -245,6 +262,82 @@ export default function SubmissionsTable({
                         )}
                       </div>
                     </div>
+
+                    {/* Camera Ready Paper Row */}
+                    {new Date() >
+                      new Date(submission.conference.submissionDeadline) && (
+                      <div className="grid grid-cols-4 min-h-[60px] border-t border-border">
+                        <div className="bg-muted p-4 border-r border-border flex items-center">
+                          <span className="font-medium text-foreground">
+                            Camera Ready Paper
+                          </span>
+                        </div>
+                        <div className="col-span-3 p-4">
+                          <div className="flex gap-8">
+                            <div className="flex items-center">
+                              {submission.cameraReadyFilepath ? (
+                                <div>
+                                  <Link
+                                    href={submission.cameraReadyFilepath}
+                                    className="text-primary hover:text-primary/80 underline"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {submission.cameraReadyFilename}
+                                  </Link>
+                                  <span className="text-muted-foreground ml-2">
+                                    [
+                                    {new Date(
+                                      submission.updatedAt
+                                    ).toLocaleDateString("fr-FR", {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                    })}
+                                    ]
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  No Camera Ready uploaded
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Upload button */}
+                            <div className="flex items-center gap-2">
+                              <Upload className="h-4 w-4 text-muted-foreground" />
+                              <UploadButton
+                                endpoint="mediaUploader"
+                                onUploadBegin={() => {
+                                  // Optional: Add uploading state if needed
+                                }}
+                                onClientUploadComplete={(res) => {
+                                  if (res && res[0]) {
+                                    updateCameraReady.mutate({
+                                      conferenceId: submission.conference.id,
+                                      submissionId: submission.id,
+                                      cameraReadyFilepath: res[0].ufsUrl, // Use ufsUrl instead of url
+                                      cameraReadyFilename: res[0].name,
+                                    });
+                                  }
+                                }}
+                                content={{
+                                  button: "Browse",
+                                  allowedContent: "PDF files only",
+                                }}
+                                appearance={{
+                                  button:
+                                    "bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md font-medium",
+                                  allowedContent:
+                                    "text-muted-foreground text-sm",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Paper Row */}
                     <div className="grid grid-cols-4 min-h-[60px] border-t border-border">

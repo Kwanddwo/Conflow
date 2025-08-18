@@ -72,6 +72,17 @@ export const userRouter = router({
     })
   ).query(async ({ input, ctx }) => {
     const { conferenceId } = input;
+    
+    // Get conference data
+    const conference = await ctx.prisma.conference.findUniqueOrThrow({
+      where: { id: conferenceId },
+      select: {
+        id: true,
+        title: true,
+        acronym: true,
+      },
+    });
+
     const usersWithRoles = await ctx.prisma.conferenceRoleEntries.findMany({
       where: { conferenceId },
       select: { userId: true },
@@ -113,6 +124,9 @@ export const userRouter = router({
       },
     });
 
-    return availableUsers;
+    return {
+      conference,
+      users: availableUsers,
+    };
   }),
 });

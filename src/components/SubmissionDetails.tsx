@@ -12,9 +12,15 @@ interface SubmissionDetailsProps {
     keywords: string[] | string | unknown;
     paperFilePath?: string | null;
     paperFileName?: string | null;
+    cameraReadyFilepath?: string | null;
+    cameraReadyFilename?: string | null;
     primaryArea: string;
     secondaryArea: string;
     createdAt: string | Date;
+    conference: {
+      id: string;
+      submissionDeadline: string;
+    };
   };
   showPaperLink?: boolean;
   className?: string;
@@ -66,6 +72,28 @@ export function SubmissionDetails({
                 {submission.title}
               </TableCell>
             </TableRow>
+
+            {showPaperLink &&
+              submission.cameraReadyFilepath &&
+              submission.cameraReadyFilename &&
+              new Date() >
+                new Date(submission.conference.submissionDeadline) && (
+                <TableRow>
+                  <TableCell className="font-bold text-foreground w-32">
+                    Camera Ready Paper
+                  </TableCell>
+                  <TableCell className="text-foreground">
+                    <Link
+                      href={submission.cameraReadyFilepath}
+                      className="text-primary hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {submission.cameraReadyFilename}
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              )}
 
             {showPaperLink &&
               submission.paperFilePath &&

@@ -26,6 +26,7 @@ interface ReviewAssignment {
     title: string;
     primaryArea: string;
   };
+  dueDate: string;
   isReviewed: boolean;
   reviewId: string | null;
   assignedByName: string;
@@ -111,6 +112,12 @@ export default function YourReviewsPage() {
                           <span>Title</span>
                         </div>
                       </TableHead>
+                      <TableHead className="text-sm font-semibold h-12 px-4 w-[40%]">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-muted-foreground" />
+                          <span>Due Date</span>
+                        </div>
+                      </TableHead>
                       <TableHead className="text-sm font-semibold h-12 px-4 w-[15%]">
                         <div className="flex items-center gap-2">
                           <Activity className="w-4 h-4 text-muted-foreground" />
@@ -147,6 +154,11 @@ export default function YourReviewsPage() {
                               )}
                             </p>
                           </Link>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 text-sm text-muted-foreground group-hover:text-foreground transition-colors align-top max-w-0">
+                          <p className="font-medium text-foreground mb-1 leading-relaxed break-words overflow-wrap-anywhere">
+                            {new Date(review.dueDate).toLocaleDateString()}
+                          </p>
                         </TableCell>
                         <TableCell className="px-4 py-4 align-top">
                           <Link

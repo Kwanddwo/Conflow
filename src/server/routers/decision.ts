@@ -407,6 +407,8 @@ export const decisionRouter = router({
               keywords: true,
               paperFilePath: true,
               paperFileName: true,
+              cameraReadyFilepath: true,
+              cameraReadyFilename: true,
               submissionAuthors: {
                 select: {
                   firstName: true,
@@ -470,6 +472,12 @@ export const decisionRouter = router({
             select: {
               id: true,
               title: true,
+              conference: {
+                select: {
+                  id: true,
+                  submissionDeadline: true,
+                },
+              },
               submissionAuthors: {
                 where: {
                   isCorresponding: true,
@@ -514,6 +522,16 @@ export const decisionRouter = router({
         );
       }
 
+      if (
+        new Date() >
+          new Date(assignment.submission.conference.submissionDeadline) &&
+        (reviewDecision == "MAJOR_REVISION" ||
+          reviewDecision == "MINOR_REVISION")
+      ) {
+        throw new Error(
+          "Cannot mark paper for revision after submission deadline. Please accept / refuse the paper, Or change the submission deadline."
+        );
+      }
       const decision = await ctx.prisma.decision.create({
         data: {
           assignmentId,
@@ -617,10 +635,18 @@ export const decisionRouter = router({
               keywords: true,
               paperFilePath: true,
               paperFileName: true,
+              cameraReadyFilepath: true,
+              cameraReadyFilename: true,
               primaryArea: true,
               secondaryArea: true,
               createdAt: true,
               updatedAt: true,
+              conference: {
+                select: {
+                  id: true,
+                  submissionDeadline: true,
+                },
+              },
               submissionAuthors: {
                 select: {
                   id: true,
@@ -676,7 +702,12 @@ export const decisionRouter = router({
               keywords: true,
               paperFilePath: true,
               paperFileName: true,
+              cameraReadyFilepath: true,
+              cameraReadyFilename: true,
               createdAt: true,
+              conference: {
+                select: { id: true, submissionDeadline: true },
+              },
               submissionAuthors: {
                 select: {
                   firstName: true,

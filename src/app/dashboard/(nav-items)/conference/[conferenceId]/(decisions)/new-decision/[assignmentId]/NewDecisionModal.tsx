@@ -25,10 +25,10 @@ import React, { useState } from "react";
 function NewDecisionModal({
   open,
   setOpen,
-  conferenceId,
+  conference,
   assignmentId,
 }: {
-  conferenceId: string;
+  conference: { id: string; submissionDeadline: string };
   assignmentId: string;
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -38,6 +38,7 @@ function NewDecisionModal({
     "ACCEPT" | "MAJOR_REVISION" | "MINOR_REVISION" | "REJECT"
   >("ACCEPT");
 
+  const conferenceId = conference.id;
   const handleDecisionChange = (value: string) => {
     setFinalDecision(
       value as "ACCEPT" | "MAJOR_REVISION" | "MINOR_REVISION" | "REJECT"
@@ -64,20 +65,27 @@ function NewDecisionModal({
     }
   };
 
-  const decisionOptions = [
-    { value: "ACCEPT", label: "Accept", color: "text-green-600" },
-    { value: "REJECT", label: "Reject", color: "text-red-600" },
-    {
-      value: "MINOR_REVISION",
-      label: "Minor Revision",
-      color: "text-yellow-600",
-    },
-    {
-      value: "MAJOR_REVISION",
-      label: "Major Revision",
-      color: "text-orange-600",
-    },
-  ];
+  const decisionOptions =
+    new Date() > new Date(conference.submissionDeadline)
+      ? [
+          { value: "ACCEPT", label: "Accept", color: "text-green-600" },
+          { value: "REJECT", label: "Reject", color: "text-red-600" },
+        ]
+      : [
+          { value: "ACCEPT", label: "Accept", color: "text-green-600" },
+          { value: "REJECT", label: "Reject", color: "text-red-600" },
+          {
+            value: "MINOR_REVISION",
+            label: "Minor Revision",
+            color: "text-yellow-600",
+          },
+          {
+            value: "MAJOR_REVISION",
+            label: "Major Revision",
+            color: "text-orange-600",
+          },
+        ];
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md">

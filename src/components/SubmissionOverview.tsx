@@ -19,10 +19,16 @@ interface Submission {
   keywords: string | string[] | unknown; // Handle various JSON types from Prisma
   paperFilePath?: string | null;
   paperFileName?: string | null;
+  cameraReadyFilepath?: string | null;
+  cameraReadyFilename?: string | null;
   primaryArea: string;
   secondaryArea: string;
   createdAt: string | Date;
   submissionAuthors: Author[];
+  conference: {
+    id: string;
+    submissionDeadline: string;
+  };
 }
 
 interface SubmissionOverviewProps {

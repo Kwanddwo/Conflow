@@ -47,6 +47,7 @@ enum ConferenceStatus {
   PENDING
   APPROVED
   REJECTED
+  CAMERA_READY_PHASE
   COMPLETED
 }
 

@@ -18,7 +18,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -69,23 +69,25 @@ function PaperSubmission() {
 
   const { data: session } = useSession();
 
-  const canSubmit = (conference) =>
-    session?.user.role === "USER" &&
-    conference?.status === "APPROVED" &&
-    new Date() < new Date(conference?.submissionDeadline) &&
-    !conference?.conferenceRoles.some(
-      (role) => role.userId === session?.user.id
-    );
-
   const { data: conference } =
     trpc.conference.getConference.useQuery(conferenceId);
 
-  if (!canSubmit(conference)) {
-    toast.error(
-      "You cannot submit to this conference. Please check the conference status and deadlines."
-    );
-    router.push(`/dashboard/conference/${conferenceId}`);
-  }
+  useEffect(() => {
+    const canSubmit = (conference) =>
+      session?.user.role === "USER" &&
+      conference?.status === "APPROVED" &&
+      new Date() < new Date(conference?.submissionDeadline) &&
+      !conference?.conferenceRoles.some(
+        (role) => role.userId === session?.user.id
+      );
+
+    if (conference && !canSubmit(conference)) {
+      toast.error(
+        "You cannot submit to this conference. Please check the conference status and deadlines."
+      );
+      router.push(`/dashboard/conference/${conferenceId}`);
+    }
+  }, [conference, router, conferenceId, session]);
 
   const onSubmit = async (data: PaperSubmissionValues) => {
     try {

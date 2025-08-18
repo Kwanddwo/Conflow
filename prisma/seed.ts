@@ -751,9 +751,11 @@ async function main() {
         "attention mechanisms",
         "graph neural networks",
       ],
-      paperFilePath: "/uploads/submissions/paper_001.pdf",
+      paperFilePath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       paperFileName: "deep_learning_nlu.pdf",
-      cameraReadyFilepath: "/uploads/camera_ready/cr_001.pdf",
+      cameraReadyFilepath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       cameraReadyFilename: "deep_learning_nlu_camera_ready.pdf",
       primaryArea: "Natural Language Processing",
       secondaryArea: "Language Models",
@@ -811,7 +813,8 @@ async function main() {
         "threat detection",
         "cybersecurity",
       ],
-      paperFilePath: "/uploads/submissions/paper_002.pdf",
+      paperFilePath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       paperFileName: "zero_trust_cloud_security.pdf",
       cameraReadyFilepath: "",
       cameraReadyFilename: "",
@@ -860,7 +863,8 @@ async function main() {
         "medical imaging",
         "early detection",
       ],
-      paperFilePath: "/uploads/submissions/paper_003.pdf",
+      paperFilePath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       paperFileName: "ai_diagnostic_system.pdf",
       cameraReadyFilepath: "",
       cameraReadyFilename: "",
@@ -919,7 +923,8 @@ async function main() {
         "data processing",
         "sustainability",
       ],
-      paperFilePath: "/uploads/submissions/paper_004.pdf",
+      paperFilePath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       paperFileName: "energy_efficient_algorithms.pdf",
       cameraReadyFilepath: "",
       cameraReadyFilename: "",
@@ -968,7 +973,8 @@ async function main() {
         "optimization",
         "quantum advantage",
       ],
-      paperFilePath: "/uploads/submissions/paper_005.pdf",
+      paperFilePath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       paperFileName: "quantum_hybrid_networks.pdf",
       cameraReadyFilepath: "",
       cameraReadyFilename: "",
@@ -1027,9 +1033,11 @@ async function main() {
         "HIPAA compliance",
         "data protection",
       ],
-      paperFilePath: "/uploads/submissions/paper_006.pdf",
+      paperFilePath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       paperFileName: "privacy_ml_healthcare.pdf",
-      cameraReadyFilepath: "/uploads/camera_ready/cr_006.pdf",
+      cameraReadyFilepath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
       cameraReadyFilename: "privacy_ml_healthcare_camera_ready.pdf",
       primaryArea: "Data Privacy",
       secondaryArea: "Privacy by Design",

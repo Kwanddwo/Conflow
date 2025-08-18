@@ -12,7 +12,7 @@ import React from "react";
 import NewDecisionModal from "./NewDecisionModal";
 import ReviewListForChair from "@/components/ReviewListForChair";
 
-export default function DecisionModal() {
+export default function NewDecision() {
   const { conferenceId, assignmentId } = useParams<{
     conferenceId: string;
     assignmentId: string;
@@ -100,7 +100,7 @@ export default function DecisionModal() {
       <NewDecisionModal
         open={open}
         setOpen={setOpen}
-        conferenceId={conferenceId}
+        conference={assignment.submission.conference}
         assignmentId={assignmentId}
       />
     </div>

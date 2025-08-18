@@ -40,10 +40,13 @@ export default function NewParticipant() {
   const [selectedUser, setSelectedUser] = useState<ChosenUser | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const { conferenceId } = useParams<{ conferenceId: string }>();
-  const { data: users } = trpc.user.getParticipantUsers.useQuery({
+  const { data } = trpc.user.getParticipantUsers.useQuery({
     conferenceId,
   });
   const { data: session } = useSession();
+
+  const conference = data?.conference;
+  const users = data?.users;
 
   const {
     mutateAsync: sendInviteNotificationMutation,
@@ -85,7 +88,7 @@ export default function NewParticipant() {
           title: `Conference Invitation - ${
             selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
           } Role`,
-          message: `You have been invited to participate as a ${selectedRole} in our conference. Please review the invitation and respond accordingly.`,
+          message: `You have been invited to participate as a ${selectedRole} in ${conference?.title} (${conference?.acronym}). Please review the invitation and respond accordingly.`,
           conferenceId: conferenceId,
           role: selectedRole,
         });
@@ -102,18 +105,18 @@ export default function NewParticipant() {
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {
       case "reviewer":
-        return "bg-green-100 text-green-800 hover:bg-green-200";
+        return "bg-green-100 text-green-800 border-green-200";
       case "chair":
-        return "bg-purple-100 text-purple-800 hover:bg-purple-200";
+        return "bg-violet-100 text-violet-800 border-violet-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-muted-foreground border-border";
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="justify-start">
+        <Button variant="outline" className="justify-start">
           <Plus className="mr-2 h-4 w-4" />
           Add a New Participant
         </Button>
@@ -131,19 +134,19 @@ export default function NewParticipant() {
           <div className="space-y-2">
             <Label>Select User</Label>
             {selectedUser ? (
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-sm">
+                    <AvatarFallback className="text-sm bg-muted text-muted-foreground">
                       {selectedUser.firstName[0]}
                       {selectedUser.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium text-sm">
+                    <div className="font-medium text-foreground text-sm">
                       {selectedUser.firstName} {selectedUser.lastName}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground">
                       {selectedUser.email}
                     </div>
                   </div>
@@ -152,9 +155,9 @@ export default function NewParticipant() {
                   variant="ghost"
                   size="sm"
                   onClick={handleRemoveUser}
-                  className="h-6 w-6 p-0 hover:bg-red-100"
+                  className="h-6 w-6 p-0 hover:bg-destructive/10"
                 >
-                  <X className="h-4 w-4 text-red-500" />
+                  <X className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
             ) : (
@@ -170,7 +173,7 @@ export default function NewParticipant() {
                   />
                 </div>
 
-                <div className="max-h-40 overflow-y-auto border rounded-md">
+                <div className="max-h-40 overflow-y-auto border border-border rounded-md bg-background">
                   <div className="p-1">
                     {filteredUsers?.map((user) => (
                       <div
@@ -179,13 +182,13 @@ export default function NewParticipant() {
                         className="flex items-center gap-3 p-2 rounded-md hover:bg-accent cursor-pointer transition-colors"
                       >
                         <Avatar className="h-8 w-8">
-                          <AvatarFallback>
+                          <AvatarFallback className="bg-muted text-muted-foreground">
                             {user.firstName[0]}
                             {user.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm">
+                          <div className="font-medium text-foreground text-sm">
                             {user.firstName} {user.lastName}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">
@@ -227,7 +230,7 @@ export default function NewParticipant() {
                 </SelectItem>
                 <SelectItem value="chair">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-violet-500 rounded-full"></div>
                     Chair
                   </div>
                 </SelectItem>
@@ -238,7 +241,9 @@ export default function NewParticipant() {
           {/* Selected Role Badge */}
           {selectedRole && (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Selected role:</span>
+              <span className="text-sm text-muted-foreground">
+                Selected role:
+              </span>
               <Badge className={getRoleBadgeColor(selectedRole)}>
                 {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
               </Badge>
