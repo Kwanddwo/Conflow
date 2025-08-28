@@ -4,12 +4,7 @@ import { trpc } from "@/server/client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-
-const clearCooldownData = (email: string | null) => {
-  if (typeof window === "undefined") return;
-  const key = `email_cooldown_${email}`;
-  sessionStorage.removeItem(key);
-};
+import { clearCooldownData } from "@/lib/email-cooldown";
 function Page() {
   const params = useParams();
   const searchParams = useSearchParams();
