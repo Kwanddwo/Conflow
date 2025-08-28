@@ -49,6 +49,7 @@ type SubmissionWithAuthors = Submission & {
     country: string;
     affiliation: string;
     isCorresponding: boolean;
+    hasPaid: boolean;
   }[];
 };
 

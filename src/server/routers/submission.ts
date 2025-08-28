@@ -31,6 +31,10 @@ export interface SubmissionWithAuthors {
   cameraReadyFilepath: string;
   cameraReadyFilename: string;
   createdAt: Date;
+  conference: {
+    id: string;
+    submissionDeadline: Date;
+  };
   submissionAuthors: {
     id: string;
     firstName: string;
@@ -39,6 +43,7 @@ export interface SubmissionWithAuthors {
     country: string;
     affiliation: string;
     isCorresponding: boolean;
+    hasPaid: boolean;
   }[];
 }
 export const submissionRouter = router({
@@ -747,6 +752,7 @@ export const submissionRouter = router({
               country: true,
               affiliation: true,
               isCorresponding: true,
+              hasPaid: true,
             },
           },
         },
@@ -818,5 +824,106 @@ export const submissionRouter = router({
         reviewerName: `${review.assignment.reviewer.user.firstName} ${review.assignment.reviewer.user.lastName}`,
         reviewerEmail: review.assignment.reviewer.user.email,
       }));
+    }),
+
+  // Payment management endpoints
+  getAcceptedSubmissionsWithPaymentStatus: chairProcedure
+    .input(z.object({ conferenceId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { conferenceId } = input;
+
+      // Get accepted submissions based on decisions
+      const acceptedSubmissions = await ctx.prisma.submission.findMany({
+        where: {
+          conferenceId,
+          decision: {
+            reviewDecision: "ACCEPT",
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          submissionAuthors: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              affiliation: true,
+              hasPaid: true,
+              isCorresponding: true,
+            },
+          },
+        },
+        orderBy: { title: "asc" },
+      });
+
+      return acceptedSubmissions;
+    }),
+
+  updatePaymentStatus: chairProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+        authorId: z.string(),
+        hasPaid: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { conferenceId, authorId, hasPaid } = input;
+
+      // Verify the author belongs to a submission in this conference
+      const author = await ctx.prisma.submissionAuthor.findFirst({
+        where: {
+          id: authorId,
+          submission: {
+            conferenceId,
+          },
+        },
+        include: {
+          submission: {
+            select: {
+              title: true,
+              conference: {
+                select: {
+                  title: true,
+                  acronym: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!author) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Author not found or not part of this conference",
+        });
+      }
+
+      try {
+        const updatedAuthor = await ctx.prisma.submissionAuthor.update({
+          where: { id: authorId },
+          data: { hasPaid },
+        });
+
+        return {
+          success: true,
+          message: `Payment status updated successfully for ${author.firstName} ${author.lastName}`,
+          author: {
+            id: updatedAuthor.id,
+            firstName: author.firstName,
+            lastName: author.lastName,
+            hasPaid: updatedAuthor.hasPaid,
+          },
+        };
+      } catch (error) {
+        console.error("Error updating payment status:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update payment status",
+        });
+      }
     }),
 });

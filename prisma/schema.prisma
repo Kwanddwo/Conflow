@@ -124,6 +124,7 @@ model SubmissionAuthor {
   submission      Submission @relation(fields: [submissionId], references: [id])
   isCorresponding Boolean
   createdAt       DateTime   @default(now())
+  hasPaid         Boolean    @default(false)
 
   userId String?
   user   User?   @relation("AuthorUser", fields: [userId], references: [id])

@@ -24,6 +24,7 @@ import SubmissionAssignment from "@/components/SubmissionAssignment";
 import { useSession } from "next-auth/react";
 import { FileCheck } from "lucide-react";
 import { SubmissionOverview } from "@/components/SubmissionOverview";
+import PaymentTracking from "@/components/PaymentTracking";
 interface Participant {
   role: string;
   id: string;
@@ -96,6 +97,12 @@ export default function ConferenceDashboard() {
     id: sub.id,
     title: sub.title,
   }));
+
+  // Check if camera ready deadline has passed
+  const isCameraReadyDeadlinePassed = conference?.cameraReadyDeadline
+    ? new Date() > new Date(conference.cameraReadyDeadline)
+    : false;
+
   console.log("Available Submissions:", submissions);
   return (
     <div className="main-content-height bg-background">
@@ -193,6 +200,36 @@ export default function ConferenceDashboard() {
           </CardContent>
         </Card>
 
+        {/* Payment Tracking - Only show after camera ready deadline */}
+        {isChair && (
+          <div className="mb-8">
+            {isCameraReadyDeadlinePassed ? (
+              <PaymentTracking conferenceId={conferenceId} />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileCheck className="h-5 w-5" />
+                    Payment Tracking
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Payment tracking will be available after the camera-ready
+                    deadline (
+                    {conference?.cameraReadyDeadline
+                      ? new Date(
+                          conference.cameraReadyDeadline
+                        ).toLocaleDateString()
+                      : "not set"}
+                    ).
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
         {/* Chair-Submissions Assignments */}
         {isMainChair && (
           <SubmissionAssignment
@@ -208,6 +245,7 @@ export default function ConferenceDashboard() {
           conferenceId={conferenceId}
           availableSubmissions={availableSubmissions}
         />
+
         {/* Submissions */}
         <Card>
           <CardHeader>
