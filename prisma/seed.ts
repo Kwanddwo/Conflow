@@ -174,8 +174,9 @@ async function main() {
       endDate: new Date("2024-09-18"),
       abstractDeadline: new Date("2024-06-01"),
       submissionDeadline: new Date("2024-06-15"),
+      // Set camera ready deadline in the past to enable payment tracking
       cameraReadyDeadline: new Date("2024-07-30"),
-      status: ConferenceStatus.APPROVED,
+      status: ConferenceStatus.CAMERA_READY_PHASE, // Updated for payment tracking
       isPublic: true,
       researchAreas: {
         "Machine Learning": [
@@ -239,8 +240,9 @@ async function main() {
       endDate: new Date("2024-11-12"),
       abstractDeadline: new Date("2024-07-15"),
       submissionDeadline: new Date("2024-08-01"),
+      // Set camera ready deadline in the past to enable payment tracking
       cameraReadyDeadline: new Date("2024-09-15"),
-      status: ConferenceStatus.APPROVED,
+      status: ConferenceStatus.CAMERA_READY_PHASE, // Updated for payment tracking
       isPublic: true,
       researchAreas: {
         Cybersecurity: [
@@ -764,7 +766,7 @@ async function main() {
     },
   });
 
-  // Authors for submission 1 - mix of linked and non-linked users
+  // Authors for submission 1 - mix of linked and non-linked users with payment status
   await prisma.submissionAuthor.createMany({
     data: [
       {
@@ -776,6 +778,7 @@ async function main() {
         submissionId: submission1.id,
         isCorresponding: true,
         userId: johnUser.id, // Linked to existing user
+        hasPaid: true, // Corresponding author has paid
       },
       {
         firstName: "Alice",
@@ -786,6 +789,7 @@ async function main() {
         submissionId: submission1.id,
         isCorresponding: false,
         userId: aliceUser.id, // Linked to existing user
+        hasPaid: false, // Co-author hasn't paid yet
       },
       {
         firstName: "Michael",
@@ -796,6 +800,7 @@ async function main() {
         submissionId: submission1.id,
         isCorresponding: false,
         userId: null, // Not linked to any user
+        hasPaid: true, // Non-user co-author has paid
       },
     ],
   });
@@ -836,6 +841,7 @@ async function main() {
         submissionId: submission2.id,
         isCorresponding: true,
         userId: janeUser.id,
+        hasPaid: true, // All authors have paid
       },
       {
         firstName: "David",
@@ -846,6 +852,7 @@ async function main() {
         submissionId: submission2.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: true, // All authors have paid
       },
     ],
   });
@@ -886,6 +893,7 @@ async function main() {
         submissionId: submission3.id,
         isCorresponding: true,
         userId: aliceUser.id,
+        hasPaid: false,
       },
       {
         firstName: "Dr. Sarah",
@@ -896,6 +904,7 @@ async function main() {
         submissionId: submission3.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: false,
       },
       {
         firstName: "Robert",
@@ -906,6 +915,7 @@ async function main() {
         submissionId: submission3.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: false,
       },
     ],
   });
@@ -946,6 +956,7 @@ async function main() {
         submissionId: submission4.id,
         isCorresponding: true,
         userId: testUser.id,
+        hasPaid: false,
       },
       {
         firstName: "Emma",
@@ -956,6 +967,7 @@ async function main() {
         submissionId: submission4.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: false,
       },
     ],
   });
@@ -996,6 +1008,7 @@ async function main() {
         submissionId: submission5.id,
         isCorresponding: true,
         userId: charlieUser.id,
+        hasPaid: false,
       },
       {
         firstName: "Dr. Lisa",
@@ -1006,6 +1019,7 @@ async function main() {
         submissionId: submission5.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: false,
       },
       {
         firstName: "Professor Alex",
@@ -1016,6 +1030,7 @@ async function main() {
         submissionId: submission5.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: false,
       },
     ],
   });
@@ -1057,6 +1072,7 @@ async function main() {
         submissionId: submission6.id,
         isCorresponding: true,
         userId: bobUser.id,
+        hasPaid: false, // No one has paid yet
       },
       {
         firstName: "Jane",
@@ -1067,6 +1083,7 @@ async function main() {
         submissionId: submission6.id,
         isCorresponding: false,
         userId: janeUser.id, // Co-author who is also a user
+        hasPaid: false, // No one has paid yet
       },
       {
         firstName: "Dr. Maria",
@@ -1077,6 +1094,7 @@ async function main() {
         submissionId: submission6.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: false, // No one has paid yet
       },
       {
         firstName: "Prof. James",
@@ -1087,11 +1105,76 @@ async function main() {
         submissionId: submission6.id,
         isCorresponding: false,
         userId: null,
+        hasPaid: false, // No one has paid yet
       },
     ],
   });
 
-  console.log(`✅ Created 6 submissions with multiple authors`);
+  // Add another ACCEPTED submission for ICAI2024 with all authors unpaid
+  const submission7 = await prisma.submission.create({
+    data: {
+      title: "Explainable AI for Medical Diagnosis: A Comprehensive Framework",
+      abstract:
+        "This paper presents a novel framework for explainable artificial intelligence in medical diagnosis. Our approach provides transparent and interpretable AI models that can assist healthcare professionals while maintaining clinical accuracy and meeting regulatory requirements.",
+      keywords: [
+        "explainable AI",
+        "medical diagnosis",
+        "interpretability",
+        "healthcare AI",
+        "regulatory compliance",
+      ],
+      paperFilePath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
+      paperFileName: "explainable_ai_medical.pdf",
+      cameraReadyFilepath:
+        "https://8tyye4fbpp.ufs.sh/f/iDM0dapMasUCCkIXI3gvCVHGoUlfBRNXmsn7WK1ErOSuT9IP",
+      cameraReadyFilename: "explainable_ai_medical_camera_ready.pdf",
+      primaryArea: "AI Ethics",
+      secondaryArea: "Explainable AI",
+      submittedById: testUser.id,
+      conferenceId: conference1.id,
+    },
+  });
+
+  await prisma.submissionAuthor.createMany({
+    data: [
+      {
+        firstName: "Test",
+        lastName: "User",
+        email: "test@conflow.com",
+        affiliation: "Test Organization",
+        country: "us",
+        submissionId: submission7.id,
+        isCorresponding: true,
+        userId: testUser.id,
+        hasPaid: false, // Unpaid corresponding author
+      },
+      {
+        firstName: "Dr. Elena",
+        lastName: "Rossi",
+        email: "e.rossi@medicalai.it",
+        affiliation: "Medical AI Research Center",
+        country: "it",
+        submissionId: submission7.id,
+        isCorresponding: false,
+        userId: null,
+        hasPaid: false, // Unpaid co-author
+      },
+      {
+        firstName: "Prof. Ahmed",
+        lastName: "Al-Rashid",
+        email: "a.alrashid@tech.ae",
+        affiliation: "UAE Institute of Technology",
+        country: "ae",
+        submissionId: submission7.id,
+        isCorresponding: false,
+        userId: null,
+        hasPaid: false, // Unpaid co-author
+      },
+    ],
+  });
+
+  console.log(`✅ Created 7 submissions with multiple authors`);
 
   // Create review assignments
   console.log("📋 Creating review assignments...");
@@ -1465,6 +1548,63 @@ async function main() {
 
   console.log(`✅ Created ${decisions.length} decisions`);
 
+  // Create ACCEPTED decisions for payment tracking
+  console.log(
+    "📋 Creating additional ACCEPT decisions for payment tracking..."
+  );
+
+  // Create decision assignment for submission7 (ICAI2024)
+  let submission7DecisionAssignment;
+  if (johnMainChairRole) {
+    submission7DecisionAssignment = await prisma.decisionAssignment.create({
+      data: {
+        submissionId: submission7.id,
+        dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago (completed)
+        chairRoleId: johnMainChairRole.id,
+        assignedByRoleId: johnMainChairRole.id,
+      },
+    });
+  }
+
+  // Create ACCEPT decisions for payment tracking
+  const acceptDecisions: {
+    submissionId: string;
+    assignmentId: string;
+    reviewDecision: DecStatus;
+  }[] = [];
+
+  // Find existing decision assignments that we want to mark as ACCEPT
+  const submission1DecisionAssignment = createdDecisionAssignments.find(
+    (assignment) => assignment.submissionId === submission1.id
+  );
+
+  if (submission1DecisionAssignment) {
+    acceptDecisions.push({
+      submissionId: submission1.id,
+      assignmentId: submission1DecisionAssignment.id,
+      reviewDecision: "ACCEPT",
+    });
+  }
+
+  if (submission7DecisionAssignment) {
+    acceptDecisions.push({
+      submissionId: submission7.id,
+      assignmentId: submission7DecisionAssignment.id,
+      reviewDecision: "ACCEPT",
+    });
+  }
+
+  // Create the ACCEPT decisions
+  for (const decision of acceptDecisions) {
+    await prisma.decision.create({
+      data: decision,
+    });
+  }
+
+  console.log(
+    `✅ Created ${acceptDecisions.length} additional ACCEPT decisions for payment tracking`
+  );
+
   // Create notifications (existing + conference-related)
   console.log("🔔 Creating notifications...");
 
@@ -1637,6 +1777,53 @@ async function main() {
     },
   ];
 
+  // Add payment-related notifications
+  const paymentNotifications = [
+    {
+      userId: johnUser.id,
+      title: "Payment Required - ICAI2024",
+      message: `Your paper "Deep Learning Approaches for Natural Language Understanding" has been accepted for ICAI2024. Please complete your registration payment to secure your spot.`,
+      isRead: false,
+      isArchived: false,
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    },
+    {
+      userId: aliceUser.id,
+      title: "Co-Author Payment Reminder",
+      message: `As a co-author on the accepted paper "Deep Learning Approaches for Natural Language Understanding" for ICAI2024, please complete your registration payment.`,
+      isRead: false,
+      isArchived: false,
+      createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+    },
+    {
+      userId: bobUser.id,
+      title: "Conference Registration Payment Due",
+      message: `Your paper "Privacy-Preserving Machine Learning in Healthcare" has been accepted for CDPS2024. Registration payment is now due for all authors.`,
+      isRead: false,
+      isArchived: false,
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+    },
+    {
+      userId: testUser.id,
+      title: "Payment Deadline Approaching",
+      message: `Reminder: Payment for your accepted paper "Explainable AI for Medical Diagnosis" at ICAI2024 is due within 7 days.`,
+      isRead: true,
+      isArchived: false,
+      createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+    },
+    {
+      userId: janeUser.id,
+      title: "Payment Status Update Required",
+      message: `As Main Chair of CDPS2024, please update payment statuses for accepted authors using the payment tracking dashboard.`,
+      isRead: false,
+      isArchived: false,
+      createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+    },
+  ];
+
+  // Add payment notifications to existing notifications array
+  notifications.push(...paymentNotifications);
+
   // Create all notifications
   for (const notification of notifications) {
     await prisma.notification.create({
@@ -1654,6 +1841,18 @@ async function main() {
   const conferenceCount = await prisma.conference.count();
   const submissionCount = await prisma.submission.count();
   const authorCount = await prisma.submissionAuthor.count();
+  const paidAuthorsCount = await prisma.submissionAuthor.count({
+    where: { hasPaid: true },
+  });
+  const unpaidAuthorsCount = await prisma.submissionAuthor.count({
+    where: { hasPaid: false },
+  });
+  const acceptedSubmissionsCount = await prisma.decision.count({
+    where: { reviewDecision: "ACCEPT" },
+  });
+  const cameraReadyConferencesCount = await prisma.conference.count({
+    where: { status: ConferenceStatus.CAMERA_READY_PHASE },
+  });
   const roleEntriesCount = await prisma.conferenceRoleEntries.count();
   const reviewAssignmentCount = await prisma.reviewAssignment.count();
   const reviewCount = await prisma.review.count();
@@ -1694,12 +1893,16 @@ async function main() {
 
   console.log(`👤 Total Users: ${userCount}`);
   console.log(`🏛️ Total Conferences: ${conferenceCount}`);
+  console.log(`  📹 Camera Ready Phase: ${cameraReadyConferencesCount}`);
   console.log(`  ✅ Approved: ${approvedConferences}`);
   console.log(`  ⏳ Pending: ${pendingConferences}`);
   console.log(`  ❌ Rejected: ${rejectedConferences}`);
   console.log(`  🏁 Completed: ${completedConferences}`);
   console.log(`📝 Total Submissions: ${submissionCount}`);
+  console.log(`  ✅ Accepted: ${acceptedSubmissionsCount}`);
   console.log(`👥 Total Authors: ${authorCount}`);
+  console.log(`  💰 Paid Authors: ${paidAuthorsCount}`);
+  console.log(`  💳 Unpaid Authors: ${unpaidAuthorsCount}`);
   console.log(`📋 Review Assignments: ${reviewAssignmentCount}`);
   console.log(`📝 Reviews: ${reviewCount}`);
   console.log(`⚖️ Decision Assignments: ${decisionAssignmentCount}`);
@@ -1773,7 +1976,45 @@ async function main() {
   console.log("✅ Role-based access control");
   console.log("✅ Flexible role assignment/removal");
 
-  console.log("\n🌱 Database seeding completed successfully!");
+  console.log("\n💰 Payment Tracking Features:");
+  console.log("==============================");
+  console.log(
+    "✅ ICAI2024 - Camera ready deadline passed, payment tracking enabled"
+  );
+  console.log(
+    "✅ CDPS2024 - Camera ready deadline passed, payment tracking enabled"
+  );
+  console.log(
+    "📊 Mixed payment status across accepted submissions for testing"
+  );
+  console.log(
+    "🔍 Payment status can be toggled by chairs in conference dashboard"
+  );
+  console.log("📥 CSV export functionality for payment reports");
+
+  console.log("\n📋 Payment Status Examples:");
+  console.log("============================");
+  console.log("📝 Submission 1 (ICAI2024): 2/3 authors paid");
+  console.log("📝 Submission 2 (CDPS2024): 2/2 authors paid");
+  console.log("📝 Submission 6 (CDPS2024): 0/4 authors paid");
+  console.log("📝 Submission 7 (ICAI2024): 0/3 authors paid");
+
+  console.log("\n🎯 For Testing Payment Features:");
+  console.log("=================================");
+  console.log(`🔍 ${userEmail} (John) as Main Chair of ICAI2024 can:`);
+  console.log(
+    "   - View payment tracking section (camera ready deadline passed)"
+  );
+  console.log("   - Toggle payment status for all accepted submission authors");
+  console.log("   - Download CSV reports of payment status");
+  console.log("   - See mixed payment statuses for comprehensive testing");
+  console.log(`🔍 jane@example.com (Jane) as Main Chair of CDPS2024 can:`);
+  console.log("   - Access payment tracking for accepted submissions");
+  console.log("   - Manage payment status for multiple author submissions");
+
+  console.log(
+    "\n🌱 Database seeding completed successfully with payment tracking!"
+  );
   if (argc < 3) {
     console.warn(
       "⚠️  Not enough email parameters provided. Used default emails for remaining users."
