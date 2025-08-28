@@ -14,25 +14,11 @@ import { trpc } from "@/server/client";
 import { RotateCcw } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-
-interface CooldownData {
-  endTime: number;
-  multiplier: number;
-  count: number;
-}
-
-const getCooldownData = (email: string) => {
-  if (typeof window === "undefined") return null;
-  const key = `email_cooldown_${email}`;
-  const data = sessionStorage.getItem(key);
-  return data ? JSON.parse(data) : null;
-};
-
-const setCooldownData = (email: string, data: CooldownData) => {
-  if (typeof window === "undefined") return;
-  const key = `email_cooldown_${email}`;
-  sessionStorage.setItem(key, JSON.stringify(data));
-};
+import {
+  getCooldownData,
+  setCooldownData,
+  COOLDOWN_CONFIG,
+} from "@/lib/email-cooldown";
 
 function Page() {
   const [sent, setSent] = useState(false);
@@ -42,7 +28,7 @@ function Page() {
   const [cooldownMultiplier, setCooldownMultiplier] = useState(1);
   const [resendCount, setResendCount] = useState(0);
   useEffect(() => {
-    const savedData = getCooldownData(email);
+    const savedData = getCooldownData(email, "password-reset");
     if (savedData) {
       const { endTime, multiplier, count } = savedData;
       const now = Date.now();
@@ -64,16 +50,17 @@ function Page() {
       onSuccess: () => {
         setSent(true);
         setError("");
-        const baseTime = 60;
+        const baseTime = COOLDOWN_CONFIG.baseTime;
         const newCooldownTime = baseTime * cooldownMultiplier;
         const endTime = Date.now() + newCooldownTime * 1000;
         setCooldownTime(newCooldownTime);
-        const newMultiplier = cooldownMultiplier * 5;
+        const newMultiplier =
+          cooldownMultiplier * COOLDOWN_CONFIG.multipliers["password-reset"];
         const newCount = resendCount + 1;
 
         setCooldownMultiplier(newMultiplier);
         setResendCount(newCount);
-        setCooldownData(email, {
+        setCooldownData(email, "password-reset", {
           endTime,
           multiplier: newMultiplier,
           count: newCount,
