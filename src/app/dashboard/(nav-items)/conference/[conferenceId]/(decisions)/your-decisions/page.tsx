@@ -20,6 +20,7 @@ import {
   ExternalLink,
   FileText,
   GitBranch,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -84,11 +85,24 @@ export default function YourDecisionsPage() {
     <div className="main-content-height bg-gradient-to-br from-background via-muted/20 to-muted/40 p-6">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <GitBranch className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-              Your Decisions
-            </h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <GitBranch className="w-8 h-8 text-primary" />
+              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+                Your Decisions
+              </h1>
+            </div>
+            <Link
+              href={`/dashboard/conference/${conferenceId}/chair-dashboard`}
+            >
+              <Button
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary/10"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Chair Dashboard
+              </Button>
+            </Link>
           </div>
         </div>
         <Card className="py-1 w-full border-2 border-border/60 hover:border-border transition-colors duration-300 shadow-sm">

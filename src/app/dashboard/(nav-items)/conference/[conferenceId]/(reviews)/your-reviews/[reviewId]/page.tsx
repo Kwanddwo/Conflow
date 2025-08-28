@@ -99,7 +99,7 @@ export default function ConflowReview() {
             <span className="text-muted-foreground">
               {review.submission.id}
             </span>{" "}
-            of CONF2024
+            of {review.submission.conference.acronym}
           </h1>
           <Button
             asChild

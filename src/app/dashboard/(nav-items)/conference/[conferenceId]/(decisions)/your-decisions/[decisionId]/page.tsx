@@ -112,16 +112,29 @@ export default function ConflowReview() {
             <span className="text-muted-foreground">
               {decision.submission.id}
             </span>{" "}
-            of CONF2024
+            of {decision.submission.conference.acronym}
           </h1>
-          <Button
-            asChild
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <Link href={`/dashboard/conference/${conferenceId}`}>
-              Go to Conference
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary/10"
+            >
+              <Link
+                href={`/dashboard/conference/${conferenceId}/chair-dashboard`}
+              >
+                Chair Dashboard
+              </Link>
+            </Button>
+            <Button
+              asChild
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Link href={`/dashboard/conference/${conferenceId}`}>
+                Go to Conference
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-8">

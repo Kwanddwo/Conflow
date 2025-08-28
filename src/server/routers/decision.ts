@@ -644,6 +644,7 @@ export const decisionRouter = router({
               conference: {
                 select: {
                   id: true,
+                  acronym: true,
                   submissionDeadline: true,
                 },
               },

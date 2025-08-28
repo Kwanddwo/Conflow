@@ -564,6 +564,12 @@ export const reviewRouter = router({
               secondaryArea: true,
               createdAt: true,
               updatedAt: true,
+              conference: {
+                select: {
+                  id: true,
+                  acronym: true,
+                },
+              },
               submissionAuthors: {
                 select: {
                   id: true,
