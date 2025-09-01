@@ -4,8 +4,10 @@ import updateCameraReady from "@/server/scripts/updateCameraReadyAssignments";
 
 export async function POST(request: NextRequest) {
   // Verify the request is from Vercel Cron
+  console.log("starting cron job: update-camera-ready...");
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.error("Unauthorized: could not find header");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
