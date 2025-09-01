@@ -1,9 +1,10 @@
 import { sendNotification } from "@/lib/notification";
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
-async function runTask() {
+export default async function updateCameraReady() {
+  // Use end of day UTC to be more forgiving with timezone differences
   const today = new Date();
+  today.setUTCHours(23, 59, 59, 999); // End of day UTC
 
   // Add check to prevent running multiple times on same data
   const acceptDecisions = await prisma.decision.findMany({
@@ -70,7 +71,7 @@ async function runTask() {
     .map((dec) => ({
       user: dec.assignment.chairReviewer!.user,
       title: "New Camera-Ready Assignment",
-      message: `You have been assigned camera-ready review for the paper "${dec.submission.title}" (${dec.submission.id}) in ${dec.submission.conference.title} (${dec.submission.conference.acronym})`,
+      message: `You have been automatically assigned a camera-ready review for the paper "${dec.submission.title}" (${dec.submission.id}) in ${dec.submission.conference.title} (${dec.submission.conference.acronym})`,
       decisionId: dec.id,
     }));
 
@@ -94,10 +95,3 @@ async function runTask() {
     `Successfully processed ${acceptDecisions.length} decisions and sent ${notifications.length} notifications`
   );
 }
-
-runTask()
-  .catch((error) => {
-    console.error("Script failed:", error);
-    process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());

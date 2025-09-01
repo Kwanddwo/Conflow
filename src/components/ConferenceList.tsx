@@ -11,16 +11,7 @@ import {
 } from "./ui/table";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { getName } from "country-list";
-import {
-  Hash,
-  FileText,
-  Activity,
-  Globe,
-  MapPin,
-  ExternalLink,
-  Calendar,
-} from "lucide-react";
+import { Hash, FileText, Activity, ExternalLink, Calendar } from "lucide-react";
 
 const getStatusBadge = (status: string) => {
   const statusConfig = {

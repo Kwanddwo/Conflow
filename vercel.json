@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron-jobs/update-camera-ready",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}
