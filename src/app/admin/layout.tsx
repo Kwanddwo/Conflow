@@ -27,6 +27,12 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           >
             Inbox
           </Link>
+          <Link
+            href="/admin/settings"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            Settings
+          </Link>
         </nav>
         <div className="flex gap-4">
           <Button

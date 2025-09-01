@@ -1,10 +1,11 @@
 import z from "zod";
-import { procedure, router } from "../trpc";
+import { adminProcedure, procedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { hashPassword } from "@/lib/hash";
+import { hashPassword, verifyPassword } from "@/lib/hash";
 import jwt from "jsonwebtoken";
 import { sendPasswordMail, sendVerificationMail } from "@/lib/mail";
 import { sendNotification } from "@/lib/notification";
+import { passwordValidation } from "@/lib/validations/password";
 
 const EMAIL_TOKEN_SECRET = process.env.EMAIL_TOKEN_SECRET!;
 
@@ -176,6 +177,52 @@ export const authRouter = router({
       );
 
       await sendPasswordMail(input.email, token, input.from);
+      return { success: true };
+    }),
+
+  changePassword: adminProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1, "Current password is required"),
+        newPassword: passwordValidation,
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { currentPassword, newPassword } = input;
+
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: ctx.session.user.id },
+        select: {
+          id: true,
+          password: true,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const isCurrentPasswordValid = await verifyPassword(
+        currentPassword,
+        user.password
+      );
+      if (!isCurrentPasswordValid) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Current password is incorrect",
+        });
+      }
+
+      const hashedNewPassword = await hashPassword(newPassword);
+
+      await ctx.prisma.user.update({
+        where: { id: ctx.session.user.id },
+        data: { password: hashedNewPassword },
+      });
+
       return { success: true };
     }),
 });
