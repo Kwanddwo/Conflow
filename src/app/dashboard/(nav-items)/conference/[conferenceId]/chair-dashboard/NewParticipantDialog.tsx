@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, X, Send } from "lucide-react";
+import { Search, Plus, X, Send, AlertCircle } from "lucide-react";
 import { trpc } from "@/server/client";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
@@ -36,14 +36,20 @@ type UserRole = "author" | "reviewer" | "chair";
 
 export default function NewParticipant() {
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+  const [searchedEmail, setSearchedEmail] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<ChosenUser | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const { conferenceId } = useParams<{ conferenceId: string }>();
-  const { data } = trpc.user.getParticipantUsers.useQuery({
-    conferenceId,
-  });
   const { data: session } = useSession();
+
+  // Only run query if searchedEmail is set
+  const { data, isLoading, error } = trpc.user.getParticipantUsers.useQuery(
+    { conferenceId, email: searchedEmail },
+    {
+      enabled: !!searchedEmail && !!conferenceId,
+    }
+  );
 
   const conference = data?.conference;
   const users = data?.users;
@@ -60,19 +66,14 @@ export default function NewParticipant() {
     },
   });
 
-  const filteredUsers = users?.filter((user) => {
-    const isCurrentUser = user.id !== session?.user.id;
-    const matchesSearch =
-      user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return isCurrentUser && matchesSearch;
-  });
+  const handleEmailSearch = () => {
+    setSearchedEmail(emailInput.trim());
+    setSelectedUser(null);
+    setSelectedRole(null);
+  };
 
   const handleUserSelect = (user: ChosenUser) => {
     setSelectedUser(user);
-    setSearchQuery("");
   };
 
   const handleRemoveUser = () => {
@@ -95,6 +96,8 @@ export default function NewParticipant() {
 
         setSelectedUser(null);
         setSelectedRole(null);
+        setEmailInput("");
+        setSearchedEmail("");
         setOpen(false);
       } catch (error) {
         console.error("Failed to send invitation:", error);
@@ -113,8 +116,24 @@ export default function NewParticipant() {
     }
   };
 
+  const handleRetrySearch = () => {
+    if (emailInput.trim()) {
+      setSearchedEmail(emailInput.trim());
+    }
+  };
+
+  const handleDialogClose = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      setEmailInput("");
+      setSearchedEmail("");
+      setSelectedUser(null);
+      setSelectedRole(null);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogTrigger asChild>
         <Button variant="outline" className="justify-start">
           <Plus className="mr-2 h-4 w-4" />
@@ -125,90 +144,127 @@ export default function NewParticipant() {
         <DialogHeader>
           <DialogTitle>Add Participant</DialogTitle>
           <DialogDescription>
-            Search for a user and assign them a role in this conference.
+            Enter an email to search for a user and assign them a role in this
+            conference.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* User Selection */}
+          {/* Email Search */}
           <div className="space-y-2">
-            <Label>Select User</Label>
-            {selectedUser ? (
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-sm bg-muted text-muted-foreground">
-                      {selectedUser.firstName[0]}
-                      {selectedUser.lastName[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium text-foreground text-sm">
-                      {selectedUser.firstName} {selectedUser.lastName}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {selectedUser.email}
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleRemoveUser}
-                  className="h-6 w-6 p-0 hover:bg-destructive/10"
-                >
-                  <X className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Type a username, full name, or email"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                    autoFocus
-                  />
-                </div>
+            <Label>Enter Email</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Type user email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                autoFocus
+              />
+              <Button
+                onClick={handleEmailSearch}
+                disabled={!emailInput.trim()}
+                variant="secondary"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </Button>
+            </div>
+          </div>
 
-                <div className="max-h-40 overflow-y-auto border border-border rounded-md bg-background">
-                  <div className="p-1">
-                    {filteredUsers?.map((user) => (
-                      <div
-                        key={user.id}
-                        onClick={() => handleUserSelect(user)}
-                        className="flex items-center gap-3 p-2 rounded-md hover:bg-accent cursor-pointer transition-colors"
-                      >
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-muted text-muted-foreground">
-                            {user.firstName[0]}
-                            {user.lastName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-foreground text-sm">
-                            {user.firstName} {user.lastName}
-                          </div>
-                          <div className="text-xs text-muted-foreground truncate">
-                            {user.email}
-                          </div>
+          {/* Loading State */}
+          {isLoading && searchedEmail && (
+            <div className="p-4 text-center text-muted-foreground text-sm">
+              Searching...
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && searchedEmail && !isLoading && (
+            <div className="p-4 text-center space-y-2">
+              <div className="flex items-center justify-center gap-2 text-destructive text-sm">
+                <AlertCircle className="h-4 w-4" />
+                <span>Search failed</span>
+              </div>
+              <p className="text-xs text-muted-foreground">{error.message}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRetrySearch}
+                className="mt-2"
+              >
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {/* User Selection */}
+          {users && users.length > 0 && !selectedUser && !error && (
+            <div className="max-h-40 overflow-y-auto border border-border rounded-md bg-background">
+              <div className="p-1">
+                {users
+                  .filter((user) => user.id !== session?.user.id)
+                  .map((user) => (
+                    <div
+                      key={user.id}
+                      onClick={() => handleUserSelect(user)}
+                      className="flex items-center gap-3 p-2 rounded-md hover:bg-accent cursor-pointer transition-colors"
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-muted text-muted-foreground">
+                          {user.firstName[0]}
+                          {user.lastName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-foreground text-sm">
+                          {user.firstName} {user.lastName}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {user.email}
                         </div>
                       </div>
-                    ))}
-                    {filteredUsers?.length === 0 && (
-                      <div className="p-4 text-center text-muted-foreground text-sm">
-                        {searchQuery
-                          ? "No users found"
-                          : "Start typing to search users"}
-                      </div>
-                    )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* No Results */}
+          {searchedEmail && users?.length === 0 && !isLoading && !error && (
+            <div className="p-4 text-center text-muted-foreground text-sm">
+              No user found with that email.
+            </div>
+          )}
+
+          {/* Selected User */}
+          {selectedUser && (
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="text-sm bg-muted text-muted-foreground">
+                    {selectedUser.firstName[0]}
+                    {selectedUser.lastName[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-medium text-foreground text-sm">
+                    {selectedUser.firstName} {selectedUser.lastName}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {selectedUser.email}
                   </div>
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRemoveUser}
+                className="h-6 w-6 p-0 hover:bg-destructive/10"
+              >
+                <X className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          )}
 
           {/* Role Selection */}
           <div className="space-y-2">
