@@ -60,14 +60,7 @@ export default function ConferenceDashboard() {
     (role) => role.role === "MAIN_CHAIR" && role.user.id === session?.user.id
   );
   useEffect(() => {
-    if (submissions && invitees) {
-      const authorParticipants = submissions.flatMap((submission) =>
-        submission.submissionAuthors.map((author) => ({
-          ...author,
-          role: "AUTHOR",
-        }))
-      );
-
+    if (invitees) {
       const inviteeParticipants: Participant[] = invitees.map((entry) => ({
         id: entry.user.id,
         firstName: entry.user.firstName,
@@ -77,17 +70,11 @@ export default function ConferenceDashboard() {
         affiliation: entry.user.affiliation,
         role: entry.role,
       }));
-      const mergedParticipants: Participant[] = [
-        ...authorParticipants,
-        ...inviteeParticipants.filter(
-          (invitee) =>
-            !authorParticipants.some((author) => author.email === invitee.email)
-        ),
-      ];
 
-      setAllParticipants(mergedParticipants);
+
+      setAllParticipants(inviteeParticipants);
     }
-  }, [submissions, invitees]);
+  }, [invitees]);
 
   if (isLoading || !submissions || isLoadingInvitees) {
     return <LoadingSpinner />;
