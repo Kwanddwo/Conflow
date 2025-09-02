@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import SubmissionAssignment from "@/components/SubmissionAssignment";
 import { useSession } from "next-auth/react";
 import { FileCheck } from "lucide-react";
-import { SubmissionOverview } from "@/components/SubmissionOverview";
+import { SimpleSubmissionsList } from "@/components/SimpleSubmissionsList";
 import PaymentTracking from "@/components/PaymentTracking";
 interface Participant {
   role: string;
@@ -247,22 +247,7 @@ export default function ConferenceDashboard() {
         />
 
         {/* Submissions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-foreground">
-              Submissions
-            </CardTitle>
-          </CardHeader>
-          {submissions.map((submission, index) => (
-            <CardContent key={index}>
-              <SubmissionOverview
-                isTitle={true}
-                submission={submission}
-                authorsTitle={null}
-              />
-            </CardContent>
-          ))}
-        </Card>
+        <SimpleSubmissionsList submissions={submissions} />
       </main>
     </div>
   );
