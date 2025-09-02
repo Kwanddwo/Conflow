@@ -276,7 +276,7 @@ export default function AuthorForm() {
                       </Button>
                     )}
 
-                    {isLinked && (
+                    {isLinked && !isCurrent && (
                       <Button
                         type="button"
                         variant="outline"
@@ -323,7 +323,7 @@ export default function AuthorForm() {
                   </div>
                 )}
 
-                {isLinked && (
+                {isLinked && !isCurrent && (
                   <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
                     <div className="flex items-center gap-2">
                       <UserCheck className="w-4 h-4" />
@@ -340,6 +340,18 @@ export default function AuthorForm() {
                       >
                         Unlink to edit
                       </Button>
+                    </div>
+                  </div>
+                )}
+
+                {isLinked && isCurrent && (
+                  <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm text-green-800">
+                    <div className="flex items-center gap-2">
+                      <UserCheck className="w-4 h-4" />
+                      <span>
+                        This is your account. You cannot unlink yourself from
+                        your own submission.
+                      </span>
                     </div>
                   </div>
                 )}
@@ -432,14 +444,9 @@ export default function AuthorForm() {
                     type="checkbox"
                     {...register(`authors.${index}.isCorresponding`)}
                     className="h-4 w-4"
-                    disabled={isCurrent && index === 0} // Can't change for first author if it's current user
+                    disabled={false} // Allow all users to change corresponding status
                   />
                   <Label className="cursor-pointer">Corresponding Author</Label>
-                  {isCurrent && index === 0 && (
-                    <span className="text-xs text-muted-foreground ml-2">
-                      (You are the default corresponding author)
-                    </span>
-                  )}
                 </div>
               </div>
             );

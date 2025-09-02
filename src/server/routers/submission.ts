@@ -231,6 +231,22 @@ export const submissionRouter = router({
         });
       }
 
+      // If the current user is the submitter,
+      // they must remain linked as an author
+      if (isSubmitter) {
+        const submitterStillLinked = authors.some(
+          (author) => author.userId === ctx.session.user.id
+        );
+
+        if (!submitterStillLinked) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "The submitting author cannot remove themselves from the submission",
+          });
+        }
+      }
+
       try {
         // Use transaction to ensure data consistency
         await ctx.prisma.$transaction(async (prisma) => {

@@ -98,9 +98,9 @@ export default function UserChooser({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Assign to someone</DialogTitle>
+          <DialogTitle>Add an author</DialogTitle>
           <DialogDescription>
-            Enter an email to search for a user to assign this to.
+            Enter an email to search for a user to add as an author
           </DialogDescription>
         </DialogHeader>
 
