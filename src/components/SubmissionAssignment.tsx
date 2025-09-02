@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -17,10 +17,12 @@ import {
   TableRow,
 } from "./ui/table";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import { trpc } from "@/server/client";
 import { toast } from "sonner";
 import { NewReviewAssignmentForm } from "./NewReviewAssignmentForm";
 import { NewDecisionAssignmentForm } from "./NewDecisionAssignment";
+import { useRouter } from "next/navigation";
 
 interface Submission {
   id: string;
@@ -53,6 +55,8 @@ function SubmissionAssignment({
   availableSubmissions,
 }: SubmissionAssignmentProps) {
   const [assignments, setAssignments] = React.useState<Assignment[]>([]);
+  const router = useRouter();
+
   const { data: reviewAssignmentsData, refetch: refetchReviewAssignments } =
     trpc.review.getReviewAssignments.useQuery({
       conferenceId: conferenceId || "",
@@ -277,9 +281,26 @@ function SubmissionAssignment({
                             )
                           </span>
                           {submission.isReviewed && (
-                            <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/80">
-                              {isReviewAssignment ? "Reviewed" : "Made"}
-                            </Badge>
+                            <>
+                              <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/80">
+                                {isReviewAssignment ? "Reviewed" : "Made"}
+                              </Badge>
+                              {isReviewAssignment && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => {
+                                    router.push(
+                                      `/dashboard/conference/${conferenceId}/reviews/${submission.assignmentId}`
+                                    );
+                                  }}
+                                  title="View Review Details"
+                                >
+                                  <Eye className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </>
                           )}
                           <X
                             className="h-4 w-4 text-destructive cursor-pointer hover:text-destructive/80"

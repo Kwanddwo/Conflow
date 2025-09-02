@@ -355,6 +355,97 @@ export const reviewRouter = router({
         createdAt: assignment.createdAt,
       };
     }),
+  // Chair endpoint to get review assignment details (for viewing completed reviews)
+  getReviewAssignmentForChair: chairProcedure
+    .input(
+      z.object({
+        conferenceId: z.string(),
+        assignmentId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { assignmentId, conferenceId } = input;
+      const assignment = await ctx.prisma.reviewAssignment.findUnique({
+        where: { id: assignmentId },
+        include: {
+          submission: {
+            select: {
+              id: true,
+              title: true,
+              abstract: true,
+              primaryArea: true,
+              secondaryArea: true,
+              keywords: true,
+              paperFilePath: true,
+              paperFileName: true,
+              cameraReadyFilepath: true,
+              cameraReadyFilename: true,
+              conferenceId: true,
+              submissionAuthors: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  affiliation: true,
+                  country: true,
+                },
+              },
+            },
+          },
+          reviewer: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          assignedBy: {
+            select: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!assignment) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Review assignment not found",
+        });
+      }
+
+      // Verify the assignment belongs to this conference
+      if (assignment.submission.conferenceId !== conferenceId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Assignment does not belong to this conference",
+        });
+      }
+
+      return {
+        id: assignment.id,
+        submission: assignment.submission,
+        reviewer: {
+          id: assignment.reviewer.user.id,
+          name: `${assignment.reviewer.user.firstName} ${assignment.reviewer.user.lastName}`,
+          email: assignment.reviewer.user.email,
+        },
+        assignedBy: {
+          name: `${assignment.assignedBy.user.firstName} ${assignment.assignedBy.user.lastName}`,
+        },
+        dueDate: assignment.dueDate,
+        createdAt: assignment.createdAt,
+      };
+    }),
   updateReviewAssignmentDueDate: chairProcedure
     .input(
       z.object({
