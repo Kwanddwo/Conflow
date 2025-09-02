@@ -114,14 +114,9 @@ export function SimpleSubmissionsList({
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1">
-                    <Badge variant="outline" className="text-xs w-fit">
-                      {submission.primaryArea}
-                    </Badge>
-                    {submission.secondaryArea && (
-                      <Badge variant="secondary" className="text-xs w-fit">
-                        {submission.secondaryArea}
-                      </Badge>
-                    )}
+                    {submission.primaryArea}
+                    {submission.secondaryArea &&
+                      ` / ${submission.secondaryArea}`}
                   </div>
                 </TableCell>
                 <TableCell>
