@@ -13,13 +13,6 @@ async function handleCronRequest(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Optional secondary check: Vercel cron header (defense in depth)
-  const cronHeader = request.headers.get("x-vercel-cron");
-  if (cronHeader !== "1") {
-    console.error("Unauthorized: missing Vercel cron header");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     await updateCameraReady();
 
