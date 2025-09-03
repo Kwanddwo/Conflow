@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import updateCameraReady from "@/server/scripts/updateCameraReadyAssignments";
 
-export async function POST(request: NextRequest) {
+async function handleCronRequest(request: NextRequest) {
   // Verify the request is from Vercel Cron
   console.log("starting cron job: update-camera-ready...");
 
@@ -31,4 +31,13 @@ export async function POST(request: NextRequest) {
     console.error("Cron job failed:", error);
     return NextResponse.json({ error: "Cron job failed" }, { status: 500 });
   }
+}
+
+// Handle both GET (for Vercel cron) and POST requests
+export async function GET(request: NextRequest) {
+  return handleCronRequest(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handleCronRequest(request);
 }
