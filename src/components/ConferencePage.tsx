@@ -68,15 +68,9 @@ export default function ConferencePage() {
       (role) => role.userId === session?.user.id
     );
   const isReviewer = conference?.conferenceRoles?.some(
-  (role) =>
-    role.role === "REVIEWER" &&
-    role.user.id === session?.user.id
-);
+    (role) => role.role === "REVIEWER" && role.user.id === session?.user.id
+  );
 
-  // Debug logging for session and main chair comparison
-  console.log("Session user:", session?.user);
-  console.log("Conference roles:", conference?.conferenceRoles);
-  console.log("Is main chair?", editable);
 
   // State for editable fields
   const [editableData, setEditableData] = useState<{
@@ -86,7 +80,6 @@ export default function ConferencePage() {
     callForPapers: string;
     startDate: string;
     endDate: string;
-    abstractDeadline: string;
     submissionDeadline: string;
     cameraReadyDeadline: string;
     locationVenue: string;
@@ -108,9 +101,6 @@ export default function ConferencePage() {
         callForPapers: conference.callForPapers,
         startDate: new Date(conference.startDate).toISOString().split("T")[0],
         endDate: new Date(conference.endDate).toISOString().split("T")[0],
-        abstractDeadline: new Date(conference.abstractDeadline)
-          .toISOString()
-          .split("T")[0],
         submissionDeadline: new Date(conference.submissionDeadline)
           .toISOString()
           .split("T")[0],
@@ -168,7 +158,6 @@ export default function ConferencePage() {
         callForPapers: editableData.callForPapers,
         startDate: new Date(editableData.startDate),
         endDate: new Date(editableData.endDate),
-        abstractDeadline: new Date(editableData.abstractDeadline),
         submissionDeadline: new Date(editableData.submissionDeadline),
         cameraReadyDeadline: new Date(editableData.cameraReadyDeadline),
         locationVenue: editableData.locationVenue,
@@ -606,17 +595,6 @@ export default function ConferencePage() {
               {editable && isEditing ? (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="abstractDeadline">Abstract Deadline</Label>
-                    <Input
-                      id="abstractDeadline"
-                      type="date"
-                      value={editableData?.abstractDeadline || ""}
-                      onChange={(e) =>
-                        handleInputChange("abstractDeadline", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
                     <Label htmlFor="submissionDeadline">
                       Submission Deadline
                     </Label>
@@ -645,16 +623,6 @@ export default function ConferencePage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="flex justify-between items-start">
-                    <span className="text-sm font-medium">
-                      Abstract Deadline
-                    </span>
-                    <span className="text-sm text-muted-foreground text-right">
-                      {formatDate(conference.abstractDeadline)}
-                    </span>
-                  </div>
-                  <Separator />
-
                   <div className="flex justify-between items-start">
                     <span className="text-sm font-medium">
                       Submission Deadline

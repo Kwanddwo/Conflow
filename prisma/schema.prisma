@@ -63,7 +63,6 @@ model Conference {
   websiteUrl          String?
   startDate           DateTime
   endDate             DateTime
-  abstractDeadline    DateTime
   submissionDeadline  DateTime
   cameraReadyDeadline DateTime
   createdAt           DateTime         @default(now())
@@ -86,7 +85,7 @@ model Conference {
 // }
 
 model Submission {
-  id                  String           @id @default(cuid())
+  id                  String     @id @default(cuid())
   title               String
   abstract            String
   keywords            Json
@@ -97,20 +96,20 @@ model Submission {
   primaryArea         String
   secondaryArea       String
   // status              SubmissionStatus @default(DRAFT)
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
   conferenceId        String
-  conference          Conference       @relation(fields: [conferenceId], references: [id])
+  conference          Conference @relation(fields: [conferenceId], references: [id])
   submittedById       String
-  submittedBy         User             @relation(fields: [submittedById], references: [id])
+  submittedBy         User       @relation(fields: [submittedById], references: [id])
 
-  submissionAuthors   SubmissionAuthor[]
-  reviewAssignments   ReviewAssignment[]
+  submissionAuthors SubmissionAuthor[]
+  reviewAssignments ReviewAssignment[]
 
   reviews Review[]
 
-  decisionAssignment  DecisionAssignment? @relation("DecisionAssignmentSubmission")
-  decision            Decision?           @relation("DecisionSubmission")
+  decisionAssignment DecisionAssignment? @relation("DecisionAssignmentSubmission")
+  decision           Decision?           @relation("DecisionSubmission")
 }
 
 model SubmissionAuthor {
@@ -212,25 +211,27 @@ model DecisionAssignment {
 
   decision Decision? @relation("AssignmentDecision")
 
+  @@unique([submissionId]) // Ensure one decision per submission
   @@index([submissionId])
   @@index([chairRoleId])
   @@index([assignedByRoleId])
-  @@unique([submissionId]) // Ensure one decision per submission
 }
+
 enum DecStatus {
   ACCEPT
   MAJOR_REVISION
   MINOR_REVISION
   REJECT
 }
+
 model Decision {
-  id                String    @id @default(cuid())
-  submissionId      String    @unique
-  createdAt         DateTime  @default(now())
-  assignmentId      String    @unique 
-  reviewDecision    DecStatus
-  submission        Submission         @relation("DecisionSubmission", fields: [submissionId], references: [id])
-  assignment        DecisionAssignment  @relation("AssignmentDecision", fields: [assignmentId], references: [id], onDelete: Cascade)
+  id             String             @id @default(cuid())
+  submissionId   String             @unique
+  createdAt      DateTime           @default(now())
+  assignmentId   String             @unique
+  reviewDecision DecStatus
+  submission     Submission         @relation("DecisionSubmission", fields: [submissionId], references: [id])
+  assignment     DecisionAssignment @relation("AssignmentDecision", fields: [assignmentId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
 }

@@ -27,7 +27,6 @@ const conferenceSchema = z.object({
   websiteUrl: z.string().url().optional().or(z.literal("")),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
-  abstractDeadline: z.string().min(1, "Abstract deadline is required"),
   submissionDeadline: z.string().min(1, "Submission deadline is required"),
   cameraReadyDeadline: z.string().min(1, "Camera ready deadline is required"),
   isPublic: z.boolean(),
@@ -71,13 +70,12 @@ export default function ConferenceForm() {
 
   const onSubmit = async (data: ConferenceFormData) => {
     try {
-      console.log("Submitting data:", data); // Debug log
+
       // Convert string dates to Date objects
       const formattedData = {
         ...data,
         startDate: new Date(data.startDate),
         endDate: new Date(data.endDate),
-        abstractDeadline: new Date(data.abstractDeadline),
         submissionDeadline: new Date(data.submissionDeadline),
         cameraReadyDeadline: new Date(data.cameraReadyDeadline),
       };
@@ -186,7 +184,7 @@ export default function ConferenceForm() {
           </div>
 
           <div className="space-y-2">
-             <Controller
+            <Controller
               control={control}
               name="locationCountry"
               render={({ field }) => (
@@ -266,25 +264,6 @@ export default function ConferenceForm() {
             )}
             <p className="text-sm text-muted-foreground">
               Enter The conference&apos;s end date
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <div className="relative">
-              <Input
-                {...register("abstractDeadline")}
-                type="date"
-                placeholder="Abstract deadline"
-                className="border-border text-foreground placeholder:text-muted-foreground"
-              />
-            </div>
-            {errors.abstractDeadline && (
-              <p className="text-sm text-destructive">
-                {errors.abstractDeadline.message}
-              </p>
-            )}
-            <p className="text-sm text-muted-foreground">
-              Enter The CFP Abstraction registration deadline
             </p>
           </div>
 
@@ -403,7 +382,6 @@ export default function ConferenceForm() {
                 <br/>
                 <h2>Important Dates</h2>
                 <ul>
-                  <li>Abstract Submission Deadline: [Month DD, YYYY]</li>
                   <li>Full Paper Submission Deadline: [Month DD, YYYY]</li>
                   <li>Notification of Acceptance: [Month DD, YYYY]</li>
                   <li>Camera-ready Submission: [Month DD, YYYY]</li>
@@ -465,5 +443,3 @@ export default function ConferenceForm() {
     </div>
   );
 }
-
-

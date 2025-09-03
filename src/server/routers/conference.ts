@@ -76,7 +76,6 @@ export const conferenceRouter = router({
           websiteUrl: true,
           startDate: true,
           endDate: true,
-          abstractDeadline: true,
           submissionDeadline: true,
           cameraReadyDeadline: true,
           status: true,
@@ -246,9 +245,6 @@ export const conferenceRouter = router({
         endDate: z
           .union([z.date(), z.string()])
           .transform((val) => (typeof val === "string" ? new Date(val) : val)),
-        abstractDeadline: z
-          .union([z.date(), z.string()])
-          .transform((val) => (typeof val === "string" ? new Date(val) : val)),
         submissionDeadline: z
           .union([z.date(), z.string()])
           .transform((val) => (typeof val === "string" ? new Date(val) : val)),
@@ -264,16 +260,15 @@ export const conferenceRouter = router({
 
       if (
         !(
-          input.startDate < input.abstractDeadline &&
-          input.abstractDeadline < input.submissionDeadline &&
           input.submissionDeadline < input.cameraReadyDeadline &&
-          input.cameraReadyDeadline < input.endDate
+          input.cameraReadyDeadline < input.startDate &&
+          input.startDate < input.endDate
         )
       ) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message:
-            "Dates are not in the correct order: startDate, abstractDeadline, submissionDeadline, cameraReadyDeadline must be in ascending order.",
+            "Dates are not in the correct order: submissionDeadline, cameraReadyDeadline, startDate, endDate must be in ascending order.",
         });
       }
 
@@ -334,7 +329,6 @@ export const conferenceRouter = router({
           websiteUrl: true,
           startDate: true,
           endDate: true,
-          abstractDeadline: true,
           submissionDeadline: true,
           cameraReadyDeadline: true,
           status: true,
@@ -374,9 +368,6 @@ export const conferenceRouter = router({
         endDate: z
           .union([z.date(), z.string()])
           .transform((val) => (typeof val === "string" ? new Date(val) : val)),
-        abstractDeadline: z
-          .union([z.date(), z.string()])
-          .transform((val) => (typeof val === "string" ? new Date(val) : val)),
         submissionDeadline: z
           .union([z.date(), z.string()])
           .transform((val) => (typeof val === "string" ? new Date(val) : val)),
@@ -390,10 +381,14 @@ export const conferenceRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { id, ...updateData } = input;
 
-      // Check if user is the main chair or admin using the role system
-      const conference = await ctx.prisma.conference.findUnique({
+      // First, get the existing conference data including dates and permissions
+      const existingConference = await ctx.prisma.conference.findUnique({
         where: { id },
         select: {
+          submissionDeadline: true,
+          cameraReadyDeadline: true,
+          startDate: true,
+          endDate: true,
           conferenceRoles: {
             where: { role: "MAIN_CHAIR" },
             select: { userId: true },
@@ -401,14 +396,42 @@ export const conferenceRouter = router({
         },
       });
 
-      if (!conference) {
+      if (!existingConference) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Conference not found",
         });
       }
 
-      const isMainChair = conference.conferenceRoles.some(
+      // Merge existing data with update data for validation
+      const finalData = {
+        submissionDeadline:
+          updateData.submissionDeadline ||
+          existingConference.submissionDeadline,
+        cameraReadyDeadline:
+          updateData.cameraReadyDeadline ||
+          existingConference.cameraReadyDeadline,
+        startDate: updateData.startDate || existingConference.startDate,
+        endDate: updateData.endDate || existingConference.endDate,
+      };
+
+      // Validate the final merged dates
+      if (
+        !(
+          finalData.submissionDeadline < finalData.cameraReadyDeadline &&
+          finalData.cameraReadyDeadline < finalData.startDate &&
+          finalData.startDate < finalData.endDate
+        )
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Dates are not in the correct order: submissionDeadline, cameraReadyDeadline, startDate, endDate must be in ascending order.",
+        });
+      }
+
+      // Check permissions
+      const isMainChair = existingConference.conferenceRoles.some(
         (role) => role.userId === ctx.session.user.id
       );
       const isAdmin = ctx.session.user.role === "ADMIN";
@@ -418,6 +441,11 @@ export const conferenceRouter = router({
           code: "FORBIDDEN",
           message: "You don't have permission to edit this conference",
         });
+      }
+
+      // Sanitize call for papers if it's being updated
+      if (updateData.callForPapers) {
+        updateData.callForPapers = DOMPurify.sanitize(updateData.callForPapers);
       }
 
       return ctx.prisma.conference.update({
@@ -664,12 +692,12 @@ export const conferenceRouter = router({
               firstName: true,
               lastName: true,
               email: true,
-              country : true,
+              country: true,
               affiliation: true,
-            }
+            },
           },
           role: true,
-        }
+        },
       });
 
       return invitees || [];
