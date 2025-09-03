@@ -5,9 +5,18 @@ import updateCameraReady from "@/server/scripts/updateCameraReadyAssignments";
 export async function POST(request: NextRequest) {
   // Verify the request is from Vercel Cron
   console.log("starting cron job: update-camera-ready...");
+
+  // Primary security: Check CRON_SECRET
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    console.error("Unauthorized: could not find header");
+    console.error("Unauthorized: invalid or missing CRON_SECRET");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Optional secondary check: Vercel cron header (defense in depth)
+  const cronHeader = request.headers.get("x-vercel-cron");
+  if (cronHeader !== "1") {
+    console.error("Unauthorized: missing Vercel cron header");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
